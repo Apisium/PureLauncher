@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-standard"
+  ],
+  "rules": {
+    "ordered-imports": false,
+    "no-var-requires": false,
+    "arrow-parens": false,
+    "no-console": [false],
+    "no-empty": false,
+    "object-literal-sort-keys": false,
+    "interface-name": false,
+    "forin": false,
+    "align": false,
+    "no-bitwise": false,
+    "jsx-no-multiline-js": false,
+    "jsx-boolean-value": false,
+    "jsx-no-lambda": false,
+    "jsx-alignment": false,
+    "no-conditional-assignment": false,
+    "max-classes-per-file": false,
+    "only-arrow-functions": false,
+    "no-sequences": false
+  }
+}

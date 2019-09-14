@@ -1,0 +1,145 @@
+@font-face{
+  font-family: 'minecraft';
+  src: url('assets/minecraft.otf');
+}
+
+#btn-border::after,#btn-border::before,#btn-pseudo-element,.btn .grow::after,.btn-danger::after,.btn-danger::before,.btn-disabled::after,.btn-disabled::before,.btn-hexagon::after,.btn-hexagon::before,.btn-info::after,.btn-info::before,.btn-primary::after,.btn-primary::before,.btn-secondary::after,.btn-secondary::before,.btn-warning::after,.btn-warning::before {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  content: '';
+  transition: .7s cubic-bezier(0,.8,.26,.99)
+}
+
+#btn-border::before,.btn-danger::before,.btn-disabled::before,.btn-hexagon::before,.btn-info::before,.btn-primary::before,.btn-secondary::before,.btn-warning::before {
+  box-shadow: 0 -4px rgba(0,0,0,.3) inset,0 4px rgba(255,255,255,.5) inset,-4px 0 rgba(255,255,255,.5) inset,4px 0 rgba(0,0,0,.3) inset;
+  z-index: -1
+}
+
+#btn-border::after,.btn-danger::after,.btn-disabled::after,.btn-hexagon::after,.btn-info::after,.btn-primary::after,.btn-secondary::after,.btn-warning::after {
+  box-shadow: 0 4px 0 0 rgba(0,0,0,.15)
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 0;
+  z-index: 1;
+  user-select: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: unset;
+  padding: .8rem 1.5rem;
+  text-decoration: none
+}
+
+.btn .grow::after {
+  box-shadow: 0 0 0 0 rgba(0,0,0,.15)
+}
+
+.btn:hover .grow::after {
+  box-shadow: 0 4px 0 0 rgba(0,0,0,.15)
+}
+
+.btn-xl {
+  padding: 1rem 2rem;
+  font-size: 2.25rem;
+  line-height: 1.5
+}
+
+.btn-lg {
+  padding: 1.35rem 3.1rem
+}
+
+.btn-danger,.btn-hexagon,.btn-primary,.btn-secondary {
+  text-shadow: 0 2px 0 rgba(0,0,0,.25);
+}
+
+.btn-primary .grow,.btn-primary::before {
+  background-color: #36b030;
+  box-shadow: 0 -4px rgba(21,108,0,.5) inset,0 4px rgba(100,253,31,.99) inset,-4px 0 rgba(100,253,31,.5) inset,4px 0 rgba(21,108,0,.5) inset;
+}
+
+.btn-primary:hover .grow,.btn-primary:hover::before {
+  background-color: #313131;
+  box-shadow: 0 -4px rgba(0,0,0,.5) inset,0 4px rgba(255,255,255,.2) inset,-4px 0 rgba(255,255,255,.2) inset,4px 0 rgba(0,0,0,.5) inset
+}
+
+.btn-primary {
+  color: #fff!important
+}
+
+.btn-secondary {
+  color: #fff!important
+}
+
+.btn-success {
+  color: #fff!important
+}
+
+.btn-info {
+  color: #1d1e1e!important
+}
+
+.btn-warning {
+  color: #1d1e1e!important
+}
+
+.btn-danger {
+  color: #fff!important
+}
+
+.btn-light {
+  color: #1d1e1e!important
+}
+
+.btn-dark {
+  color: #fff!important
+}
+
+.btn-tertiary {
+  color: #1d1e1e!important
+}
+
+.btn-quaternary {
+  color: #fff!important
+}
+
+.btn-quinary {
+  color: #fff!important
+}
+
+.btn-senary {
+  color: #fff!important
+}
+
+.btn-dungeons-primary {
+  color: #fff!important
+}
+
+.btn-dungeons-secondary {
+  color: #fff!important
+}
+
+.btn-secondary::before {
+  background-color: #757575
+}
+
+.btn-info::before {
+  background-color: #5caee0
+}
+
+.btn-warning::before {
+  background-color: #e6b40b
+}
+
+.btn-danger::before {
+  background-color: #d4441a
+}

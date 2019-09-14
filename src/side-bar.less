@@ -1,0 +1,117 @@
+.side-bar {
+  flex-shrink: 0;
+  display: flex;
+  user-select: none;
+  flex-direction: column;
+  align-items: center;
+  width: 180px;
+  height: 100%;
+  background-color: #e8c48e;
+  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+
+  .avatar {
+    margin-top: 50px;
+    border-radius: 10px;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+      0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+      transition: .4s ease-in-out;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+
+    &:hover {
+      filter: blur(1px) brightness(0.48);
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    &::after {
+      content: '';
+      top: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0px 0px 20px 0px #0000005e;
+    }
+  }
+
+  .name {
+    color: #000000e0;
+    font-size: 18px;
+    font-family: minecraft;
+    text-shadow: 2px 3px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .launch {
+    padding: 12px 36px;
+    font-size: 17px;
+  }
+
+  .version {
+    font-size: 11px;
+    color: rgba(29, 30, 30, 0.88);
+    margin-bottom: 0;
+    -webkit-app-region: no-drag;
+    cursor: pointer;
+
+    span { font-weight: bold }
+  }
+
+  .list {
+    margin-top: 0;
+    text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.15);
+    padding-left: 0;
+    width: 100%;
+    list-style-type: none;
+    -webkit-app-region: no-drag;
+
+    img {
+      width: 26px;
+      transition: ease-in-out .5s;
+      image-rendering: pixelated;
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    span {
+      color: #313131;
+      font-weight: 300;
+      font-size: 16px;
+      margin-left: 22px;
+      transition: ease-in-out .5s;
+    }
+
+    li {
+      transition: ease-in-out .5s;
+      line-height: 40px;
+      filter: brightness(0.7);
+      padding-left: 40px;
+    }
+
+    li.active { filter: brightness(1.3) }
+
+    li.active img {
+      width: 30px;
+    }
+
+    li.active span {
+      color: black;
+      font-size: 17px;
+      font-weight: 500;
+    }
+  }
+}

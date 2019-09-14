@@ -1,0 +1,55 @@
+{
+  "name": "launcher",
+  "private": false,
+  "version": "0.0.0",
+  "description": "An awesome Minecraft Launcher.",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html --target electron --public-url .",
+    "run": "electron .",
+    "build": "parcel build index.html --target electron --public-url .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Apisium/Launcher.git"
+  },
+  "keywords": [
+    "minecraft",
+    "launcher",
+    "electron",
+    "TypeScript",
+    "parcel",
+    "react",
+    "hooks"
+  ],
+  "author": "Shirasawa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Apisium/Launcher/issues"
+  },
+  "homepage": "https://github.com/Apisium/Launcher#readme",
+  "devDependencies": {
+    "@types/node": "^12.7.5",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-router-dom": "^4.3.5",
+    "electron": "^6.0.9",
+    "install": "^0.13.0",
+    "less": "^3.10.3",
+    "npm": "^6.11.3",
+    "parcel": "^1.12.3",
+    "rc-dialog": "^7.5.7",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-live-route": "^3.1.5",
+    "react-router-dom": "^5.0.1",
+    "react-slick": "^0.25.2",
+    "slick-carousel": "^1.8.1",
+    "tslint": "^5.20.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.6.3",
+    "use-react-router": "^1.0.7"
+  },
+  "browserslist": ["electron 6.0.9"]
+}
