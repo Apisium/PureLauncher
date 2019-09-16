@@ -12,7 +12,6 @@ const colors2 = ['9bbf56', '869f43', '7fad3a', '7ab53f', '7ab139', '7a993f', 'a5
 const colors3 = colors1.concat(colors2.slice(5))
 
 const blocks1 = document.getElementById('blocks1')
-
 const count = window.innerWidth / 20 | 0
 for (let i = 0; i < count; i++) {
   const elm = document.createElement('div')
@@ -23,7 +22,7 @@ for (let i = 0; i < count; i++) {
 const blocks2 = document.getElementById('blocks2')
 for (let i = 2; i < count; i++) {
   const elm = document.createElement('div')
-  elm.style.backgroundColor = colors1[Math.random() * colors3.length - 1 | 0]
+  elm.style.backgroundColor = colors3[Math.random() * colors3.length | 0]
   blocks2.appendChild(elm)
 }
 
@@ -34,23 +33,13 @@ for (let i = 16; i < count; i++) {
   blocks3.appendChild(elm)
 }
 
-setInterval(() => {
-  (blocks1.childNodes[Math.random() * blocks1.childElementCount | 0] as HTMLDivElement)
-    .style.backgroundColor = colors2[Math.random() * colors2.length | 0]
-  ;(blocks2.childNodes[Math.random() * blocks2.childElementCount | 0] as HTMLDivElement)
-    .style.backgroundColor = colors3[Math.random() * colors3.length | 0]
-  ;(blocks3.childNodes[Math.random() * blocks3.childElementCount | 0] as HTMLDivElement)
-    .style.backgroundColor = colors1[Math.random() * colors1.length | 0]
-}, 100)
-
+const content = document.getElementById('main-content')
+const main = document.getElementsByTagName('main')[0]
+const top = document.getElementById('top')
+const chicken = document.getElementById('chicken')
 const chickenSound = new Audio(require('./assets/sounds/chicken.ogg'))
 ReactDOM.render(<App />, document.getElementById('root'), () => {
   let full = true
-  const content = document.getElementById('main-content')
-  const main = document.getElementsByTagName('main')[0]
-  const top = document.getElementById('top')
-  const chicken = document.getElementById('chicken')
-  setInterval(() => (chicken.style.marginTop = 10 - (Math.random() * 20 | 0) + 'px'), 1000)
   chicken.onclick = () => {
     try { chickenSound.play().catch(() => {}) } catch (e) { }
     if (full) {
@@ -99,3 +88,24 @@ clickSound.oncanplay = () => document.addEventListener('click', e => {
 })
 
 document.getElementById('close').onclick = () => setTimeout(() => remote.app.quit(), 500)
+document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
+
+let timer1: NodeJS.Timeout
+let timer2: NodeJS.Timeout
+function startAnimation () {
+  chicken.style.opacity = '1'
+  timer1 = setInterval(() => {
+    (blocks1.childNodes[Math.random() * blocks1.childElementCount | 0] as HTMLDivElement)
+      .style.backgroundColor = colors2[Math.random() * colors2.length | 0]
+    ;(blocks2.childNodes[Math.random() * blocks2.childElementCount | 0] as HTMLDivElement)
+      .style.backgroundColor = colors3[Math.random() * colors3.length | 0]
+    ;(blocks3.childNodes[Math.random() * blocks3.childElementCount | 0] as HTMLDivElement)
+      .style.backgroundColor = colors1[Math.random() * colors1.length | 0]
+  }, 100)
+  timer2 = setInterval(() => (chicken.style.marginTop = 10 - (Math.random() * 20 | 0) + 'px'), 1000)
+}
+function stopAnimation () {
+  chicken.style.opacity = '2'
+  clearInterval(timer1)
+  clearInterval(timer2)
+}

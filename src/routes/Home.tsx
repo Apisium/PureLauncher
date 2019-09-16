@@ -9,15 +9,21 @@ const Home: React.FC = () => {
   useEffect(() => {
     fetch('https://www.mcbbs.net/forum.php')
       .then(it => it.text())
-      .then(it => setSlides(Array.from(new DOMParser()
-        .parseFromString(it, 'text/html')
-        .getElementsByClassName('slideshow')[0]
-        .children).map(({ childNodes: [a, span] }) => ({
-          text: (span as HTMLSpanElement).innerText,
-          url: 'http://www.mcbbs.net/' + (a as HTMLAnchorElement).getAttribute('href'),
-          img: (a.childNodes[0] as HTMLImageElement).getAttribute('src')
-        })))
-      )
+      .then(it => {
+        const arr = Array.from(new DOMParser()
+          .parseFromString(it, 'text/html')
+          .getElementsByClassName('slideshow')[0]
+          .children).map(({ childNodes: [a, span] }) => ({
+            text: (span as HTMLSpanElement).innerText,
+            url: 'http://www.mcbbs.net/' + (a as HTMLAnchorElement).getAttribute('href'),
+            img: (a.childNodes[0] as HTMLImageElement).getAttribute('src')
+          }))
+        Promise.all(arr.map(i => new Promise(resolve => {
+          const img = new Image()
+          img.onload = img.onerror = resolve
+          img.src = i.img
+        }))).then(() => setSlides(arr))
+      })
       .catch(console.error)
     fetch('https://authentication.x-speed.cc/mcbbsNews/')
       .then(it => it.json())
@@ -32,7 +38,7 @@ const Home: React.FC = () => {
             <img src={it.img} /><span>{it.text}</span></div>)}
         </Slider>
       </div>
-      <div className='news'>{news.map(it => <p key={it.link}>
+      <div className='news' style={{ opacity: news.length ? 1 : 0 }}>{news.map(it => <p key={it.link}>
         <span className='classify'>{it.classify}</span>
         <a onClick={() => shell.openExternal(it.link)}> {it.title} </a>
       </p>)}</div>

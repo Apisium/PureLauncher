@@ -123,6 +123,7 @@ img {
 }
 
 #chicken {
+  opacity: 0;
   top: -105px;
   position: absolute;
   animation: move-chicken 30s ease-in-out infinite;
@@ -151,7 +152,7 @@ img {
   100% { margin-left: -240px }
 }
 
-#close {
+#close, #hide {
   background-color: unset;
   border: none;
   position: fixed;
@@ -160,4 +161,8 @@ img {
   cursor: pointer;
   transition: .3s;
 }
-#close:hover { transform: scale(1.1) }
+#close:hover, #hide:hover { transform: scale(1.1) }
+#hide {
+  left: 62px;
+  margin-top: 1px;
+}

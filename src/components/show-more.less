@@ -1,0 +1,47 @@
+.show-more {
+  width: 100%;
+  position: relative;
+  margin-top: 10px;
+  padding-top: 50px;
+
+  .button {
+    top: 20px;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    transition: 1s;
+    animation: beat 1s infinite;
+  }
+
+  .content { overflow: hidden }
+
+  svg {
+    cursor: pointer;
+    user-select: none;
+    -webkit-app-region: no-drag;
+  }
+}
+
+
+@keyframes beat {
+  0% {
+    top: 0px;
+  }
+
+  30% {
+    top: 20px;
+  }
+
+  50% {
+    top: 16px;
+    // transform: scaleX(0.9);
+  }
+
+  70% {
+    top: 20px;
+  }
+
+  100% {
+    top: 0px;
+  }
+}

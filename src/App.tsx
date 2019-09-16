@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 import LRoute from 'react-live-route'
 import SideBar from './SideBar'
 import { HashRouter, Redirect, withRouter } from 'react-router-dom'
 
+import Provider from './models/index'
 import Home from './routes/Home'
 import Settings from './routes/Settings'
 
@@ -10,7 +11,7 @@ const Route = withRouter<any, any>(LRoute)
 
 const useRoute = (component: React.FC, path: string) => {
   const ref = useRef<{ routeDom: HTMLDivElement }>()
-  return <Route
+  return <Provider><Route
     alwaysLive
     wrappedComponentRef={ref}
     component={component}
@@ -29,7 +30,7 @@ const useRoute = (component: React.FC, path: string) => {
         style.opacity = '1'
       })
     }}
-  />
+  /></Provider>
 }
 
 const App: React.FC = () => {
