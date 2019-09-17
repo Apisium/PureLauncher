@@ -1,45 +1,9 @@
 import { Model } from 'use-model'
 import fs from 'fs-extra'
-
-/// minecraft root utils start ///
-
-import { remote } from 'electron'
 import { join } from 'path'
+import { getJavaVersion, getMinecraftRoot } from '../util'
+import { remote } from 'electron'
 import { platform } from 'os'
-
-function getMinecraftRoot () {
-  return join(remote.app.getPath('appData'), platform() === 'darwin' ? 'minecraft' : '.minecraft')
-}
-
-/// minecraft root utils end ///
-
-/// java utils start ///
-
-import { exec } from 'child_process'
-
-function getJavaVersion (path: string) {
-  const parseVersion = (str: string) => {
-    const match = /(\d+\.\d+\.\d+)(_(\d+))?/.exec(str)
-    if (match === null) return undefined
-    return match[1]
-  }
-  return new Promise<string>((resolve, reject) => {
-    exec(`${path} -version`, (_, stdout, serr) => {
-      if (!serr) {
-        resolve(undefined)
-      } else {
-        const version = parseVersion(serr)
-        if (version !== undefined) {
-          resolve(version)
-        } else {
-          resolve(undefined)
-        }
-      }
-    })
-  })
-}
-
-/// java utils end ///
 
 const LAUNCH_PROFILE = 'launch_profile.json'
 const EXTRA_CONFIG = 'any_profile.json'
@@ -102,13 +66,22 @@ export default class ProfilesModel extends Model {
     }
   }
 
-  public * setJavaPath (path: string) {
-    // TODO: Check java exists
-    const version = yield getJavaVersion(path)
-    if (version) {
-      this.extraJson.javaPath = path
-      yield* this.saveExtraConfigJson()
-    }
+  public * setJavaPath () {
+    yield remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+      title: '选择 Java',
+      message: '请选择启动 Minecraft 的 Java 8',
+      filters: [
+        { name: '可执行文件', extensions: platform() === 'win32' ? ['exe'] : [] }
+      ]
+    }, (files) => {
+      const version = getJavaVersion(files[0])
+      if (version) {
+        this.extraJson.javaPath = files[0]
+        this.saveExtraConfigJson()
+      } else {
+        // show some ui here to let user know
+      }
+    })
   }
 
   public * loadAllConfigs () {
