@@ -5,9 +5,12 @@
   "description": "An awesome Minecraft Launcher.",
   "main": "index.js",
   "scripts": {
+    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "lint:fix": "tslint --config tslint.json --project tsconfig.json --fix",
     "start": "parcel index.html --target electron --public-url .",
     "run": "electron .",
-    "build": "parcel build index.html --experimental-scope-hoisting --target electron --public-url .",
+    "watch": "parcel watch index.html --target electron --public-url .",
+    "build": "npm run lint && parcel build index.html --experimental-scope-hoisting --target electron --public-url .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
