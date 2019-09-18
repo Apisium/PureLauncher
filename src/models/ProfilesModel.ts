@@ -4,6 +4,7 @@ import { join } from 'path'
 import { getJavaVersion, getMinecraftRoot } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
+import merge from 'lodash.merge'
 
 const LAUNCH_PROFILE = 'launch_profile.json'
 const EXTRA_CONFIG = 'any_profile.json'
@@ -132,11 +133,11 @@ export default class ProfilesModel extends Model {
   }
 
   private loadLaunchProfileJson (json: any) {
-    this.selectedUser = json.selectedUser
-    this.authenticationDatabase = json.authenticationDatabase
-    this.clientToken = json.clientToken
-    this.settings = json.settings
-    this.profiles = json.profiles
+    this.selectedUser = merge(this.selectedUser, json)
+    this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
+    this.clientToken = merge(this.clientToken, json.clientToken)
+    this.settings = merge(this.settings, json.settings)
+    this.profiles = merge(this.profiles, json.profiles)
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {
