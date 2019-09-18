@@ -93,13 +93,16 @@ export default class ProfilesModel extends Model {
   }
 
   public * saveLaunchProfileJson () {
-    yield fs.writeJson(this.launchProfilePath, {
+    // not throw but return a null
+    const json = yield fs.readJson(this.launchProfilePath, { throws: false }) || {}
+
+    yield fs.writeJson(this.launchProfilePath, merge(json, {
       settings: this.selectedUser,
       selectedUser: this.selectedUser,
       profile: this.profiles,
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
-    })
+    }))
   }
 
   public * saveExtraConfigJson () {
