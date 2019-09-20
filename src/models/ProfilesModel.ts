@@ -136,13 +136,11 @@ export default class ProfilesModel extends Model {
   }
 
   private loadLaunchProfileJson (json: any) {
-    console.log(json)
     this.selectedUser = merge(this.selectedUser, json)
     this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
     this.clientToken = merge(this.clientToken, json.clientToken)
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
-    console.log(this)
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {
