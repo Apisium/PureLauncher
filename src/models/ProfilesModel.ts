@@ -6,7 +6,7 @@ import { remote } from 'electron'
 import { platform } from 'os'
 import merge from 'lodash.merge'
 
-const LAUNCH_PROFILE = 'launch_profile.json'
+const LAUNCH_PROFILE = 'launcher_profiles.json'
 const EXTRA_CONFIG = 'any_profile.json'
 
 interface Version {
@@ -136,11 +136,13 @@ export default class ProfilesModel extends Model {
   }
 
   private loadLaunchProfileJson (json: any) {
+    console.log(json)
     this.selectedUser = merge(this.selectedUser, json)
     this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
     this.clientToken = merge(this.clientToken, json.clientToken)
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
+    console.log(this)
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {
@@ -148,10 +150,12 @@ export default class ProfilesModel extends Model {
   }
 
   private onLoadLaunchProfileFailed (e: any) {
-
+    console.error(`Fail to load launcher profile`)
+    console.error(e)
   }
 
   private onLoadExtraConfigFailed (e: any) {
-
+    console.error(`Fail to load extra launcher profile`)
+    console.error(e)
   }
 }
