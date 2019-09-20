@@ -46,6 +46,7 @@
     "react-pose": "^4.0.8",
     "react-router-dom": "^5.0.1",
     "react-slick": "^0.25.2",
+    "skinview3d": "^1.2.0-alpha.1",
     "slick-carousel": "^1.8.1",
     "tslint": "^5.20.0",
     "tslint-config-standard": "^8.0.1",

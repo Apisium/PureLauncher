@@ -6,6 +6,7 @@ import { HashRouter, Redirect, withRouter } from 'react-router-dom'
 import Provider from './models/index'
 import Home from './routes/Home'
 import Settings from './routes/Settings'
+import Manager from './routes/Manager'
 
 const Route = withRouter<any, any>(LRoute)
 
@@ -35,13 +36,14 @@ const useRoute = (component: React.FC, path: string) => {
 
 const App: React.FC = () => {
   const home = useRoute(Home, '/home')
+  const manager = useRoute(Manager, '/manager')
   const settings = useRoute(Settings, '/settings')
   return (
     <HashRouter>
       <SideBar />
       <section id='main-content' className='main-content'>
-        {home}{settings}
-        <Redirect to='/settings' />
+        {home}{settings}{manager}
+        <Redirect to='/manager' />
       </section>
     </HashRouter>
   )

@@ -1,0 +1,31 @@
+.dropdown {
+  z-index: 10;
+  overflow: hidden;
+  position: fixed;
+  list-style-type: none;
+  -webkit-app-region: no-drag;
+  filter: drop-shadow(0 4px 11px #00000057);
+
+  .cover {
+    border-radius: 3px;
+    flex-shrink: 0;
+    padding: 10px;
+    position: relative;
+    background-color: #edd1a6;
+
+    &:after {
+      position: absolute;
+      content: '';
+      width: 14px;
+      height: 14px;
+      bottom: -8px;
+      left: 50%;
+      margin-left: -7px;
+      overflow: hidden;
+      pointer-events: none;
+      transform: rotate(45deg);
+      bottom: -7px;
+      background: #edd1a6;
+    }
+  }
+}

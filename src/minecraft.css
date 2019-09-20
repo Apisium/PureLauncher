@@ -3,7 +3,7 @@
   src: url('assets/minecraft.otf');
 }
 
-#btn-border::after,#btn-border::before,#btn-pseudo-element,.btn .grow::after,.btn-danger::after,.btn-danger::before,.btn-disabled::after,.btn-disabled::before,.btn-hexagon::after,.btn-hexagon::before,.btn-info::after,.btn-info::before,.btn-primary::after,.btn-primary::before,.btn-secondary::after,.btn-secondary::before,.btn-warning::after,.btn-warning::before {
+#btn-border::after,#btn-border::before,#btn-pseudo-element,.btn .grow::after,.btn-danger::after,.btn-danger::before,.btn:disabled::after,.btn:disabled::before,.btn-hexagon::after,.btn-hexagon::before,.btn-info::after,.btn-info::before,.btn-primary::after,.btn-primary::before,.btn-secondary::after,.btn-secondary::before,.btn-warning::after,.btn-warning::before {
   position: absolute;
   pointer-events: none;
   top: 0;
@@ -15,12 +15,12 @@
   transition: .7s cubic-bezier(0,.8,.26,.99)
 }
 
-#btn-border::before,.btn-danger::before,.btn-disabled::before,.btn-hexagon::before,.btn-info::before,.btn-primary::before,.btn-secondary::before,.btn-warning::before {
+#btn-border::before,.btn-danger::before,.btn:disabled::before,.btn-hexagon::before,.btn-info::before,.btn-primary::before,.btn-secondary::before,.btn-warning::before {
   box-shadow: 0 -4px rgba(0,0,0,.3) inset,0 4px rgba(255,255,255,.5) inset,-4px 0 rgba(255,255,255,.5) inset,4px 0 rgba(0,0,0,.3) inset;
   z-index: -1
 }
 
-#btn-border::after,.btn-danger::after,.btn-disabled::after,.btn-hexagon::after,.btn-info::after,.btn-primary::after,.btn-secondary::after,.btn-warning::after {
+#btn-border::after,.btn-danger::after,.btn:disabled::after,.btn-hexagon::after,.btn-info::after,.btn-primary::after,.btn-secondary::after,.btn-warning::after {
   box-shadow: 0 4px 0 0 rgba(0,0,0,.15)
 }
 
@@ -142,4 +142,32 @@
 
 .btn-danger::before {
   background-color: #d4441a
+}
+
+.btn:disabled {
+  cursor: no-drop;
+  text-shadow: 0 2px 0 rgba(0,0,0,.1);
+  color: #1d1e1e!important;
+}
+
+.btn:disabled::before {
+  background-color: inherit;
+}
+
+input, select {
+  outline: none;
+  border: 2px solid #a0a0a0;
+  padding: 6px;
+  font-size: 15px;
+  background: #f8e8bf;
+}
+option, select {
+  font-size: 14px;
+  cursor: pointer;
+}
+select {
+  /* -webkit-appearance: none; */
+}
+option .small {
+  font-size: 14px;
 }

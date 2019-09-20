@@ -114,4 +114,36 @@
       font-weight: 500;
     }
   }
+
+  .dropdown {
+    top: 200px;
+    left: 200px;
+    display: flex;
+    align-items: center;
+    height: calc(100% - 300px);
+
+    .cover {
+      margin-left: 20px;
+    }
+    .cover:after {
+      left: 0;
+      bottom: 50%;
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+    li {
+      display: block;
+      background-color: #edd1a6;
+    }
+    a {
+      padding: 4px 12px;
+      color: #000000e0;
+      font-size: 15px;
+      display: block;
+      text-decoration: none;
+    }
+  }
 }
