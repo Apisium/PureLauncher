@@ -5,9 +5,12 @@
   "description": "An awesome Minecraft Launcher.",
   "main": "index.js",
   "scripts": {
+    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "lint:fix": "tslint --config tslint.json --project tsconfig.json --fix",
     "start": "parcel index.html --target electron --public-url .",
     "run": "electron .",
-    "build": "parcel build index.html --experimental-scope-hoisting --target electron --public-url .",
+    "watch": "parcel watch index.html --target electron --public-url .",
+    "build": "npm run lint && parcel build index.html --experimental-scope-hoisting --target electron --public-url .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +26,11 @@
     "react",
     "hooks"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "author": "Shirasawa",
   "license": "MIT",
   "bugs": {
@@ -31,12 +39,14 @@
   "homepage": "https://github.com/Apisium/Launcher#readme",
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
+    "@types/lodash.merge": "^4.6.6",
     "@types/node": "^12.7.5",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
     "@types/react-router-dom": "^4.3.5",
     "electron": "^6.0.9",
     "fs-extra": "^8.1.0",
+    "husky": "^3.0.5",
     "less": "^3.10.3",
     "parcel": "^1.12.3",
     "rc-dialog": "^7.5.7",
@@ -56,5 +66,8 @@
   },
   "browserslist": [
     "electron 6.0.9"
-  ]
+  ],
+  "dependencies": {
+    "lodash.merge": "^4.6.2"
+  }
 }

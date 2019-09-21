@@ -83,7 +83,9 @@ const clickSound = new Audio(require('./assets/sounds/click.ogg'))
 clickSound.oncanplay = () => document.addEventListener('click', e => {
   const t = e.target as HTMLElement
   if (t.tagName === 'BUTTON' || t.tagName === 'A' || t.dataset.sound) {
-    clickSound.play()
+    clickSound.play().catch(() => {
+      // TODO: error handling
+    })
   }
 })
 

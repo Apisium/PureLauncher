@@ -14,7 +14,7 @@ const Settings: React.FC = () => {
         <input
           placeholder='<自动>'
           value={pm.extraJson.javaPath}
-          onClick={e => pm.setJavaPath((e.target as HTMLInputElement).value)}
+          onClick={e => pm.setJavaPath()}
           readOnly
         />
       </div>

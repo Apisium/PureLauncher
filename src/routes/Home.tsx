@@ -18,7 +18,7 @@ const Home: React.FC = () => {
             url: 'http://www.mcbbs.net/' + (a as HTMLAnchorElement).getAttribute('href'),
             img: (a.childNodes[0] as HTMLImageElement).getAttribute('src')
           }))
-        Promise.all(arr.map(i => new Promise(resolve => {
+        return Promise.all(arr.map(i => new Promise(resolve => {
           const img = new Image()
           img.onload = img.onerror = resolve
           img.src = i.img
