@@ -41,6 +41,8 @@ export default class ProfilesModel extends Model {
     javaPath: '',
     bmclAPI: true,
     memory: 0,
+    animation: true,
+    sandbox: true,
     selectedUser: '',
     offlineAuthenticationDatabase: [] as string[],
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
@@ -133,6 +135,16 @@ export default class ProfilesModel extends Model {
   public * toggleShowLog () {
     this.settings.showGameLog = !this.settings.showGameLog
     yield* this.saveLaunchProfileJson()
+  }
+
+  public * toggleAnimation () {
+    this.extraJson.animation = this.extraJson.animation
+    yield* this.saveExtraConfigJson()
+  }
+
+  public * toggleSandbox () {
+    this.extraJson.sandbox = this.extraJson.sandbox
+    yield* this.saveExtraConfigJson()
   }
 
   private loadLaunchProfileJson (json: any) {

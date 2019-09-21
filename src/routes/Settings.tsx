@@ -14,7 +14,7 @@ const Settings: React.FC = () => {
         <input
           placeholder='<自动>'
           value={pm.extraJson.javaPath}
-          onClick={e => pm.setJavaPath()}
+          onClick={pm.setJavaPath}
           readOnly
         />
       </div>
@@ -28,11 +28,11 @@ const Settings: React.FC = () => {
       </div>
       <div className='group'>
         <label>JVM 参数</label>
-        <input value={pm.extraJson.javaArgs} onChange={e => pm.setArgs(e.target.value)}></input>
+        <input value={pm.extraJson.javaArgs} onChange={e => pm.setArgs(e.target.value)}/>
       </div>
       <div className='group' style={{ paddingTop: 18 }}>
-        <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.showGameLog} onChange={pm.toggleShowLog} />
-        <label>显示游戏日志</label>
+        <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.animation} onChange={pm.toggleAnimation} />
+        <label>开启启动器动画</label>
       </div>
       <div className='group' style={{ paddingTop: 18 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.soundOn} onChange={pm.toggleSound} />
@@ -41,6 +41,14 @@ const Settings: React.FC = () => {
       <div className='group' style={{ paddingTop: 18 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.bmclAPI} onChange={pm.toggleBmclAPI} />
         <label>使用 BMCLAPI 加速下载</label>
+      </div>
+      <div className='group' style={{ paddingTop: 18 }}>
+        <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.showGameLog} onChange={pm.toggleShowLog} />
+        <label>显示游戏日志</label>
+      </div>
+      <div className='group' style={{ paddingTop: 18 }}>
+        <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.sandbox} onChange={pm.toggleSandbox} />
+        <label>使用沙箱运行游戏</label>
       </div>
     </form>
     <ShowMore>

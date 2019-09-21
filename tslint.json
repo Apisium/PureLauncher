@@ -1,6 +1,7 @@
 {
   "extends": [
     "tslint:recommended",
+    "tslint-react",
     "tslint-config-standard"
   ],
   "rules": {
@@ -21,6 +22,7 @@
     "no-conditional-assignment": false,
     "max-classes-per-file": false,
     "only-arrow-functions": false,
-    "no-sequences": false
+    "no-sequences": false,
+    "jsx-wrap-multiline": false
   }
 }

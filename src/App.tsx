@@ -36,14 +36,14 @@ const useRoute = (component: React.FC, path: string) => {
 
 const App: React.FC = () => {
   const home = useRoute(Home, '/home')
-  const manager = useRoute(Manager, '/manager')
+  const manager = useRoute(Manager, '/manager/:type')
   const settings = useRoute(Settings, '/settings')
   return (
     <HashRouter>
       <SideBar />
       <section id='main-content' className='main-content'>
         {home}{settings}{manager}
-        <Redirect to='/manager' />
+        <Redirect to='/manager/versions' />
       </section>
     </HashRouter>
   )
