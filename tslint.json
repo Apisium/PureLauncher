@@ -23,6 +23,9 @@
     "max-classes-per-file": false,
     "only-arrow-functions": false,
     "no-sequences": false,
-    "jsx-wrap-multiline": false
+    "jsx-wrap-multiline": false,
+    "no-var-keyword": false,
+    "no-floating-promises": false,
+    "await-promise": false
   }
 }

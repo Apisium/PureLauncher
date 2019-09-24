@@ -159,7 +159,11 @@ input, select {
   border: 2px solid #a0a0a0;
   padding: 6px;
   font-size: 15px;
-  background: #f8e8bf;
+  background: var(--input-color);
+  color: var(--text-color-0);
+}
+input::-webkit-input-placeholder {
+  color: var(--text-color-2);
 }
 option, select {
   font-size: 14px;

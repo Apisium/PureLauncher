@@ -38,7 +38,7 @@ const Home: React.FC = () => {
             <img src={it.img} /><span>{it.text}</span></div>)}
         </Slider>
       </div>
-      <div className='news' style={{ opacity: news.length ? 1 : 0 }}>{news.map(it => <p key={it.link}>
+      <div className='news' style={{ opacity: news.length ? null : 0 }}>{news.map(it => <p key={it.link}>
         <span className='classify'>{it.classify}</span>
         <a onClick={() => shell.openExternal(it.link)}> {it.title} </a>
       </p>)}</div>

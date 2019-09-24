@@ -1,0 +1,36 @@
+:root {
+  --top-color: #6ead3c;
+  --top-border: #fff483c7;
+  --top-shadow: rgba(255, 255, 255, 0.62);
+
+  --main-color: #e8c48e;
+  --secondary-color: var(--main-color);
+  --dropdown-color: #edd1a6;
+
+  --text-color-0: #000000e0;
+  --text-color-1: rgba(29, 30, 30, 0.88);
+  --text-color-2: #00000080;
+
+  --input-color: #f8e8bf;
+
+  --background: url(https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/startpage-hero/index-hero-sm.png);
+}
+
+:root {
+  /* --top-color: url(./assets/images/bg-wool-dark-light.png); */
+  /* --top-border: #fff483c7;
+  --top-shadow: rgba(255, 255, 255, 0.22); */
+  --top-filter: brightness(0.5);
+
+  --main-color: url(./assets/images/bg-wool-dark-light.png);
+  --secondary-color: var(--main-color);
+  --dropdown-color: var(--main-color);
+
+  --text-color-0: #ffffffe0;
+  --text-color-1: rgba(255, 255, 255, 0.88);
+  --text-color-2: #ffffff80;
+
+  --input-color: #444;
+
+  --background: url(./assets/images/bg-wool-dark.png);;
+}

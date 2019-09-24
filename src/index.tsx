@@ -1,5 +1,6 @@
 import './minecraft.css'
 import './index.css'
+import './i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
@@ -10,6 +11,9 @@ const colors1 = ['7e512f', '8c6a48', '8b6428', '885b3c', '754b2e', 'c38a58', '77
   '8b6428', '675d46', '645634', '6f6449'].map(i => '#' + i)
 const colors2 = ['9bbf56', '869f43', '7fad3a', '7ab53f', '7ab139', '7a993f', 'a5c95e', '87b43e'].map(i => '#' + i)
 const colors3 = colors1.concat(colors2.slice(5))
+// const colors1 = Array.from({ length: 20 }).map(() => `hsl(0, 0%, ${Math.random() * 20 | 0}%)`)
+// const colors2 = colors1
+// const colors3 = colors1
 
 const blocks1 = document.getElementById('blocks1')
 const count = window.innerWidth / 20 | 0
@@ -92,8 +96,8 @@ clickSound.oncanplay = () => document.addEventListener('click', e => {
 document.getElementById('close').onclick = () => setTimeout(() => remote.app.quit(), 500)
 document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
 
-let timer1: NodeJS.Timeout
-let timer2: NodeJS.Timeout
+var timer1: NodeJS.Timeout
+var timer2: NodeJS.Timeout
 function startAnimation () {
   chicken.style.opacity = '1'
   timer1 = setInterval(() => {

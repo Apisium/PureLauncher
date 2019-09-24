@@ -1,9 +1,9 @@
 import { Model } from 'use-model'
-import fs from 'fs-extra'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
+import fs from 'fs-extra'
 import merge from 'lodash.merge'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
@@ -80,7 +80,7 @@ export default class ProfilesModel extends Model {
       const version = getJavaVersion(files[0])
       if (version) {
         this.extraJson.javaPath = files[0]
-        this.saveExtraConfigJson()
+        return this.saveExtraConfigJson()
       } else {
         // show some ui here to let user know
       }
@@ -159,13 +159,25 @@ export default class ProfilesModel extends Model {
     this.extraJson = extra
   }
 
-  private onLoadLaunchProfileFailed (e: any) {
-    console.error(`Fail to load launcher profile`)
-    console.error(e)
+  private async onLoadLaunchProfileFailed (e: Error) {
+    if (e.message.includes('no such file or directory')) {
+      console.error('Fail to load launcher profile', e)
+    }
+    if (await fs.pathExists(this.launchProfilePath)) {
+      await fs.rename(this.launchProfilePath, `${this.launchProfilePath}.${Date.now()}.bak`)
+    }
+    await fs.mkdirs(dirname(this.launchProfilePath))
+    await this.saveExtraConfigJson()
   }
 
-  private onLoadExtraConfigFailed (e: any) {
-    console.error(`Fail to load extra launcher profile`)
-    console.error(e)
+  private async onLoadExtraConfigFailed (e: Error) {
+    if (!e.message.includes('no such file or directory')) {
+      console.error('Fail to load extra launcher profile', e)
+    }
+    if (await fs.pathExists(this.extraConfigPath)) {
+      await fs.rename(this.extraConfigPath, `${this.extraConfigPath}.${Date.now()}.bak`)
+    }
+    await fs.mkdirs(dirname(this.extraConfigPath))
+    await this.saveLaunchProfileJson()
   }
 }

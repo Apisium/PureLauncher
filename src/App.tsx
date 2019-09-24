@@ -12,7 +12,7 @@ const Route = withRouter<any, any>(LRoute)
 
 const useRoute = (component: React.FC, path: string) => {
   const ref = useRef<{ routeDom: HTMLDivElement }>()
-  return <Provider><Route
+  return <Route
     alwaysLive
     wrappedComponentRef={ref}
     component={component}
@@ -31,7 +31,7 @@ const useRoute = (component: React.FC, path: string) => {
         style.opacity = '1'
       })
     }}
-  /></Provider>
+  />
 }
 
 const App: React.FC = () => {
@@ -39,13 +39,15 @@ const App: React.FC = () => {
   const manager = useRoute(Manager, '/manager/:type')
   const settings = useRoute(Settings, '/settings')
   return (
-    <HashRouter>
-      <SideBar />
-      <section id='main-content' className='main-content'>
-        {home}{settings}{manager}
-        <Redirect to='/manager/versions' />
-      </section>
-    </HashRouter>
+    <Provider>
+      <HashRouter>
+        <SideBar />
+        <section id='main-content' className='main-content'>
+          {home}{settings}{manager}
+          <Redirect to='/settings' />
+        </section>
+      </HashRouter>
+    </Provider>
   )
 }
 
