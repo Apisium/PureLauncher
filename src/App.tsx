@@ -42,7 +42,7 @@ const App: React.FC = () => {
     <Provider>
       <HashRouter>
         <SideBar />
-        <section id='main-content' className='main-content'>
+        <section id='main-content'>
           {home}{settings}{manager}
           <Redirect to='/settings' />
         </section>

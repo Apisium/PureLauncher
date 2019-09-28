@@ -20,18 +20,6 @@ export const pages = [
   {
     name: '模组',
     path: '/manager/mods'
-  },
-  {
-    name: '地图',
-    path: '/manager/levels'
-  },
-  {
-    name: '材质',
-    path: '/manager/resources'
-  },
-  {
-    name: '截图',
-    path: '/manager/screenshots'
   }
 ]
 

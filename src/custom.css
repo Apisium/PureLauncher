@@ -21,6 +21,7 @@
   /* --top-border: #fff483c7;
   --top-shadow: rgba(255, 255, 255, 0.22); */
   --top-filter: brightness(0.5);
+  --launch-filter: brightness(0.8);
 
   --main-color: url(./assets/images/bg-wool-dark-light.png);
   --secondary-color: var(--main-color);

@@ -24,6 +24,7 @@ const Profile: React.FC<{ open: boolean, skin?: string, onClose: () => void }> =
     ref2.current = skinViewer
     return () => skinViewer.dispose()
   }, [ref.current])
+  useEffect(() => void (ref2.current && (ref2.current.animationPaused = !props.open)), [props.open])
   useEffect(() => void (props.skin && (ref2.current.skinUrl = props.skin)), [props.skin])
   return <Dialog className='profile' onClose={props.onClose} visible={props.open} forceRender>
     <div className='left'>
