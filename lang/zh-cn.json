@@ -1,3 +1,13 @@
 {
-  "Launch": "启动游戏"
+  "Home": "主页",
+  "Manager": "管理",
+  "Settings": "设置",
+  "Launch": "启动游戏",
+  "No Title": "未命名",
+  "Last played": "上次游玩",
+  "Unknown": "未知",
+  "last-release": "最新版本",
+  "last-snapshot": "最新快照",
+  "Version": "版本",
+  "Click here to switch versions": "点击这里以切换游戏版本"
 }

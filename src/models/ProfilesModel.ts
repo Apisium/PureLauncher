@@ -3,6 +3,7 @@ import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
+import moment from 'moment'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
 
@@ -127,6 +128,13 @@ export default class ProfilesModel extends Model {
     yield* this.saveExtraConfigJson()
   }
 
+  public * setSelectedVersion (id: string) {
+    const profile = this.profiles[id]
+    if (!profile) throw new Error('No such id: ' + id) // TODO: Add a dialog
+    profile.lastUsed = new Date().toISOString()
+    yield* this.saveExtraConfigJson()
+  }
+
   public * toggleSound () {
     this.settings.soundOn = !this.settings.soundOn
     yield* this.saveLaunchProfileJson()
@@ -147,12 +155,17 @@ export default class ProfilesModel extends Model {
     yield* this.saveExtraConfigJson()
   }
 
+  public applyLanguage (lang: string) {
+    moment.locale(lang)
+  }
+
   private loadLaunchProfileJson (json: any) {
     this.selectedUser = merge(this.selectedUser, json)
     this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
     this.clientToken = merge(this.clientToken, json.clientToken)
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
+    this.applyLanguage(this.settings.locale)
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {

@@ -6,6 +6,7 @@
   --main-color: #e8c48e;
   --secondary-color: var(--main-color);
   --dropdown-color: #edd1a6;
+  --scroll-color: var(--main-color);
 
   --text-color-0: #000000e0;
   --text-color-1: rgba(29, 30, 30, 0.88);
@@ -26,6 +27,7 @@
   --main-color: url(./assets/images/bg-wool-dark-light.png);
   --secondary-color: var(--main-color);
   --dropdown-color: var(--main-color);
+  --scroll-color: url(./assets/images/bg-wool-white.png);
 
   --text-color-0: #ffffffe0;
   --text-color-1: rgba(255, 255, 255, 0.88);
@@ -33,5 +35,5 @@
 
   --input-color: #444;
 
-  --background: url(./assets/images/bg-wool-dark.png);;
+  --background: url(./assets/images/bg-wool-dark.png);
 }
