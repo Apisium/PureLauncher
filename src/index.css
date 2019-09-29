@@ -117,7 +117,7 @@ img {
 
 #main-content > * {
   transition: .4s ease-in-out;
-  display: block !important;
+  display: block;
 }
 
 #main-content::-webkit-scrollbar {
@@ -215,4 +215,20 @@ img {
   box-shadow: 0px 8px 11px -5px rgba(0, 0, 0, 0.2),
     0px 17px 26px 2px rgba(0, 0, 0, 0.14),
     0px 6px 32px 5px rgba(0, 0, 0, 0.12);
+}
+
+#top-logo {
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  filter: drop-shadow(2px 4px 6px #0000004e);
+  top: 40px;
+  left: calc(50% - 150px);
+  z-index: 1061;
+  position: fixed;
+  width: 300px;
+  pointer-events: auto;
+  transition: .8s;
+}
+#top-logo:hover {
+  filter: drop-shadow(2px 4px 6px #0000008e);
 }

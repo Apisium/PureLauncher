@@ -1,6 +1,6 @@
 {
-  "name": "launcher",
-  "private": false,
+  "name": "pure-launcher",
+  "private": true,
   "version": "0.0.0",
   "description": "An awesome Minecraft Launcher.",
   "main": "index.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Apisium/Launcher.git"
+    "url": "git+https://github.com/Apisium/PureLauncher.git"
   },
   "keywords": [
     "minecraft",
@@ -34,9 +34,9 @@
   "author": "Shirasawa",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Apisium/Launcher/issues"
+    "url": "https://github.com/Apisium/PureLauncher/issues"
   },
-  "homepage": "https://github.com/Apisium/Launcher#readme",
+  "homepage": "https://github.com/Apisium/PureLauncher#readme",
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
     "@types/lodash.merge": "^4.6.6",

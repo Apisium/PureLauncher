@@ -40,6 +40,7 @@ for (let i = 16; i < count; i++) {
 const content = document.getElementById('main-content')
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
+const logo = document.getElementById('top-logo')
 const chicken = document.getElementById('chicken')
 const chickenSound = new Audio(require('./assets/sounds/chicken.ogg'))
 ReactDOM.render(<App />, document.getElementById('root'), () => {
@@ -51,6 +52,7 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
       chicken.style.opacity = '0'
       content.style.opacity = '0'
       blocks3.style.opacity = '0'
+      logo.style.opacity = '0'
       setTimeout(() => {
         top.style.width = '220px'
         top.style.paddingRight = '0'
@@ -76,6 +78,7 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
         setTimeout(() => {
           blocks3.style.opacity = '1'
           content.style.opacity = '1'
+          logo.style.opacity = '1'
         }, 3000)
         setTimeout(() => (chicken.style.opacity = '1'), 4000)
       }, 1000)
