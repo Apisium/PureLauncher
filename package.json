@@ -69,8 +69,5 @@
   },
   "browserslist": [
     "electron 6.0.9"
-  ],
-  "dependencies": {
-    "zipfile": "^0.5.12"
-  }
+  ]
 }
