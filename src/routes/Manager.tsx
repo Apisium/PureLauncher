@@ -2,7 +2,9 @@ import './manager.less'
 import React from 'react'
 import Dots from '../components/Dots'
 import useRouter from 'use-react-router'
-import { } from 'react-router-dom'
+import useRoute from '../useRoute'
+
+import Versions from './manager/Versions'
 
 export const pages = [
   {
@@ -26,8 +28,11 @@ export const pages = [
 const Manager: React.FC = () => {
   const { location: { pathname }, history } = useRouter()
   const onChange = i => history.push(pages[i].path)
+
+  const versions = useRoute(Versions, '/manager/verions')
+
   return <div className='manager'>
-    <h2>版本</h2>
+    {versions}
     <Dots
       count={pages.length}
       onChange={onChange}

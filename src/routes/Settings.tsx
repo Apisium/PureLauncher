@@ -53,7 +53,7 @@ const Settings: React.FC = () => {
     </form>
     <ShowMore>
       <div>
-        <p>是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.</p>
+        <p>PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.</p>
       </div>
     </ShowMore>
   </div>

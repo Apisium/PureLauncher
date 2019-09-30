@@ -7,28 +7,48 @@ const Home: React.FC = () => {
   const [slides, setSlides] = useState<Array<{ text: string, url: string, img: string }>>([])
   const [news, setNews] = useState<Array<{ title: string, classify: string, link: string, time: string }>>([])
   useEffect(() => {
-    fetch('https://www.mcbbs.net/forum.php')
-      .then(it => it.text())
-      .then(it => {
-        const arr = Array.from(new DOMParser()
-          .parseFromString(it, 'text/html')
-          .getElementsByClassName('slideshow')[0]
-          .children).map(({ childNodes: [a, span] }) => ({
-            text: (span as HTMLSpanElement).innerText,
-            url: 'http://www.mcbbs.net/' + (a as HTMLAnchorElement).getAttribute('href'),
-            img: (a.childNodes[0] as HTMLImageElement).getAttribute('src')
-          }))
-        return Promise.all(arr.map(i => new Promise(resolve => {
-          const img = new Image()
-          img.onload = img.onerror = resolve
-          img.src = i.img
-        }))).then(() => setSlides(arr))
-      })
-      .catch(console.error)
-    fetch('https://authentication.x-speed.cc/mcbbsNews/')
-      .then(it => it.json())
-      .then(it => setNews(it.slice(0, 6)))
-      .catch(console.error)
+    let time = +localStorage.getItem('slidesTime') || 0
+    let promise = Promise.resolve()
+    if (Date.now() - time > 12 * 60 * 60 * 1000) {
+      localStorage.removeItem('slides')
+      promise = fetch('https://www.mcbbs.net/forum.php')
+        .then(it => it.text())
+        .then(it => {
+          localStorage.setItem('slides', JSON.stringify(Array.from(new DOMParser()
+            .parseFromString(it, 'text/html')
+            .getElementsByClassName('slideshow')[0]
+            .children).map(({ childNodes: [a, span] }) => ({
+              text: (span as HTMLSpanElement).innerText,
+              url: 'http://www.mcbbs.net/' + (a as HTMLAnchorElement).getAttribute('href'),
+              img: (a.childNodes[0] as HTMLImageElement).getAttribute('src')
+            }))))
+        })
+        .catch(console.error)
+    }
+    promise.then(() => {
+      const v = localStorage.getItem('slides')
+      if (!v) return
+      const arr = JSON.parse(v)
+      Promise.all(arr.map(i => new Promise(resolve => {
+        const img = new Image()
+        img.onload = img.onerror = resolve
+        img.src = i.img
+      }))).then(() => setSlides(arr))
+    })
+
+    time = +localStorage.getItem('newsTime') || 0
+    promise = Promise.resolve()
+    if (Date.now() - time > 12 * 60 * 60 * 1000) {
+      localStorage.removeItem('news')
+      promise = fetch('https://authentication.x-speed.cc/mcbbsNews/')
+        .then(it => it.json())
+        .then(it => localStorage.setItem('news', JSON.stringify(it.slice(0, 6))))
+        .catch(console.error)
+    }
+    promise.then(() => {
+      const v = localStorage.getItem('news')
+      if (v) setNews(JSON.parse(v))
+    })
   }, [])
   return (
     <div className='home'>
