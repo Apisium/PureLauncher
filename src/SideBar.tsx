@@ -26,10 +26,11 @@ const SideBar: React.FC = () => {
   const openVersionSwitch = () => setSwitch(true)
   const ver = Object
     .values(pm.profiles)
-    .map(it => ({ name: it.name, version: it.lastVersionId, lastUsed: moment(it.lastUsed) }))
+    .filter(it => it.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
+    .map(it => ({ name: it.name, type: it.type, version: it.lastVersionId, lastUsed: moment(it.lastUsed) }))
     .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())[0]
-  const versionName = `${ver.name || noTitle} (${ver.version === 'last-release' ? lastRelease
-    : ver.version === 'last-snapshot' ? lastSnapshot : ver.version})`
+  const versionName = `${ver.type === 'latest-release' ? lastRelease
+  : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
   return (
     <div className='side-bar'>
       <div className='avatar' onClick={() => setProfile(true)}>

@@ -29,7 +29,7 @@ const Manager: React.FC = () => {
   const { location: { pathname }, history } = useRouter()
   const onChange = i => history.push(pages[i].path)
 
-  const versions = useRoute(Versions, '/manager/verions')
+  const versions = useRoute(Versions, '/manager/versions')
 
   return <div className='manager'>
     {versions}

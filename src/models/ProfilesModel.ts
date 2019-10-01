@@ -180,7 +180,23 @@ export default class ProfilesModel extends Model {
       await fs.rename(this.launchProfilePath, `${this.launchProfilePath}.${Date.now()}.bak`)
     }
     await fs.mkdirs(dirname(this.launchProfilePath))
-    await this.saveExtraConfigJson()
+    this.profiles.b7472ad16d074bb8336095262999a176 = {
+      name: '',
+      created: '1970-01-01T00:00:00.000Z',
+      icon: 'Grass',
+      lastUsed: '1970-01-01T00:00:00.000Z',
+      lastVersionId: 'latest-release',
+      type: 'latest-release'
+    }
+    this.profiles['439b6eb6c263108aebb8f85dfe31bc17'] = {
+      name: '',
+      created: '1970-01-01T00:00:00.000Z',
+      icon: 'Crafting_Table',
+      lastUsed: '1970-01-01T00:00:00.000Z',
+      lastVersionId: 'latest-snapshot',
+      type: 'latest-snapshot'
+    }
+    await this.saveLaunchProfileJson()
   }
 
   private async onLoadExtraConfigFailed (e: Error) {
@@ -191,6 +207,6 @@ export default class ProfilesModel extends Model {
       await fs.rename(this.extraConfigPath, `${this.extraConfigPath}.${Date.now()}.bak`)
     }
     await fs.mkdirs(dirname(this.extraConfigPath))
-    await this.saveLaunchProfileJson()
+    await this.saveExtraConfigJson()
   }
 }

@@ -3,14 +3,9 @@
 @import 'rc-dialog/assets/index.css';
 @import './custom.css';
 
-@font-face {
-  font-family: 'iconfont';  /* project id 1442814 */
-  src: url('//at.alicdn.com/t/font_1442814_wc0k5yriyfp.eot');
-  src: url('//at.alicdn.com/t/font_1442814_wc0k5yriyfp.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_1442814_wc0k5yriyfp.woff2') format('woff2'),
-  url('//at.alicdn.com/t/font_1442814_wc0k5yriyfp.woff') format('woff'),
-  url('//at.alicdn.com/t/font_1442814_wc0k5yriyfp.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_1442814_wc0k5yriyfp.svg#iconfont') format('svg');
+* {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 html { height: 100% }
@@ -19,7 +14,6 @@ body {
   position: relative;
   overflow: hidden;
   top: 80px;
-  user-select: none;
   height: 516px;
   color: var(--text-color-0);
   filter: drop-shadow(2px 4px 4px #00000037);
@@ -116,7 +110,6 @@ button, a, input, select {
 
 img {
   pointer-events: none;
-  user-select: none;
 }
 
 #main-content {
@@ -243,6 +236,7 @@ img {
 #top-logo img {
   max-width: 100%;
   max-height: 100%;
+  image-rendering: pixelated;
 }
 #top-logo:hover {
   filter: drop-shadow(2px 4px 6px #0000008e);
