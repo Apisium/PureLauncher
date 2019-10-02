@@ -3,8 +3,7 @@ import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
-import { langs } from '../i18n'
-import moment from 'moment'
+import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
 
@@ -96,6 +95,19 @@ export default class ProfilesModel extends Model {
       e => this.onLoadExtraConfigFailed(e))
   }
 
+  public saveLaunchProfileJsonSync () {
+    // not throw but return a null
+    const json = fs.readJsonSync(this.launchProfilePath, { throws: false }) || {}
+
+    fs.writeJsonSync(this.launchProfilePath, merge(json, {
+      settings: this.selectedUser,
+      selectedUser: this.selectedUser,
+      profile: this.profiles,
+      authenticationDatabase: this.authenticationDatabase,
+      clientToken: this.clientToken
+    }))
+  }
+
   public * saveLaunchProfileJson () {
     // not throw but return a null
     const json = yield fs.readJson(this.launchProfilePath, { throws: false }) || {}
@@ -160,11 +172,7 @@ export default class ProfilesModel extends Model {
     if (!(lang in langs)) throw new Error('No such lang: ' + lang)
     this.settings.locale = lang
     yield* this.saveLaunchProfileJson()
-    this.applyLanguage(lang)
-  }
-
-  public applyLanguage (lang: string) {
-    moment.locale(lang)
+    applyLocate(lang)
   }
 
   private loadLaunchProfileJson (json: any) {
@@ -173,21 +181,21 @@ export default class ProfilesModel extends Model {
     this.clientToken = merge(this.clientToken, json.clientToken)
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
-    this.applyLanguage(this.settings.locale)
+    applyLocate(this.settings.locale, true)
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {
     this.extraJson = extra
   }
 
-  private async onLoadLaunchProfileFailed (e: Error) {
+  private onLoadLaunchProfileFailed (e: Error) {
     if (e.message.includes('no such file or directory')) {
       console.error('Fail to load launcher profile', e)
     }
-    if (await fs.pathExists(this.launchProfilePath)) {
-      await fs.rename(this.launchProfilePath, `${this.launchProfilePath}.${Date.now()}.bak`)
+    if (fs.pathExistsSync(this.launchProfilePath)) {
+      fs.renameSync(this.launchProfilePath, `${this.launchProfilePath}.${Date.now()}.bak`)
     }
-    await fs.mkdirs(dirname(this.launchProfilePath))
+    fs.mkdirsSync(dirname(this.launchProfilePath))
     this.profiles.b7472ad16d074bb8336095262999a176 = {
       name: '',
       created: '1970-01-01T00:00:00.000Z',
@@ -204,7 +212,7 @@ export default class ProfilesModel extends Model {
       lastVersionId: 'latest-snapshot',
       type: 'latest-snapshot'
     }
-    await this.saveLaunchProfileJson()
+    this.saveLaunchProfileJsonSync()
   }
 
   private async onLoadExtraConfigFailed (e: Error) {

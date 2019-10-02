@@ -33,7 +33,7 @@ const Settings: React.FC = () => {
       </div>
       <div className='group'>
         <label>{$('LANGUAGE')}</label>
-        <select value={pm.settings.locale}>{Object
+        <select value={pm.settings.locale} onChange={e => pm.setLocate(e.target.value)}>{Object
           .entries(langs)
           .map(([key, value]) => <option value={key} key={key}>{value.$LanguageName$}</option>)}
         </select>

@@ -1,6 +1,6 @@
 import './minecraft.css'
 import './index.css'
-import React from 'react'
+import React, { createRef } from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import { remote } from 'electron'
@@ -37,13 +37,15 @@ for (let i = 16; i < count; i++) {
   blocks3.appendChild(elm)
 }
 
+const ref = createRef()
 const content = document.getElementById('main-content')
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
 const logo = document.getElementById('top-logo')
 const chicken = document.getElementById('chicken')
 const chickenSound = new Audio(require('./assets/sounds/chicken.ogg'))
-console.log(ReactDOM.render(<App />, document.getElementById('root'), () => {
+ReactDOM.render(<App ref2={ref} />, document.getElementById('root'), () => {
+  setInstance(ref)
   let full = true
   chicken.onclick = () => {
     try { chickenSound.play().catch(() => {}) } catch (e) { }
@@ -84,7 +86,7 @@ console.log(ReactDOM.render(<App />, document.getElementById('root'), () => {
       }, 1000)
     }
   }
-}))
+})
 
 const clickSound = new Audio(require('./assets/sounds/click.ogg'))
 clickSound.oncanplay = () => document.addEventListener('click', e => {

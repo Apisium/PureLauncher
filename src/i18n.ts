@@ -1,4 +1,6 @@
 import zhCN from '../lang/zh-cn.json'
+import moment from 'moment'
+import forceUpdate from 'react-deep-force-update'
 
 export const langs = {
   'zh-cn': zhCN,
@@ -10,10 +12,13 @@ export const setInstance = (instance2: any) => void (instance = instance2)
 
 let current = zhCN
 
-export const applyLocate = (name: string) => {
+export const applyLocate = (name: string, notUpdate: boolean = false) => {
   if (!(name in langs)) throw new Error('No such lang: ' + name)
   current = zhCN
-
+  moment.locale(name)
+  if (!notUpdate) {
+    forceUpdate(instance.current)
+  }
 }
 
 declare const $: (text: keyof typeof zhCN, ...args: string[]) => string

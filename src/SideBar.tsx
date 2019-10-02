@@ -29,7 +29,8 @@ const SideBar: React.FC = () => {
     .values(pm.profiles)
     .filter(it => it.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
     .map(it => ({ name: it.name, type: it.type, version: it.lastVersionId, lastUsed: moment(it.lastUsed) }))
-    .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())[0]
+    .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())[0] ||
+      { type: 'latest-release', version: 'latest-release' }
   const versionName = `${ver.type === 'latest-release' ? lastRelease
   : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
   return (
