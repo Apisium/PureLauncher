@@ -6,6 +6,7 @@
   align-items: center;
   width: 180px;
   height: 100%;
+  padding: 0 6px;
   background: var(--main-color);
   box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
     0px 6px 10px 0px rgba(0, 0, 0, 0.14),
@@ -69,6 +70,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    width: 100%;
+    text-align: center;
 
     span { font-weight: bold }
   }
@@ -98,11 +101,12 @@
       color: var(--text-color-1);
       font-weight: 300;
       font-size: 16px;
-      margin-left: 22px;
+      margin: 0 auto;
       transition: ease-in-out .5s;
     }
 
     li {
+      padding: 0 20px 0 40px;
       transition: ease-in-out .5s;
       line-height: 40px;
       filter: brightness(0.7);
@@ -112,13 +116,13 @@
 
     li.active img {
       width: 30px;
+      margin-left: -2px;
     }
 
     li.active span {
       color: var(--text-color-0);
       font-size: 17px;
       font-weight: 500;
-      margin-left: 19px;
     }
   }
 

@@ -1,10 +1,9 @@
 import './minecraft.css'
 import './index.css'
-import React, { createRef } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import { remote } from 'electron'
-import { setInstance } from './i18n'
 
 const colors1 = ['7e512f', '8c6a48', '8b6428', '885b3c', '754b2e', 'c38a58', '775237', '775236',
   '905536', '675432', '735337', '754b2e', '975a35', '70472f', '8c6948', '5f4939', '7e512f',
@@ -37,15 +36,13 @@ for (let i = 16; i < count; i++) {
   blocks3.appendChild(elm)
 }
 
-const ref = createRef()
 const content = document.getElementById('main-content')
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
 const logo = document.getElementById('top-logo')
 const chicken = document.getElementById('chicken')
 const chickenSound = new Audio(require('./assets/sounds/chicken.ogg'))
-ReactDOM.render(<App ref2={ref} />, document.getElementById('root'), () => {
-  setInstance(ref)
+ReactDOM.render(<App />, document.getElementById('root'), () => {
   let full = true
   chicken.onclick = () => {
     try { chickenSound.play().catch(() => {}) } catch (e) { }

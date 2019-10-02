@@ -14,11 +14,9 @@ let current = zhCN
 
 export const applyLocate = (name: string, notUpdate: boolean = false) => {
   if (!(name in langs)) throw new Error('No such lang: ' + name)
-  current = zhCN
+  current = langs[name]
   moment.locale(name)
-  if (!notUpdate) {
-    forceUpdate(instance.current)
-  }
+  if (!notUpdate) forceUpdate(instance.current)
 }
 
 declare const $: (text: keyof typeof zhCN, ...args: string[]) => string
