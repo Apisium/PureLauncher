@@ -1,10 +1,10 @@
 import './minecraft.css'
 import './index.css'
-import './i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import { remote } from 'electron'
+import { setInstance } from './i18n'
 
 const colors1 = ['7e512f', '8c6a48', '8b6428', '885b3c', '754b2e', 'c38a58', '775237', '775236',
   '905536', '675432', '735337', '754b2e', '975a35', '70472f', '8c6948', '5f4939', '7e512f',
@@ -43,7 +43,7 @@ const top = document.getElementById('top')
 const logo = document.getElementById('top-logo')
 const chicken = document.getElementById('chicken')
 const chickenSound = new Audio(require('./assets/sounds/chicken.ogg'))
-ReactDOM.render(<App />, document.getElementById('root'), () => {
+console.log(ReactDOM.render(<App />, document.getElementById('root'), () => {
   let full = true
   chicken.onclick = () => {
     try { chickenSound.play().catch(() => {}) } catch (e) { }
@@ -84,15 +84,13 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
       }, 1000)
     }
   }
-})
+}))
 
 const clickSound = new Audio(require('./assets/sounds/click.ogg'))
 clickSound.oncanplay = () => document.addEventListener('click', e => {
   const t = e.target as HTMLElement
   if (t.tagName === 'BUTTON' || t.tagName === 'A' || t.dataset.sound) {
-    clickSound.play().catch(() => {
-      // TODO: error handling
-    })
+    clickSound.play().catch(() => {})
   }
 })
 

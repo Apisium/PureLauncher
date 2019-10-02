@@ -3,6 +3,7 @@ import React from 'react'
 import Switch from '../components/Switch'
 import ShowMore from '../components/ShowMore'
 import ProfilesModel from '../models/ProfilesModel'
+import { langs } from '../i18n'
 import { useModel } from 'use-model'
 
 const Settings: React.FC = () => {
@@ -10,46 +11,53 @@ const Settings: React.FC = () => {
   return <div className='settings'>
     <form>
       <div className='group'>
-        <label>Java 路径</label>
+        <label>{$('JAVA EXECUTABLE')}</label>
         <input
-          placeholder='<自动>'
+          placeholder={$('<auto>')}
           value={pm.extraJson.javaPath}
           onClick={pm.setJavaPath}
           readOnly
         />
       </div>
       <div className='group'>
-        <label>最大内存</label>
+        <label>{$('MAXIMUM MEMORY')}</label>
         <input
-          placeholder='<自动>'
+          placeholder={$('<auto>')}
           value={pm.extraJson.memory || ''}
           onChange={e => pm.setMemory(e.target.value)}
         />
       </div>
       <div className='group'>
-        <label>JVM 参数</label>
+        <label>{$('JVM ARGUMENTS')}</label>
         <input value={pm.extraJson.javaArgs} onChange={e => pm.setArgs(e.target.value)}/>
+      </div>
+      <div className='group'>
+        <label>{$('LANGUAGE')}</label>
+        <select value={pm.settings.locale}>{Object
+          .entries(langs)
+          .map(([key, value]) => <option value={key} key={key}>{value.$LanguageName$}</option>)}
+        </select>
       </div>
       <div className='group' style={{ paddingTop: 18 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.animation} onChange={pm.toggleAnimation} />
-        <label>开启启动器动画</label>
+        <label>{$('ENABLE ANIMATION')}</label>
       </div>
       <div className='group' style={{ paddingTop: 18 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.soundOn} onChange={pm.toggleSound} />
-        <label>开启启动器音效</label>
+        <label>{$('ENABLE SOUND')}</label>
       </div>
       <div className='group' style={{ paddingTop: 18 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.bmclAPI} onChange={pm.toggleBmclAPI} />
-        <label>使用 BMCLAPI 加速下载</label>
+        <label>{$('ENABLE BMCLAPI')}</label>
       </div>
       <div className='group' style={{ paddingTop: 28 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.showGameLog} onChange={pm.toggleShowLog} />
-        <label>显示游戏日志</label>
+        <label>{$('SHOW OUTPUT LOGS')}</label>
       </div>
-      <div className='group' style={{ paddingTop: 28 }}>
+      {/* <div className='group' style={{ paddingTop: 28 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.sandbox} onChange={pm.toggleSandbox} />
         <label>使用沙箱运行游戏</label>
-      </div>
+      </div> */}
     </form>
     <ShowMore>
       <div>

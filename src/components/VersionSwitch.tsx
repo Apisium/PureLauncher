@@ -19,13 +19,13 @@ const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = (props) 
         .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
         .map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
         .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
-        .map(ver => <li key={ver.key} onClick={() => {
+        .map(ver => <li data-sound key={ver.key} onClick={() => {
           pm.setSelectedVersion(ver.key)
           props.onClose()
         }}>{ver.type === 'latest-release' ? lastRelease
         : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
-          <span>({ver.lastVersionId})</span>
-          <div>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div></li>)
+          <span data-sound>({ver.lastVersionId})</span>
+          <div data-sound>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div></li>)
       }
     </ul>
   </Dialog>

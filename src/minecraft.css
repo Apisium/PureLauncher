@@ -37,7 +37,32 @@
   letter-spacing: 1px;
   white-space: unset;
   padding: .8rem 1.5rem;
-  text-decoration: none
+  text-decoration: none;
+}
+
+.btn2 {
+  border: none;
+  outline: none;
+  padding: 7px 14px;
+  cursor: pointer;
+  white-space: unset;
+  color: #fff;
+  font-size: 13px;
+  letter-spacing: 1px;
+  background-color: #36b030;
+  transition: background-color .3s;
+}
+
+.btn2:hover {
+  background-color: #4ecd47;
+}
+
+.btn2.danger {
+  background-color: #d4441a;
+}
+
+.btn2.danger:hover {
+  background-color: #e7643c;
 }
 
 .btn .grow::after {
@@ -170,7 +195,7 @@ option, select {
   cursor: pointer;
 }
 select {
-  /* -webkit-appearance: none; */
+  -webkit-appearance: none;
 }
 option .small {
   font-size: 14px;

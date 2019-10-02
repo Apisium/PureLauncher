@@ -1,22 +1,85 @@
 .manager-list {
-  padding: 0;
-  list-style-type: none;
   li {
     padding: 6px;
+    position: relative;
+  }
+  ul {
+    padding: 0;
+    list-style-type: none;
   }
   .list-top {
+    padding: 6px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-bottom: 1px solid #777;
-    .add-version {
-      display: flex;
+    span {
+      margin-top: -2px;
+    }
+    .header {
+      font-weight: bold;
+      font-size: 18px;
+      padding-right: 14px;
+      border-right: 1px solid #555;
+    }
+    .add-btn {
+      color: var(--text-color-3);
+      display: inline-flex;
       align-items: center;
+      font-weight: 100;
+      transition: color .3s;
+      cursor: pointer;
       i {
         margin: 0 6px 0 10px;
         font-size: 30px;
       }
       span {
-        font-size: 15px;
-        margin-top: -2px;
+        font-size: 14px;
+      }
+      &:hover {
+        color: var(--text-color-2);
       }
     }
+  }
+  .buttons {
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    right: 20px;
+    display: flex;
+    transition: opacity .6s;
+    button {
+      margin: auto;
+    }
+    button + button {
+      margin-left: 16px;
+    }
+  }
+}
+
+.manager-versions {
+  ul {
+    border: none;
+    color: inherit;
+    width: 100%;
+    box-shadow: none;
+    max-height: unset !important;
+  }
+  li {
+    margin: 0 18px;
+    padding: 14px 0;
+    border-top: none !important;
+    border-bottom: 1px solid #555;
+    background-color: unset !important;
+    .buttons {
+      opacity: 0;
+    }
+    &:hover .buttons {
+      opacity: 1;
+    }
+  }
+  .time {
+    margin-top: 1px;
+    color: var(--text-color-2);
   }
 }

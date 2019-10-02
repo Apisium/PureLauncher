@@ -6,28 +6,29 @@ import useRoute from '../useRoute'
 
 import Versions from './manager/Versions'
 
-export const pages = [
+export const getPages = () => [
   {
-    name: '版本',
+    name: $('Versions'),
     path: '/manager/versions'
   },
   {
-    name: '帐号',
-    path: '/manager/profiles'
-  },
-  {
-    name: '下载',
+    name: $('Downloads'),
     path: '/manager/downloads'
   },
   {
-    name: '模组',
-    path: '/manager/mods'
+    name: $('Resources'),
+    path: '/manager/resources'
+  },
+  {
+    name: $('Saves'),
+    path: '/manager/saves'
   }
 ]
 
 const Manager: React.FC = () => {
+  const pages = getPages()
   const { location: { pathname }, history } = useRouter()
-  const onChange = i => history.push(pages[i].path)
+  const onChange = (i: number) => history.push(pages[i].path)
 
   const versions = useRoute(Versions, '/manager/versions')
 

@@ -11,6 +11,7 @@ const Dots: React.FC<P> = props => {
   for (let i = 0; i < props.count; i++) {
     const active = i === props.active
     arr[i] = <div
+      data-sound
       key={i}
       onClick={active ? () => {} : () => props.onChange(i)}
       className={active ? 'active' : undefined}

@@ -7,7 +7,7 @@ import VersionSwitch from './components/VersionSwitch'
 import useRouter from 'use-react-router'
 import ProfileModel from './models/ProfilesModel'
 import { Link } from 'react-router-dom'
-import { pages } from './routes/Manager'
+import { getPages } from './routes/Manager'
 import { useModel } from 'use-model'
 
 const homeIcon = require('./assets/images/written_book.png')
@@ -15,6 +15,7 @@ const settingsIcon = require('./assets/images/redstone.png')
 const managerIcon = require('./assets/images/compass_19.png')
 
 const SideBar: React.FC = () => {
+  const pages = getPages()
   const [open, setOpen] = useState(false)
   const [openProfile, setProfile] = useState(false)
   const [openSwitch, setSwitch] = useState(false)
@@ -33,7 +34,7 @@ const SideBar: React.FC = () => {
   : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
   return (
     <div className='side-bar'>
-      <div className='avatar' onClick={() => setProfile(true)}>
+      <div className='avatar' data-sound onClick={() => setProfile(true)}>
         <img src='https://minotar.net/helm/ShirasawaSama/80.png' />
       </div>
       <p className='name'>ShirasawaSama</p>
@@ -58,9 +59,10 @@ const SideBar: React.FC = () => {
           <Link to={it.path}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={console.log}>{$('Launch')}</button>
-      <p className='version' onClick={openVersionSwitch}>{$('Version')}: <span>{versionName}</span></p>
-      <p className='version' style={{ margin: 0 }} onClick={openVersionSwitch}>
+      <button className='btn btn-primary launch' onClick={console.log}>{$('Play')}</button>
+      <p className='version' data-sound onClick={openVersionSwitch}>
+        {$('Version')}: <span data-sound>{versionName}</span></p>
+      <p className='version' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>
         [{$('Click here to switch versions')}]</p>
       <Profile onClose={() => setProfile(false)} open={openProfile} />
       <VersionSwitch onClose={() => setSwitch(false)} open={openSwitch} />

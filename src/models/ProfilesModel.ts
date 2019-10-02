@@ -3,12 +3,13 @@ import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
+import { langs } from '../i18n'
 import moment from 'moment'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
-const EXTRA_CONFIG = 'any_profile.json'
+const EXTRA_CONFIG = 'pure_launcher_profile.json'
 
 interface Version {
   name: string
@@ -153,6 +154,13 @@ export default class ProfilesModel extends Model {
   public * toggleSandbox () {
     this.extraJson.sandbox = this.extraJson.sandbox
     yield* this.saveExtraConfigJson()
+  }
+
+  public * setLocate (lang: string) {
+    if (!(lang in langs)) throw new Error('No such lang: ' + lang)
+    this.settings.locale = lang
+    yield* this.saveLaunchProfileJson()
+    this.applyLanguage(lang)
   }
 
   public applyLanguage (lang: string) {

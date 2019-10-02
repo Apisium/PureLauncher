@@ -1,12 +1,39 @@
 import './list.less'
 import React from 'react'
+import moment from 'moment'
+import ProfileModel from '../../models/ProfilesModel'
+import { useModel } from 'use-model'
 
 const Versions: React.FC = () => {
-  return <ul className='manager-list'>
-    <li className='list-top'>
-      <a className='add-version'><i className='iconfont icon-shuliang-zengjia_o' /><span>添加新的版本</span></a>
-    </li>
-  </ul>
+  const pm = useModel(ProfileModel)
+  const noTitle = $('No Title')
+  const unknown = $('Unknown')
+  const lastPlayed = $('Last played')
+  const lastRelease = $('last-release')
+  const lastSnapshot = $('last-snapshot')
+  return <div className='manager-list version-switch manager-versions'>
+    <div className='list-top'>
+      <span className='header'>{$('Versions List')}</span>
+      <a className='add-btn'><i className='iconfont icon-shuliang-zengjia_o' /><span>{$('Add new...')}</span></a>
+    </div>
+    <ul >
+      {Object
+        .entries(pm.profiles)
+        .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
+        .map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
+        .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
+        .map(ver => <li key={ver.key}>{ver.type === 'latest-release' ? lastRelease
+        : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
+          <span>({ver.lastVersionId})</span>
+          <div className='time'>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div>
+          <div className='buttons'>
+            <button className='btn2'>{$('Mods')}</button>
+            <button className='btn2 danger'>{$('Delete')}</button>
+          </div>
+        </li>)
+      }
+    </ul>
+  </div>
 }
 
 export default Versions

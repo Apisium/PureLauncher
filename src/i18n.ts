@@ -1,5 +1,21 @@
-import lang from '../lang/zh-cn.json'
+import zhCN from '../lang/zh-cn.json'
 
-declare const $: (text: keyof typeof lang, ...args: string[]) => string
-;(window as any).$ = (text: keyof typeof lang, ...args: string[]) =>
-  text in lang ? lang[text].replace(/{(\d)}/, (_, i) => args[i]) : text
+export const langs = {
+  'zh-cn': zhCN,
+  'en-us': { $LanguageName$: 'English' }
+}
+
+let instance: any
+export const setInstance = (instance2: any) => void (instance = instance2)
+
+let current = zhCN
+
+export const applyLocate = (name: string) => {
+  if (!(name in langs)) throw new Error('No such lang: ' + name)
+  current = zhCN
+
+}
+
+declare const $: (text: keyof typeof zhCN, ...args: string[]) => string
+;(window as any).$ = (text: keyof typeof zhCN, ...args: string[]) =>
+  text in current ? current[text].replace(/{(\d)}/, (_, i) => args[i]) : text
