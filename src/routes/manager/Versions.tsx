@@ -14,7 +14,8 @@ const Versions: React.FC = () => {
   return <div className='manager-list version-switch manager-versions'>
     <div className='list-top'>
       <span className='header'>{$('Versions List')}</span>
-      <a className='add-btn'><i className='iconfont icon-shuliang-zengjia_o' /><span>{$('Add new...')}</span></a>
+      <a className='add-btn'><i data-sound className='iconfont icon-shuliang-zengjia_o' />
+        <span data-sound>{$('Add new...')}</span></a>
     </div>
     <ul >
       {Object

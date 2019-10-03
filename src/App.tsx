@@ -21,7 +21,7 @@ const App: React.FC = () => {
         <SideBar />
         <section id='main-content'>
           {home}{settings}{manager}
-          <Redirect to='/manager/versions' />
+          <Redirect to='/manager/downloads' />
         </section>
       </HashRouter>
     </Provider>

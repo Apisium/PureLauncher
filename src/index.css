@@ -1,6 +1,7 @@
 @import 'slick-carousel/slick/slick.css';
 @import 'slick-carousel/slick/slick-theme.css';
 @import 'rc-dialog/assets/index.css';
+@import 'rc-tooltip/assets/bootstrap.css';
 @import './custom.css';
 
 * {
@@ -239,5 +240,9 @@ img {
   image-rendering: pixelated;
 }
 #top-logo:hover {
-  filter: drop-shadow(2px 4px 6px #0000008e);
+  filter: drop-shadow(0px 4px 14px #000000ae);
+}
+
+.rc-tooltip-inner {
+  min-height: unset;
 }

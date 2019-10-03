@@ -194,9 +194,38 @@ option, select {
   font-size: 14px;
   cursor: pointer;
 }
-select {
-  -webkit-appearance: none;
-}
 option .small {
   font-size: 14px;
+}
+
+progress/* , select */ {
+  height: 10px;
+  overflow: hidden;
+  position: relative;
+  -webkit-appearance: none;
+}
+progress[value='-1']::after {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  content: '';
+  width: 15px;
+  position: absolute;
+  border-radius: 3px;
+  animation: unknown-progress 2s ease-in-out infinite;
+  transition: .6s ease-in-out;
+  background: url(./assets/images/progress.png) 0 0 repeat-x;
+}
+@keyframes unknown-progress {
+  from { left: 0 }
+  to { left: 100% }
+}
+::-webkit-progress-value {
+  border-radius: 3px;
+  transition: .6s ease-in-out;
+  background: url(./assets/images/progress.png) 0 0 repeat-x;
+}
+::-webkit-progress-bar {
+  border-radius: 3px;
+  background: url(./assets/images/progress.png) 0 -10px repeat-x;
 }

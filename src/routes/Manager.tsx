@@ -1,10 +1,11 @@
-import './manager.less'
+import './manager.css'
 import React from 'react'
 import Dots from '../components/Dots'
 import useRouter from 'use-react-router'
 import useRoute from '../useRoute'
 
 import Versions from './manager/Versions'
+import Downloads from './manager/Downloads'
 
 export const getPages = () => [
   {
@@ -31,12 +32,14 @@ const Manager: React.FC = () => {
   const onChange = (i: number) => history.push(pages[i].path)
 
   const versions = useRoute(Versions, '/manager/versions')
+  const downloads = useRoute(Downloads, '/manager/downloads')
 
   return <div className='manager'>
-    {versions}
+    {versions}{downloads}
     <Dots
       count={pages.length}
       onChange={onChange}
+      names={pages.map(it => it.name)}
       active={pages.findIndex(it => it.path === pathname)}
     />
   </div>
