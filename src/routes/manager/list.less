@@ -1,4 +1,5 @@
 .manager-list {
+  color: var(--text-color-0);
   li {
     padding: 6px;
     position: relative;
@@ -81,5 +82,22 @@
   .time {
     margin-top: 1px;
     color: var(--text-color-2);
+  }
+}
+
+.manager-downloads {
+  li {
+    cursor: default;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    span {
+      color: var(--text-color-1);
+    }
+  }
+  progress {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
   }
 }
