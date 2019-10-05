@@ -7,7 +7,7 @@ export default class GameModel extends Model {
   private profileModel = this.getModel(ProfilesModel)
   private worker: Worker = new Worker('../workers/launch.ts')
 
-  constructor() {
+  constructor () {
     super()
     this.worker.addEventListener('message', (m) => {
       const { state, error } = m.data
@@ -33,7 +33,7 @@ export default class GameModel extends Model {
     const userProfile = userProfiles[selectedUser.profile] || { displayName: 'Steve' }
 
     const option: Launcher.Option = {
-      javaPath: '/usr/bin/java',
+      javaPath: javaPath || 'java',
       extraJVMArgs: javaArgs.split(' '),
       auth: {
         accessToken: accessToken || '',
@@ -42,7 +42,11 @@ export default class GameModel extends Model {
         userType: 'mojang' as any
       },
       gamePath: root,
-      version: '1.14.4'
+      version: '1.14.4',
+      extraExecOption: {
+        detached: true,
+        env: {}
+      }
     }
     this.worker.postMessage(option)
   }
