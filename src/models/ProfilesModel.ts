@@ -26,6 +26,7 @@ interface User {
   username: string
   properties: []
   profiles: { [key: string]: { displayName: string } }
+  properties: Array<{ [key: string]: string }>,
 }
 export default class ProfilesModel extends Model {
   public i = 0
@@ -237,7 +238,7 @@ export default class ProfilesModel extends Model {
   private loadLaunchProfileJson (json: any) {
     this.selectedUser = merge(this.selectedUser, json)
     this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
-    this.clientToken = merge(this.clientToken, json.clientToken)
+    this.clientToken = json.clientToken
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
     if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()

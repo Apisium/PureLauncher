@@ -10,7 +10,7 @@
     "start": "parcel index.html --target electron --public-url .",
     "run": "electron .",
     "watch": "parcel watch index.html --target electron --public-url .",
-    "build": "npm run lint && parcel build index.html --experimental-scope-hoisting --target electron --public-url .",
+    "build": "npm run lint && parcel build index.html --experimental-scope-hoisting --target electron --public-url . --no-hmr",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -77,5 +77,9 @@
   "browserslist": [
     "electron 6.0.9"
   ],
-  "gypfile": true
+  "gypfile": true,
+  "dependencies": {
+    "@xmcl/launch": "0.0.23",
+    "zipfile": "^0.5.12"
+  }
 }

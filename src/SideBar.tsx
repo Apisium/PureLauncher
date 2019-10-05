@@ -14,6 +14,7 @@ import { getPages } from './routes/Manager'
 import { useModel } from 'use-model'
 import { join } from 'path'
 import { skinsDir } from './util'
+import GameModel from './models/GameModel'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
@@ -30,6 +31,7 @@ const SideBar: React.FC = () => {
   const lastRelease = $('last-release')
   const lastSnapshot = $('last-snapshot')
   const openVersionSwitch = () => setSwitch(true)
+  const gameModel = useModel(GameModel)
   const ver = Object
     .values(pm.profiles)
     .filter(it => it.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
@@ -78,7 +80,7 @@ const SideBar: React.FC = () => {
           <Link to={it.path}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={console.log}>
+  <button className='btn btn-primary launch' onClick={gameModel.launch}>
         <i className='iconfont icon-icons-minecraft_pic' />{$('Play')}</button>
       <p className='version' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span></p>
@@ -87,7 +89,7 @@ const SideBar: React.FC = () => {
       <Profile onClose={() => setProfile(false)} open={openProfile} />
       <LoginDialog onClose={() => pm.setLoginDialogVisible(false)} open={pm.loginDialogVisible} />
       <VersionSwitch onClose={() => setSwitch(false)} open={openSwitch} />
-    </div>
+    </div >
   )
 }
 
