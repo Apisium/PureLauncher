@@ -1,14 +1,18 @@
 import { Model } from 'use-model'
 import { join, dirname } from 'path'
-import { getJavaVersion, getMinecraftRoot } from '../util'
+import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
 import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
+import pAll from 'p-all'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
-const EXTRA_CONFIG = 'pure_launcher_profile.json'
+const EXTRA_CONFIG = 'config.json'
+
+export const ONLINE_LOGIN = 'Online'
+export const OFFLINE_LOGIN = 'Offline'
 
 interface Version {
   name: string
@@ -24,6 +28,7 @@ interface User {
   profiles: { [key: string]: { displayName: string } }
 }
 export default class ProfilesModel extends Model {
+  public i = 0
   public settings = {
     enableSnapshots: false,
     locale: 'zh-cn',
@@ -45,6 +50,7 @@ export default class ProfilesModel extends Model {
     animation: true,
     sandbox: true,
     selectedUser: '',
+    loginType: '',
     offlineAuthenticationDatabase: [] as string[],
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M'
@@ -56,7 +62,7 @@ export default class ProfilesModel extends Model {
   constructor (readonly root = getMinecraftRoot()) {
     super()
     this.launchProfilePath = join(this.root, LAUNCH_PROFILE)
-    this.extraConfigPath = join(this.root, EXTRA_CONFIG)
+    this.extraConfigPath = join(appDir, EXTRA_CONFIG)
     try {
       this.loadLaunchProfileJson(fs.readJsonSync(this.launchProfilePath))
     } catch (e) {
@@ -68,14 +74,61 @@ export default class ProfilesModel extends Model {
     } catch (e) {
       this.onLoadExtraConfigFailed(e)
     }
+    this.cacheSkins().catch(console.error).then(() => {
+      const u = this.getCurrentProfile()
+      if (u.username) cacheSkin(u.uuid || u.username)
+    }).catch(console.error)
+  }
+
+  public getCurrentProfile (): { type: string, accessToken?: string,
+    uuid?: string, username: string } {
+    switch (this.extraJson.loginType) {
+      case '': break
+      case ONLINE_LOGIN:
+        const su = this.selectedUser
+        if (su.account && su.profile) {
+          if (su.account in this.authenticationDatabase) {
+            const u = this.authenticationDatabase[su.account]
+            if (su.profile in u.profiles) {
+              const p = u[su.profile].profiles
+              return { username: p.displayName, uuid: su.profile, type: ONLINE_LOGIN, accessToken: u.accessToken }
+            }
+          }
+          su.profile = su.account = ''
+          this.saveLaunchProfileJsonSync()
+        }
+        break
+      case OFFLINE_LOGIN:
+        const cu = this.extraJson.selectedUser
+        if (cu) {
+          if (this.extraJson.offlineAuthenticationDatabase.includes(cu)) return { username: cu, type: OFFLINE_LOGIN }
+          this.extraJson.selectedUser = ''
+          this.extraJson.loginType = ''
+          this.saveExtraConfigJsonSync()
+        }
+        break
+    }
+    return { username: '', type: '' }
+  }
+
+  public async cacheSkins () {
+    const t = localStorage.getItem('skinCacheTime')
+    if (t && parseInt(t, 10) + 24 * 60 * 60 * 1000 > Date.now()) return
+    if (!await fetch('https://minotar.net/').then(it => it.ok).catch(() => false)) return
+    await pAll(Object
+      .values(this.authenticationDatabase)
+      .flatMap(a => Object.keys(a.profiles))
+      .concat(this.extraJson.offlineAuthenticationDatabase).map(it => () => cacheSkin(it)), { concurrency: 5 })
+    localStorage.setItem('skinCacheTime', Date.now().toString())
+    this.addI()
   }
 
   public * setJavaPath () {
     yield remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
-      title: '选择 Java',
-      message: '请选择启动 Minecraft 的 Java 8',
+      title: $('Locate Java'),
+      message: $('Locate the path of Java 8'),
       filters: [
-        { name: '可执行文件', extensions: platform() === 'win32' ? ['exe'] : [] }
+        { name: $('Executable File (Javaw)'), extensions: platform() === 'win32' ? ['exe'] : [] }
       ]
     }, (files) => {
       const version = getJavaVersion(files[0])
@@ -123,6 +176,10 @@ export default class ProfilesModel extends Model {
 
   public * saveExtraConfigJson () {
     yield fs.writeJson(this.extraConfigPath, this.extraJson)
+  }
+
+  public saveExtraConfigJsonSync () {
+    fs.writeJsonSync(this.extraConfigPath, this.extraJson)
   }
 
   public * setMemory (mem: string) {
@@ -182,11 +239,14 @@ export default class ProfilesModel extends Model {
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
     applyLocate(this.settings.locale, true)
+    this.getCurrentProfile()
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {
     this.extraJson = extra
   }
+
+  private addI () { this.i++ }
 
   private onLoadLaunchProfileFailed (e: Error) {
     if (e.message.includes('no such file or directory')) {

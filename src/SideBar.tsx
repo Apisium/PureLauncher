@@ -1,6 +1,8 @@
 import './side-bar.less'
 import React, { useState } from 'react'
 import moment from 'moment'
+import ToolTip from 'rc-tooltip'
+import Img from 'react-image'
 import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'
 import LoginDialog from './components/LoginDialog'
@@ -10,10 +12,14 @@ import ProfileModel from './models/ProfilesModel'
 import { Link } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useModel } from 'use-model'
+import { join } from 'path'
+import { headsDir } from './util'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
 const managerIcon = require('./assets/images/compass_19.png')
+
+const steve = require('./assets/images/steve-head.png')
 
 const SideBar: React.FC = () => {
   const pages = getPages()
@@ -32,14 +38,26 @@ const SideBar: React.FC = () => {
     .map(it => ({ name: it.name, type: it.type, version: it.lastVersionId, lastUsed: moment(it.lastUsed) }))
     .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())[0] ||
       { type: 'latest-release', version: 'latest-release' }
+  const u = pm.getCurrentProfile()
+  const logged = !!u.username
   const versionName = `${ver.type === 'latest-release' ? lastRelease
-  : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
+    : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
   return (
     <div className='side-bar'>
-      <div className='avatar' data-sound onClick={() => setProfile(true)}>
-        <img src='https://minotar.net/helm/ShirasawaSama/80.png' />
-      </div>
-      <p className='name'>ShirasawaSama</p>
+      <ToolTip
+        placement='right'
+        overlay={$(logged ? 'Click here to switch accounts' : 'Click here to login')}
+        defaultVisible={!logged}
+      >
+        <div className='avatar' data-sound onClick={() => setProfile(true)}>
+          {logged ? <Img key={(u.uuid || u.username) + pm.i} src={[
+            `https://minotar.net/helm/${u.uuid || u.username}/80.png`,
+            join(headsDir, (u.uuid || u.username) + '.png'),
+            steve
+          ]} /> : <img src={steve} />}
+        </div>
+      </ToolTip>
+      <p className='name'>{u.username || $('NOT LOGGED-IN')}</p>
       <ul className='list'>
         <li className={pathname === '/home' ? 'active' : null}>
           <Link to='/home'><img src={homeIcon} /><span data-sound>{$('Home')}</span></Link>

@@ -30,6 +30,9 @@
   "ENABLE SOUND": "开启启动器音效",
   "ENABLE BMCLAPI": "使用 BMCLAPI 加速下载",
   "SHOW OUTPUT LOGS": "显示游戏日志",
+  "Locate Java": "选择 Java",
+  "Locate the path of Java 8": "请选择你的 Java 8 路径",
+  "Executable File (Javaw)": "可执行文件 (Javaw)",
 
   "Online Login": "正版登录",
   "Offline Login": "离线登录",
@@ -39,5 +42,8 @@
   "Register": "购买正版",
   "Back": "返回",
   "Login": "登录",
+  "NOT LOGGED-IN": "你还没有登录",
+  "Click here to login": "点击这里以登录",
+  "Click here to switch accounts": "点击这里以切换账号",
   "Choose your account login mode. If you don't have the online version, please choose the \"Offline Login\" on the right": "选择您的帐号登录模式, 如果您还没有购买正版, 请您选择右侧的“离线登录”"
 }

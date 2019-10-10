@@ -1,4 +1,4 @@
-
+import fs from 'fs-extra'
 import { remote } from 'electron'
 import { join } from 'path'
 import { platform } from 'os'
@@ -8,6 +8,11 @@ export function getMinecraftRoot () {
   return join(current === 'linux' ? remote.app.getPath('home') : remote.app.getPath('appData'),
     current === 'darwin' ? 'minecraft' : '.minecraft')
 }
+export const appDir = remote.app.getPath('userData')
+export const skinsDir = join(appDir, 'skins')
+fs.ensureDirSync(skinsDir, 1)
+export const headsDir = join(appDir, 'heads')
+fs.ensureDirSync(headsDir, 1)
 
 import { exec } from 'child_process'
 
@@ -31,4 +36,17 @@ export function getJavaVersion (path: string) {
       }
     })
   })
+}
+
+export function cacheSkin (name: string) {
+  return Promise.all([
+    fetch(`https://minotar.net/helm/${name}/80.png`)
+      .then(it => it.arrayBuffer())
+      .then(it => fs.writeFile(join(headsDir, name + '.png'), it))
+      .catch(console.error),
+    fetch(`https://minotar.net/skin/${name}`)
+      .then(it => it.arrayBuffer())
+      .then(it => fs.writeFile(join(skinsDir, name + '.png'), it))
+      .catch(console.error)
+  ])
 }
