@@ -1,11 +1,11 @@
 import './show-more.less'
-import posed from 'react-pose'
+import { motion } from 'framer-motion'
 import React, { useState } from 'react'
 
-const Content = posed.div({
+const poses = {
   closed: { height: 0 },
   open: { height: 'auto' }
-})
+}
 
 const ShowMore: React.FC = (props) => {
   const [show, set] = useState(false)
@@ -24,7 +24,9 @@ const ShowMore: React.FC = (props) => {
         <rect x='1' y='4' width='2' height='2'/>
       </svg>
     </div>
-    <Content pose={show ? 'open' : 'closed'} className='content'>{props.children}</Content>
+    <motion.div initial={poses.closed} animate={show ? poses.open : poses.closed} className='content'>
+      {props.children}
+    </motion.div>
   </div>
 }
 

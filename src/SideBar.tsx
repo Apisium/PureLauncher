@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import moment from 'moment'
 import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'
+import LoginDialog from './components/LoginDialog'
 import VersionSwitch from './components/VersionSwitch'
 import useRouter from 'use-react-router'
 import ProfileModel from './models/ProfilesModel'
@@ -66,6 +67,7 @@ const SideBar: React.FC = () => {
       <p className='version' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>
         [{$('Click here to switch versions')}]</p>
       <Profile onClose={() => setProfile(false)} open={openProfile} />
+      <LoginDialog />
       <VersionSwitch onClose={() => setSwitch(false)} open={openSwitch} />
     </div>
   )

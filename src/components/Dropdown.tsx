@@ -1,15 +1,19 @@
 import './dropdown.less'
 import React from 'react'
-import posed from 'react-pose'
+import { motion } from 'framer-motion'
 
-const Cover = posed.div({
-  hoverable: true,
-  hover: { width: 'auto' },
+const poses = {
+  open: { width: 'auto' },
   closed: { width: 0 }
-})
+}
 const Dropdown: React.FC<{ open: boolean }> = (props) =>
-  <Cover pose={props.open ? 'hover' : 'closed'} className='dropdown'>
+  <motion.div
+    initial={poses.closed}
+    whileHover={poses.open}
+    animate={props.open ? 'open' : 'closed'}
+    className='dropdown'
+  >
     <div className='cover'>{props.children}</div>
-  </Cover>
+  </motion.div>
 
 export default Dropdown

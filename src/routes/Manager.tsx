@@ -16,10 +16,10 @@ export const getPages = () => [
     name: $('Downloads'),
     path: '/manager/downloads'
   },
-  {
-    name: $('Resources'),
-    path: '/manager/resources'
-  },
+  // {
+  //   name: $('Resources'),
+  //   path: '/manager/resources'
+  // },
   {
     name: $('Saves'),
     path: '/manager/saves'

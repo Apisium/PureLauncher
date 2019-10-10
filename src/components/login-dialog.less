@@ -1,0 +1,66 @@
+.login-dialog {
+  .rc-dialog-body {
+    // padding: 60px 40px 40px;
+    padding: 40px;
+  }
+  p {
+    text-align: center;
+  }
+  .title {
+    margin: 0px 0 20px;
+    font-size: 14px;
+    font-weight: 200;
+  }
+  .heads {
+    display: flex;
+    & > div {
+      margin: 0 auto;
+    }
+    & > div + div {
+      margin-left: 30px;
+    }
+  }
+  .head {
+    @w: 130px;
+    width: @w;
+    height: @w;
+    cursor: pointer;
+    border-radius: 10px;
+    filter: blur(1px) brightness(.7);
+    background-repeat: no-repeat;
+    background-size: @w * 8;
+    image-rendering: pixelated;
+    background-position: -@w -@w;
+    box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+      0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+      0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+    transition: .4s ease-in-out;
+
+    &:hover {
+      filter: blur(0px) brightness(.9);
+    }
+  }
+  .links {
+    font-size: 12px;
+    margin-top: 12px;
+    color: #0000009e;
+    .right {
+      float: right;
+    }
+    .left::before, .right::after {
+      content: '<  ';
+      font-size: 13px;
+      font-family: minecraft;
+    }
+    .right::after {
+      content: '  >';
+    }
+    span {
+      cursor: pointer;
+      transition: color .3s;
+    }
+    span:hover {
+      color: #00a354;
+    }
+  }
+}
