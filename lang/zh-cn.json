@@ -29,5 +29,15 @@
   "ENABLE ANIMATION": "开启启动器动画",
   "ENABLE SOUND": "开启启动器音效",
   "ENABLE BMCLAPI": "使用 BMCLAPI 加速下载",
-  "SHOW OUTPUT LOGS": "显示游戏日志"
+  "SHOW OUTPUT LOGS": "显示游戏日志",
+
+  "Online Login": "正版登录",
+  "Offline Login": "离线登录",
+  "Email": "邮箱",
+  "Password": "密码",
+  "Username": "游戏名",
+  "Register": "购买正版",
+  "Back": "返回",
+  "Login": "登录",
+  "Choose your account login mode. If you don't have the online version, please choose the \"Offline Login\" on the right": "选择您的帐号登录模式, 如果您还没有购买正版, 请您选择右侧的“离线登录”"
 }
