@@ -79,7 +79,6 @@
   ],
   "gypfile": true,
   "dependencies": {
-    "@xmcl/launch": "0.0.23",
-    "zipfile": "^0.5.12"
+    "@xmcl/launch": "0.0.23"
   }
 }
