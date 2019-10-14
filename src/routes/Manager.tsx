@@ -6,11 +6,16 @@ import useRoute from '../useRoute'
 
 import Versions from './manager/Versions'
 import Downloads from './manager/Downloads'
+import Profiles from './manager/Profiles'
 
 export const getPages = () => [
   {
     name: $('Versions'),
     path: '/manager/versions'
+  },
+  {
+    name: $('Accounts'),
+    path: '/manager/accounts'
   },
   {
     name: $('Downloads'),
@@ -33,9 +38,10 @@ const Manager: React.FC = () => {
 
   const versions = useRoute(Versions, '/manager/versions')
   const downloads = useRoute(Downloads, '/manager/downloads')
+  const profiles = useRoute(Downloads, '/manager/profiles')
 
   return <div className='manager'>
-    {versions}{downloads}
+    {versions}{downloads}{profiles}
     <Dots
       count={pages.length}
       onChange={onChange}

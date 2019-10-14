@@ -2,72 +2,70 @@ import './login-dialog.less'
 import React, { useState } from 'react'
 import Dialog from 'rc-dialog'
 import { shell } from 'electron'
+import * as Auth from '../plugin/Authenticator'
 
-const buy = () => shell.openExternal('https://my.minecraft.net/store/minecraft/#register')
-const steve = { backgroundImage: `url(${require('../assets/images/steve.png')})` }
-const zombie = { backgroundImage: `url(${require('../assets/images/zombie.png')})` }
-
-const LoginDialog: React.FC = () => {
-  const [type, setType] = useState(0)
+const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
+  const [type, setType] = useState('')
+  const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const back = () => setType(0)
-  return <Dialog className='login-dialog'>
-    {type === 0
+  const currentLogin = pluginMaster.logins[type]
+  return <Dialog className='login-dialog' visible={props.open} onClose={props.onClose}>
+    {type === ''
       ? <>
           <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>
           <div className='heads'>
-            <div><div className='head' style={steve} data-sound onClick={() => setType(1)} />
-              <p>{$('Online Login')}</p></div>
-            <div><div className='head' style={zombie} data-sound onClick={() => setType(2)} />
-              <p>{$('Offline Login')}</p></div>
+            {Object.values(pluginMaster.logins).map(it => <div key={it[Auth.NAME]}>
+              <div
+                data-sound
+                className='head'
+                onClick={() => {
+                  setSubmitted(false)
+                  setType(it[Auth.NAME])
+                }}
+                style={{ backgroundImage: `url(${it[Auth.IMAGE]})` }}
+              />
+              <p>{it[Auth.TITLE]()}</p>
+            </div>)}
           </div>
         </>
-      : type === 1
-        ? <form className={submitted ? 'submitted' : void 0} onSubmit={e => {
+      : <form
+        key={type}
+        className={submitted ? 'submitted' : void 0}
+        onInvalid={() => setSubmitted(true)}
+        onSubmit={e => {
           setSubmitted(true)
           e.preventDefault()
-        }} onInvalid={() => setSubmitted(true)}>
-            <label>{$('Email')}</label>
+          setLoading(true)
+          const data = { }
+          new FormData(e.target as HTMLFormElement).forEach((v, k) => (data[k] = v))
+          currentLogin
+            .login(data)
+            .then(key => __profilesModel().setSelectedProfile(key, currentLogin))
+            .catch(console.error) // TODO:
+            .finally(() => setLoading(false))
+        }}>
+          {(currentLogin[Auth.FIELDS] as Auth.Field[]).map(it => <React.Fragment key={it.name}>
+            <label>{it.title()}</label>
             <div className='input2'>
-              <input required type='email' name='email' />
+              <input {...it.inputProps} name={it.name} />
               <div className='dot0' />
               <div className='dot1' />
               <div className='dot2' />
               <div className='dot3' />
             </div>
-            <label>{$('Password')}</label>
-            <div className='input2'>
-              <input required type='password' name='password' />
-              <div className='dot0' />
-              <div className='dot1' />
-              <div className='dot2' />
-              <div className='dot3' />
-            </div>
-            <div className='links'>
-              <span data-sound className='left' onClick={back}>{$('Back')}</span>
-              <span data-sound className='right' onClick={buy}>{$('Register')}</span>
-            </div>
-            <button type='submit' className='btn3' style={{ marginTop: 8, width: '100%' }}>{$('Login')}</button>
-          </form>
-        : type === 2
-          ? <form className={submitted ? 'submitted' : void 0} onSubmit={e => {
-            setSubmitted(true)
-            e.preventDefault()
-          }} onInvalid={() => setSubmitted(true)}>
-            <label>{$('Username')}</label>
-            <div className='input2'>
-              <input required pattern='\w{2,16}' name='username' />
-              <div className='dot0' />
-              <div className='dot1' />
-              <div className='dot2' />
-              <div className='dot3' />
-            </div>
-            <div className='links'>
-              <span data-sound className='left' onClick={back}>{$('Back')}</span>
-            </div>
-            <button type='submit' className='btn3' style={{ marginTop: 8, width: '100%' }}>{$('Login')}</button>
-          </form>
-        : null}
+          </React.Fragment>)}
+          <div className='links'>
+            <span data-sound className='left' onClick={() => setType('')}>{$('Back')}</span>
+            {currentLogin[Auth.LINK] &&
+              <span data-sound className='right'
+                onClick={() => shell.openExternal(currentLogin[Auth.LINK].url())}>
+                {currentLogin[Auth.LINK].name()}
+              </span>
+            }
+          </div>
+          <button type='submit' className='btn3' style={{ marginTop: 8, width: '100%' }}>{$('Log in')}</button>
+        </form>
+      }
   </Dialog>
 }
 

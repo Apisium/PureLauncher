@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useModel } from 'use-model'
 import { join } from 'path'
-import { headsDir } from './util'
+import { skinsDir } from './util'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
@@ -39,7 +39,7 @@ const SideBar: React.FC = () => {
     .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())[0] ||
       { type: 'latest-release', version: 'latest-release' }
   const u = pm.getCurrentProfile()
-  const logged = !!u.username
+  const logged = !!u
   const versionName = `${ver.type === 'latest-release' ? lastRelease
     : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
   return (
@@ -49,15 +49,15 @@ const SideBar: React.FC = () => {
         overlay={$(logged ? 'Click here to switch accounts' : 'Click here to login')}
         defaultVisible={!logged}
       >
-        <div className='avatar' data-sound onClick={() => setProfile(true)}>
-          {logged ? <Img key={(u.uuid || u.username) + pm.i} src={[
-            `https://minotar.net/helm/${u.uuid || u.username}/80.png`,
-            join(headsDir, (u.uuid || u.username) + '.png'),
+        <div className='avatar' data-sound onClick={() => logged ? setProfile(true) : pm.setLoginDialogVisible()}>
+          {logged ? <Img key={u.key + pm.i.toString()} src={[
+            u.skinUrl,
+            join(skinsDir, u.key + '.png'),
             steve
           ]} /> : <img src={steve} />}
         </div>
       </ToolTip>
-      <p className='name'>{u.username || $('NOT LOGGED-IN')}</p>
+      <p className='name'>{logged ? u.username : $('NOT LOGGED-IN')}</p>
       <ul className='list'>
         <li className={pathname === '/home' ? 'active' : null}>
           <Link to='/home'><img src={homeIcon} /><span data-sound>{$('Home')}</span></Link>
@@ -85,7 +85,7 @@ const SideBar: React.FC = () => {
       <p className='version' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>
         [{$('Click here to switch versions')}]</p>
       <Profile onClose={() => setProfile(false)} open={openProfile} />
-      <LoginDialog />
+      <LoginDialog onClose={() => pm.setLoginDialogVisible(false)} open={pm.loginDialogVisible} />
       <VersionSwitch onClose={() => setSwitch(false)} open={openSwitch} />
     </div>
   )

@@ -1,18 +1,17 @@
 import { Model } from 'use-model'
 import { join, dirname } from 'path'
-import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin } from '../util'
+import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
+import { YGGDRASIL } from '../plugin/index'
 import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
 import pAll from 'p-all'
+import * as Auth from '../plugin/Authenticator'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
 const EXTRA_CONFIG = 'config.json'
-
-export const ONLINE_LOGIN = 'Online'
-export const OFFLINE_LOGIN = 'Offline'
 
 interface Version {
   name: string
@@ -25,6 +24,7 @@ interface Version {
 interface User {
   accessToken: string
   username: string
+  properties: []
   profiles: { [key: string]: { displayName: string } }
 }
 export default class ProfilesModel extends Model {
@@ -42,7 +42,7 @@ export default class ProfilesModel extends Model {
   }
   public profiles: { [key: string]: Version } = {}
   public authenticationDatabase: { [key: string]: User } = {}
-  public clientToken = ''
+  public clientToken = genUUID()
   public extraJson = {
     javaPath: '',
     bmclAPI: true,
@@ -51,10 +51,11 @@ export default class ProfilesModel extends Model {
     sandbox: true,
     selectedUser: '',
     loginType: '',
-    offlineAuthenticationDatabase: [] as string[],
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M'
   }
+
+  public loginDialogVisible = false
 
   public readonly launchProfilePath: string
   public readonly extraConfigPath: string
@@ -74,51 +75,35 @@ export default class ProfilesModel extends Model {
     } catch (e) {
       this.onLoadExtraConfigFailed(e)
     }
-    this.cacheSkins().catch(console.error).then(() => {
-      const u = this.getCurrentProfile()
-      if (u.username) cacheSkin(u.uuid || u.username)
-    }).catch(console.error)
+    this.cacheSkins().catch(console.error)
   }
 
-  public getCurrentProfile (): { type: string, accessToken?: string,
-    uuid?: string, username: string } {
-    switch (this.extraJson.loginType) {
-      case '': break
-      case ONLINE_LOGIN:
-        const su = this.selectedUser
-        if (su.account && su.profile) {
-          if (su.account in this.authenticationDatabase) {
-            const u = this.authenticationDatabase[su.account]
-            if (su.profile in u.profiles) {
-              const p = u[su.profile].profiles
-              return { username: p.displayName, uuid: su.profile, type: ONLINE_LOGIN, accessToken: u.accessToken }
-            }
-          }
-          su.profile = su.account = ''
-          this.saveLaunchProfileJsonSync()
-        }
-        break
-      case OFFLINE_LOGIN:
-        const cu = this.extraJson.selectedUser
-        if (cu) {
-          if (this.extraJson.offlineAuthenticationDatabase.includes(cu)) return { username: cu, type: OFFLINE_LOGIN }
-          this.extraJson.selectedUser = ''
-          this.extraJson.loginType = ''
-          this.saveExtraConfigJsonSync()
-        }
-        break
+  public modify (fn: (t: this) => void) {
+    fn(this)
+  }
+
+  public setLoginDialogVisible (state = true) { this.loginDialogVisible = state }
+
+  public getCurrentProfile () {
+    if (!this.extraJson.loginType) return null
+    try {
+      if (this.extraJson.loginType === YGGDRASIL) {
+        return this.selectedUser.account ? null : pluginMaster.logins[YGGDRASIL].getData(this.selectedUser.account)
+      } else return pluginMaster.getCurrentLogin().getData(this.extraJson.selectedUser)
+    } catch (e) {
+      this.extraJson.loginType = ''
+      this.extraJson.selectedUser = ''
+      this.saveExtraConfigJsonSync()
+      throw e // TODO:
     }
-    return { username: '', type: '' }
   }
 
   public async cacheSkins () {
     const t = localStorage.getItem('skinCacheTime')
     if (t && parseInt(t, 10) + 24 * 60 * 60 * 1000 > Date.now()) return
     if (!await fetch('https://minotar.net/').then(it => it.ok).catch(() => false)) return
-    await pAll(Object
-      .values(this.authenticationDatabase)
-      .flatMap(a => Object.keys(a.profiles))
-      .concat(this.extraJson.offlineAuthenticationDatabase).map(it => () => cacheSkin(it)), { concurrency: 5 })
+    await pAll(pluginMaster.getAllProfiles().filter(it => it.skinUrl)
+      .map(it => () => cacheSkin(it)), { concurrency: 5 })
     localStorage.setItem('skinCacheTime', Date.now().toString())
     this.addI()
   }
@@ -136,7 +121,7 @@ export default class ProfilesModel extends Model {
         this.extraJson.javaPath = files[0]
         return this.saveExtraConfigJson()
       } else {
-        // show some ui here to let user know
+        // TODO: show some ui here to let user know
       }
     })
   }
@@ -180,6 +165,19 @@ export default class ProfilesModel extends Model {
 
   public saveExtraConfigJsonSync () {
     fs.writeJsonSync(this.extraConfigPath, this.extraJson)
+  }
+
+  public * setSelectedProfile (key: string, type?: Auth.default) {
+    if (!type) type = pluginMaster.logins[pluginMaster.getAllProfiles().find(it => it.key === key).type]
+    yield type.validate(key)
+    const name = type[Auth.NAME]
+    if (name === YGGDRASIL) {
+      this.selectedUser.account = key
+      this.selectedUser.profile = type.getData(key).uuid
+      this.saveLaunchProfileJsonSync()
+    } else this.extraJson.selectedUser = key
+    this.extraJson.loginType = name
+    this.saveExtraConfigJsonSync()
   }
 
   public * setMemory (mem: string) {
@@ -239,7 +237,6 @@ export default class ProfilesModel extends Model {
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
     applyLocate(this.settings.locale, true)
-    this.getCurrentProfile()
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {

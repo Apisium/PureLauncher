@@ -1,7 +1,9 @@
 import fs from 'fs-extra'
+import uuid from 'uuid-by-string'
 import { remote } from 'electron'
 import { join } from 'path'
 import { platform } from 'os'
+import { Profile } from './plugin/Authenticator'
 
 export function getMinecraftRoot () {
   const current = platform()
@@ -11,8 +13,6 @@ export function getMinecraftRoot () {
 export const appDir = remote.app.getPath('userData')
 export const skinsDir = join(appDir, 'skins')
 fs.ensureDirSync(skinsDir, 1)
-export const headsDir = join(appDir, 'heads')
-fs.ensureDirSync(headsDir, 1)
 
 import { exec } from 'child_process'
 
@@ -38,15 +38,19 @@ export function getJavaVersion (path: string) {
   })
 }
 
-export function cacheSkin (name: string) {
-  return Promise.all([
-    fetch(`https://minotar.net/helm/${name}/80.png`)
-      .then(it => it.arrayBuffer())
-      .then(it => fs.writeFile(join(headsDir, name + '.png'), it))
-      .catch(console.error),
-    fetch(`https://minotar.net/skin/${name}`)
-      .then(it => it.arrayBuffer())
-      .then(it => fs.writeFile(join(skinsDir, name + '.png'), it))
-      .catch(console.error)
-  ])
-}
+export const cacheSkin = (p: Profile) => fetch(p.skinUrl)
+  .then(it => it.arrayBuffer())
+  .then(it => fs.writeFile(join(skinsDir, p.key + '.png'), it))
+  .catch(console.error)
+
+export const fetchJson = (url: string, post = false, body?: any, other?: RequestInit) => fetch(url, {
+  ...other,
+  method: post ? 'POST' : 'GET',
+  body: JSON.stringify(body),
+  headers: body ?
+    other ? { ...other.headers, 'Content-Type': 'application/json' }
+      : { 'Content-Type': 'application/json' }
+    : other.headers
+}).then(it => it.json())
+export const genUUID = (t?: string) => uuid(t || Math.random().toString(32) + Math.random().toString(32))
+  .replace(/-/g, '')

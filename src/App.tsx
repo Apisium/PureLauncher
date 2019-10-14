@@ -7,6 +7,9 @@ import Provider from './models/index'
 import Home from './routes/Home'
 import Settings from './routes/Settings'
 import Manager from './routes/Manager'
+import Master from './plugin/index'
+
+window.pluginMaster = new Master()
 
 const ref = createRef()
 require('./i18n').setInstance(ref)

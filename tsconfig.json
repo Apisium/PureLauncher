@@ -9,6 +9,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noImplicitAny": false,
+    "experimentalDecorators": true,
     "strictNullChecks": false,
     "noEmit": true,
     "jsx": "react"

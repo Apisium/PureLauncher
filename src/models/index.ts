@@ -3,4 +3,7 @@ import { getProvider } from 'use-model'
 import ProfilesModel from './ProfilesModel'
 import DownloadsModel from './DownloadsModel'
 
-export default getProvider(ProfilesModel, DownloadsModel)
+const P = getProvider(ProfilesModel, DownloadsModel)
+export default P
+
+window.__profilesModel = P.getModel(ProfilesModel) as any

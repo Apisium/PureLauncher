@@ -26,6 +26,8 @@
     "jsx-wrap-multiline": false,
     "no-var-keyword": false,
     "no-floating-promises": false,
-    "await-promise": false
+    "await-promise": false,
+    "callable-types": false,
+    "object-literal-key-quotes": false
   }
 }
