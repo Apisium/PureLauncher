@@ -38,7 +38,7 @@ const Manager: React.FC = () => {
 
   const versions = useRoute(Versions, '/manager/versions')
   const downloads = useRoute(Downloads, '/manager/downloads')
-  const profiles = useRoute(Downloads, '/manager/profiles')
+  const profiles = useRoute(Profiles, '/manager/accounts')
 
   return <div className='manager'>
     {versions}{downloads}{profiles}

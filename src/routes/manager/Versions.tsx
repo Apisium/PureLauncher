@@ -17,7 +17,7 @@ const Versions: React.FC = () => {
       <a className='add-btn'><i data-sound className='iconfont icon-shuliang-zengjia_o' />
         <span data-sound>{$('Add new...')}</span></a>
     </div>
-    <ul >
+    <ul className='scroll-bar'>
       {Object
         .entries(pm.profiles)
         .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)

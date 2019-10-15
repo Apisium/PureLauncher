@@ -270,20 +270,30 @@ progress[value='-1']::after {
   right: -6px;
   border-right: 2px solid #000;
 }
-.btn3:hover {
+.btn3:not(:disabled):hover {
   filter: brightness(1.2);
+}
+.btn3:disabled {
+  cursor: default;
+  filter: grayscale(1);
 }
 
 .input2 {
+  display: flex;
   margin: 4px 0 8px;
   position: relative;
+  transition: filter .4s;
   box-shadow: 0 3px 0 0 #00000024;
+}
+.input2.disabled {
+  filter: grayscale(1);
 }
 .input2 input {
   width: 200px;
   display: block;
   color: #000000c0;
   transition: .4s;
+  flex-grow: 1;
   background-color: #fff;
   border: 1px solid #008B47;
 }

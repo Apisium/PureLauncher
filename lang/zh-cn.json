@@ -21,6 +21,8 @@
   "Resources": "材质",
   "Saves": "地图",
   "Clear": "清理已完成项",
+  "Error:": "发生错误:",
+  "Loading...": "加载中...",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
@@ -49,5 +51,14 @@
   "NOT LOGGED-IN": "你还没有登录",
   "Click here to login": "点击这里以登录",
   "Click here to switch accounts": "点击这里以切换账号",
-  "Choose your account login mode. If you don't have the online version, please choose the \"Offline Login\" on the right": "选择您的帐号登录模式, 如果您还没有购买正版, 请您选择右侧的“离线登录”"
+  "Choose your account login mode. If you don't have the online version, please choose the \"Offline Login\" on the right": "选择您的帐号登录模式, 如果您还没有购买正版, 请您选择右侧的“离线登录”",
+
+  "Account already exists!": "账户已存在!",
+  "Account does not exists!": "账户不存在!",
+  "Network connection failed!": "网络连接失败!",
+  "You don't have an online profile yet!": "你还没有购买正版帐号!",
+  "You have already logged in with this account!": "你已经登录当前账户了!",
+  "Login succeeded!": "登录成功!",
+  "Success!": "操作成功!",
+  "Failed!": "操作失败!"
 }

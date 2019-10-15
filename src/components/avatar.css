@@ -1,0 +1,19 @@
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8%;
+  overflow: hidden;
+  position: relative;
+}
+
+.avatar img {
+  display: block;
+  width: 800%;
+  margin: -100%;
+  position: absolute;
+  image-rendering: pixelated;
+}
+.avatar .cover {
+  margin-left: -500%;
+  filter: drop-shadow(0px 2px 4px #0000004e) brightness(1.05);
+}

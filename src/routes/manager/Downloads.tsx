@@ -13,7 +13,7 @@ const Downloads: React.FC = () => {
         <span data-sound>{$('Clear')}</span>
       </a>
     </div>
-    <ul>{Object.entries(dm.list).map(([key, item]) => <li key={key}>
+    <ul className='scroll-bar'>{Object.entries(dm.list).map(([key, item]) => <li key={key}>
       {item.title ? <>{item.title} <span>{item.filename}</span></> : item.filename}
       <progress value={item.progress} max={100} />
     </li>)}

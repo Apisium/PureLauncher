@@ -3,7 +3,7 @@ import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../util'
 import { remote } from 'electron'
 import { platform } from 'os'
-import { YGGDRASIL } from '../plugin/index'
+import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
@@ -167,7 +167,8 @@ export default class ProfilesModel extends Model {
     fs.writeJsonSync(this.extraConfigPath, this.extraJson)
   }
 
-  public * setSelectedProfile (key: string, type?: Auth.default) {
+  public * setSelectedProfile (key: string, type?: Auth.default | string) {
+    if (typeof type === 'string') type = pluginMaster.logins[type]
     if (!type) type = pluginMaster.logins[pluginMaster.getAllProfiles().find(it => it.key === key).type]
     yield type.validate(key)
     const name = type[Auth.NAME]

@@ -2,6 +2,7 @@
 @import 'slick-carousel/slick/slick-theme.css';
 @import 'rc-dialog/assets/index.css';
 @import 'rc-tooltip/assets/bootstrap.css';
+@import 'rc-notification/assets/index.css';
 @import './custom.css';
 
 * {
@@ -113,12 +114,16 @@ img {
   pointer-events: none;
 }
 
+.scroll-bar {
+  overflow: auto !important;
+}
+
 #main-content {
   width: 100%;
   padding: 20px;
   transition: .7s;
   -webkit-app-region: no-drag;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
 }
 
 #main-content > * {
@@ -126,12 +131,12 @@ img {
   display: block;
 }
 
-#main-content::-webkit-scrollbar {
+.scroll-bar::-webkit-scrollbar {
   width: 7px;
   height: 1px;
 }
 
-#main-content::-webkit-scrollbar-thumb {
+.scroll-bar::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background: var(--scroll-color);
   box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2),
@@ -139,7 +144,7 @@ img {
     0px 1px 8px 0px rgba(0, 0, 0, 0.12);
 }
 
-#main-content::-webkit-scrollbar-thumb:hover {
+.scroll-bar::-webkit-scrollbar-thumb:hover {
   box-shadow: 0px 4px 5px -2px rgba(0, 0, 0, 0.2),
     0px 7px 10px 1px rgba(0, 0, 0, 0.14),
     0px 2px 16px 1px rgba(0, 0, 0, 0.12);
@@ -245,4 +250,17 @@ img {
 
 .rc-tooltip-inner {
   min-height: unset;
+}
+
+.rc-notification {
+  left: unset !important;
+  right: 40px;
+  top: 100px !important;
+  z-index: 5000;
+  display: flex;
+}
+.rc-notification-notice {
+  padding-left: 20px;
+  width: fit-content;
+  margin-left: auto;
 }

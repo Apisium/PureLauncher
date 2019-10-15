@@ -22,7 +22,7 @@ const App: React.FC = () => {
     <Provider>
       <HashRouter ref={ref as any}>
         <SideBar />
-        <section id='main-content'>
+        <section id='main-content' className='scroll-bar'>
           {home}{settings}{manager}
           <Redirect to='/manager/downloads' />
         </section>

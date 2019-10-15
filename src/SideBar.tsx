@@ -2,12 +2,12 @@ import './side-bar.less'
 import React, { useState } from 'react'
 import moment from 'moment'
 import ToolTip from 'rc-tooltip'
-import Img from 'react-image'
 import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'
 import LoginDialog from './components/LoginDialog'
 import VersionSwitch from './components/VersionSwitch'
 import useRouter from 'use-react-router'
+import Avatar from './components/Avatar'
 import ProfileModel from './models/ProfilesModel'
 import { Link } from 'react-router-dom'
 import { getPages } from './routes/Manager'
@@ -18,8 +18,6 @@ import { skinsDir } from './util'
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
 const managerIcon = require('./assets/images/compass_19.png')
-
-const steve = require('./assets/images/steve-head.png')
 
 const SideBar: React.FC = () => {
   const pages = getPages()
@@ -49,13 +47,15 @@ const SideBar: React.FC = () => {
         overlay={$(logged ? 'Click here to switch accounts' : 'Click here to login')}
         defaultVisible={!logged}
       >
-        <div className='avatar' data-sound onClick={() => logged ? setProfile(true) : pm.setLoginDialogVisible()}>
-          {logged ? <Img key={u.key + pm.i.toString()} src={[
+        <Avatar
+          data-sound
+          key={(logged ? u.key : '') + pm.i.toString()}
+          src={logged ? [
             u.skinUrl,
-            join(skinsDir, u.key + '.png'),
-            steve
-          ]} /> : <img src={steve} />}
-        </div>
+            join(skinsDir, u.key + '.png')
+          ] : null}
+          onClick={() => logged ? setProfile(true) : pm.setLoginDialogVisible()}
+        />
       </ToolTip>
       <p className='name'>{logged ? u.username : $('NOT LOGGED-IN')}</p>
       <ul className='list'>
