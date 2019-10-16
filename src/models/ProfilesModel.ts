@@ -94,9 +94,11 @@ export default class ProfilesModel extends Model {
       this.extraJson.loginType = ''
       this.extraJson.selectedUser = ''
       this.saveExtraConfigJsonSync()
-      throw e // TODO:
+      notice({ content: $('Current account is invalid, please re-login!') })
     }
   }
+
+  public addI () { this.i++ }
 
   public async cacheSkins () {
     const t = localStorage.getItem('skinCacheTime')
@@ -115,14 +117,12 @@ export default class ProfilesModel extends Model {
       filters: [
         { name: $('Executable File (Javaw)'), extensions: platform() === 'win32' ? ['exe'] : [] }
       ]
-    }, (files) => {
-      const version = getJavaVersion(files[0])
+    }, ([file]) => {
+      const version = getJavaVersion(file)
       if (version) {
-        this.extraJson.javaPath = files[0]
-        return this.saveExtraConfigJson()
-      } else {
-        // TODO: show some ui here to let user know
-      }
+        this.extraJson.javaPath = file
+        this.saveExtraConfigJsonSync()
+      } else notice({ content: $('Incorrect java version!'), error: true })
     })
   }
 
@@ -199,7 +199,10 @@ export default class ProfilesModel extends Model {
 
   public * setSelectedVersion (id: string) {
     const profile = this.profiles[id]
-    if (!profile) throw new Error('No such id: ' + id) // TODO: Add a dialog
+    if (!profile) {
+      notice({ content: $('No such version:') + ' ' + id, error: true })
+      throw new Error('No such id: ' + id)
+    }
     profile.lastUsed = new Date().toISOString()
     yield* this.saveExtraConfigJson()
   }
@@ -243,8 +246,6 @@ export default class ProfilesModel extends Model {
   private loadExtraConfigJson (extra: this['extraJson']) {
     this.extraJson = extra
   }
-
-  private addI () { this.i++ }
 
   private onLoadLaunchProfileFailed (e: Error) {
     if (e.message.includes('no such file or directory')) {

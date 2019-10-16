@@ -23,6 +23,9 @@
   "Clear": "清理已完成项",
   "Error:": "发生错误:",
   "Loading...": "加载中...",
+  "No such version:": "没有这个版本:",
+  "Incorrect java version!": "Java 版本不正确!",
+  "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
@@ -60,5 +63,12 @@
   "You have already logged in with this account!": "你已经登录当前账户了!",
   "Login succeeded!": "登录成功!",
   "Success!": "操作成功!",
-  "Failed!": "操作失败!"
+  "Failed!": "操作失败!",
+  "Quick account switching:": "快速切换账号:",
+  "Change skin": "更换皮肤",
+  "Cancel upload": "取消上传",
+  "Upload!": "立即上传",
+  "Minecraft Skin File (.png)": "我的世界皮肤文件 (.png)",
+  "Incorrect file format!": "文件格式不正确!",
+  "Please select the skin file.": "请选择你的皮肤文件"
 }

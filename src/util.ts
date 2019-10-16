@@ -40,7 +40,7 @@ export function getJavaVersion (path: string) {
 
 export const cacheSkin = (p: Profile) => fetch(p.skinUrl)
   .then(it => it.arrayBuffer())
-  .then(it => fs.writeFile(join(skinsDir, p.key + '.png'), it))
+  .then(it => fs.writeFile(join(skinsDir, p.key + '.png'), Buffer.from(it)))
   .catch(console.error)
 
 export const fetchJson = (url: string, post = false, body?: any, other?: RequestInit) => fetch(url, {
@@ -51,6 +51,6 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
     other ? { ...other.headers, 'Content-Type': 'application/json' }
       : { 'Content-Type': 'application/json' }
     : other.headers
-}).then(it => it.json())
+}).then(it => it.json().catch(() => null))
 export const genUUID = (t?: string) => uuid(t || Math.random().toString(32) + Math.random().toString(32))
   .replace(/-/g, '')

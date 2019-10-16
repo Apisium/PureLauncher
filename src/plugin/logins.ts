@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import Authenticator, { RegisterAuthenticator, Profile } from './Authenticator'
+import Authenticator, { RegisterAuthenticator, Profile, SkinChangeable } from './Authenticator'
 import { genUUID, fetchJson, appDir } from '../util'
 import { join } from 'path'
 
@@ -22,7 +22,7 @@ export const YGGDRASIL = 'yggdrasil'
     inputProps: { type: 'password', required: true }
   }
 ], { name: () => $('Register'), url: () => 'https://my.minecraft.net/store/minecraft/#register' })
-export class Yggdrasil extends Authenticator {
+export class Yggdrasil extends Authenticator implements SkinChangeable {
   public async login (options: { email: string, password: string }) {
     const m = __profilesModel()
     const p = Object.values(m.authenticationDatabase)
@@ -149,6 +149,24 @@ export class Yggdrasil extends Authenticator {
           skinUrl: 'https://minotar.net/skin/' + uuid
         } : null
       }).filter(Boolean)
+  }
+  public async changeSkin (key: string, path: string, slim: boolean = false) {
+    const p = this.getData(key)
+    const body = new FormData()
+    if (slim) body.append('model', 'slim')
+    body.append('file', new Blob([await fs.readFile(path)]))
+    const text = await fetch(`https://api.mojang.com/user/profile/${p.uuid}/skin`, {
+      body,
+      method: 'PUT',
+      headers: { Authorization: 'Bearer ' + p.accessToken }
+    }).then(it => it.text(), e => {
+      console.error(e)
+      throw new Error($('Network connection failed!'))
+    })
+    if (text) {
+      console.error(JSON.parse(text))
+      throw new Error($('Network connection failed!'))
+    }
   }
 }
 

@@ -19,10 +19,10 @@
   /* --background: url(https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/startpage-hero/index-hero-sm.png); */
 }
 
-/* :root {
+:root {
   /* --top-color: url(./assets/images/bg-wool-dark-light.png);
-  /* --top-border: #fff483c7;
-  --top-shadow: rgba(255, 255, 255, 0.22);
+  --top-border: #fff483c7;
+  --top-shadow: rgba(255, 255, 255, 0.22); */
   --top-filter: brightness(0.5);
   --launch-filter: brightness(0.8);
 
@@ -39,4 +39,4 @@
   --input-color: #444;
 
   --background: url(./assets/images/bg-wool-dark.png);
-} */
+}

@@ -39,3 +39,6 @@ export default abstract class Authenticator {
   public abstract getData (key: string): Profile
   public abstract getAllProfiles (): Profile[]
 }
+export interface SkinChangeable {
+  changeSkin (key: string, path: string, slim: boolean): Promise<void>
+}
