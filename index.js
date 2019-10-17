@@ -11,7 +11,7 @@ const create = () => {
     fullscreenable: false,
     transparent: true,
     frame: false,
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { webviewTag: true, nodeIntegration: true }
   })
 
   window.loadFile('./dist/index.html')

@@ -3,6 +3,7 @@
 @import 'rc-dialog/assets/index.css';
 @import 'rc-tooltip/assets/bootstrap.css';
 @import 'rc-notification/assets/index.css';
+@import './minecraft.css';
 @import './custom.css';
 
 * {
@@ -114,10 +115,6 @@ img {
   pointer-events: none;
 }
 
-.scroll-bar {
-  overflow: auto !important;
-}
-
 #main-content {
   width: 100%;
   padding: 20px;
@@ -129,25 +126,6 @@ img {
 #main-content > * {
   transition: .4s ease-in-out;
   display: block;
-}
-
-.scroll-bar::-webkit-scrollbar {
-  width: 7px;
-  height: 1px;
-}
-
-.scroll-bar::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: var(--scroll-color);
-  box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2),
-    0px 3px 4px 0px rgba(0, 0, 0, 0.14),
-    0px 1px 8px 0px rgba(0, 0, 0, 0.12);
-}
-
-.scroll-bar::-webkit-scrollbar-thumb:hover {
-  box-shadow: 0px 4px 5px -2px rgba(0, 0, 0, 0.2),
-    0px 7px 10px 1px rgba(0, 0, 0, 0.14),
-    0px 2px 16px 1px rgba(0, 0, 0, 0.12);
 }
 
 #chicken {
@@ -263,4 +241,5 @@ img {
   padding-left: 20px;
   width: fit-content;
   margin-left: auto;
+  color: #000000d6;
 }

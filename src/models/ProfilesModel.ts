@@ -240,6 +240,7 @@ export default class ProfilesModel extends Model {
     this.clientToken = merge(this.clientToken, json.clientToken)
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
+    if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()
     applyLocate(this.settings.locale, true)
   }
 
@@ -255,6 +256,11 @@ export default class ProfilesModel extends Model {
       fs.renameSync(this.launchProfilePath, `${this.launchProfilePath}.${Date.now()}.bak`)
     }
     fs.mkdirsSync(dirname(this.launchProfilePath))
+    this.setDefaultVersions()
+    this.saveLaunchProfileJsonSync()
+  }
+
+  private setDefaultVersions () {
     this.profiles.b7472ad16d074bb8336095262999a176 = {
       name: '',
       created: '1970-01-01T00:00:00.000Z',
@@ -271,7 +277,6 @@ export default class ProfilesModel extends Model {
       lastVersionId: 'latest-snapshot',
       type: 'latest-snapshot'
     }
-    this.saveLaunchProfileJsonSync()
   }
 
   private async onLoadExtraConfigFailed (e: Error) {
