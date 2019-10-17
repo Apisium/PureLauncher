@@ -78,7 +78,8 @@ const SideBar: React.FC = () => {
           <Link to={it.path}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={console.log}>{$('Play')}</button>
+      <button className='btn btn-primary launch' onClick={console.log}>
+        <i className='iconfont icon-icons-minecraft_pic' />{$('Play')}</button>
       <p className='version' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span></p>
       <p className='version' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>

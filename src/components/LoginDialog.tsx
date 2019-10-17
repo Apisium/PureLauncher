@@ -2,6 +2,7 @@ import './login-dialog.less'
 import React, { useState } from 'react'
 import Dialog from 'rc-dialog'
 import { shell } from 'electron'
+import { Link } from 'react-router-dom'
 import * as Auth from '../plugin/Authenticator'
 
 const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
@@ -13,6 +14,8 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
     {type === ''
       ? <>
           <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>
+          <Link to='/manager/accounts' className='title title2' onClick={props.onClose}>
+            {$('Have already logged in? Click here!')}</Link>
           <div className='heads'>
             {Object.values(pluginMaster.logins).map(it => <div key={it[Auth.NAME]}>
               <div

@@ -26,6 +26,7 @@
   "No such version:": "没有这个版本:",
   "Incorrect java version!": "Java 版本不正确!",
   "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
+  "Have already logged in? Click here!": "已经登陆了? 点击这里切换账户!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
