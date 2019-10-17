@@ -4,10 +4,14 @@ import { genUUID, fetchJson, appDir } from '../util'
 import { join } from 'path'
 
 const BASE_URL = 'https://authserver.mojang.com/'
-const saveFile = () => (__profilesModel().saveLaunchProfileJson() as any as Promise<void>).catch(e => {
-  console.error(e)
-  throw new Error('保存失败!')
-})
+const saveFile = () => {
+  try {
+    __profilesModel().saveLaunchProfileJsonSync()
+  } catch (e) {
+    console.error(e)
+    throw new Error('保存失败!')
+  }
+}
 
 export const YGGDRASIL = 'yggdrasil'
 @RegisterAuthenticator(YGGDRASIL, () => $('Online Login'), require('../assets/images/steve.png'), [

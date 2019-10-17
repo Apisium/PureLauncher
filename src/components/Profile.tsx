@@ -50,7 +50,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
       } else ref2.current.skinUrl = skinUrl
     }
   }, [u, skin, pm.i])
-  const l = pluginMaster.logins[u.type]
+  const l = u && pluginMaster.logins[u.type]
   const [loading, setLoading] = useState(false)
   const handleSkinChange = () => {
     setLoading(true)
