@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/Apisium/PureLauncher#readme",
   "devDependencies": {
+    "@xmcl/launch": "0.0.23",
     "@types/fs-extra": "^8.0.0",
     "@types/lodash.merge": "^4.6.6",
     "@types/node": "^12.7.5",
@@ -79,6 +80,5 @@
   ],
   "gypfile": true,
   "dependencies": {
-    "@xmcl/launch": "0.0.23"
   }
 }

@@ -24,7 +24,6 @@ interface Version {
 interface User {
   accessToken: string
   username: string
-  properties: []
   profiles: { [key: string]: { displayName: string } }
   properties: Array<{ [key: string]: string }>,
 }
