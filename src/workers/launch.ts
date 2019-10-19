@@ -19,8 +19,8 @@ addEventListener('message', function (e) {
     p.stdout.on('data', (data) => {
       // console.log(data.toString())
     })
-    p.on('exit', (code) => {
-      postMessage({ state: 'exit', code })
+    p.on('exit', (code, signal) => {
+      postMessage({ state: 'exit', code, signal })
     })
     postMessage({ state: 'launched' })
   }).catch(err => {
