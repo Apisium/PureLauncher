@@ -20,7 +20,7 @@ body {
   height: 516px;
   color: var(--text-color-0);
   filter: drop-shadow(2px 4px 4px #00000037);
-  animation: shadow 3s ease-in-out infinite;
+  /* animation: shadow 3s ease-in-out infinite; */
   -webkit-app-region: drag;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
