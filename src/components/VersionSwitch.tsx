@@ -12,7 +12,13 @@ const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = (props) 
   const lastPlayed = $('Last played')
   const lastRelease = $('last-release')
   const lastSnapshot = $('last-snapshot')
-  return <Dialog className='version-switch' onClose={props.onClose} visible={props.open}>
+  return <Dialog
+    animation='zoom'
+    maskAnimation='fade'
+    className='version-switch'
+    onClose={props.onClose}
+    visible={props.open}
+  >
     <ul>
       {Object
         .entries(pm.profiles)

@@ -10,7 +10,13 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const currentLogin = pluginMaster.logins[type]
-  return <Dialog className='login-dialog' visible={props.open} onClose={() => !loading && props.onClose()}>
+  return <Dialog
+    animation='zoom'
+    maskAnimation='fade'
+    className='login-dialog'
+    visible={props.open}
+    onClose={() => !loading && props.onClose()}
+  >
     {type === ''
       ? <>
           <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>

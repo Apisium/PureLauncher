@@ -12,8 +12,8 @@
     "experimentalDecorators": true,
     "strictNullChecks": false,
     "noEmit": true,
-    "jsx": "react",        
-    "lib": ["webworker", "scripthost"]
+    "jsx": "react",
+    "lib": ["webworker", "scripthost", "dom"]
   },
   "include": [
     "src"

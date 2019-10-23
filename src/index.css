@@ -182,6 +182,8 @@ img {
   width: calc(100% - 40px);
   left: 20px;
   border-radius: 4px;
+  backdrop-filter: blur(2px);
+  background-color: #37373780;
 }
 .rc-dialog-wrap {
   top: 52px;

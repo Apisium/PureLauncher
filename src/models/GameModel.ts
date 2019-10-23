@@ -1,6 +1,6 @@
 import { Model } from 'use-model'
-import ProfilesModel from './ProfilesModel'
 import { Launcher } from '@xmcl/launch'
+import ProfilesModel from './ProfilesModel'
 
 export default class GameModel extends Model {
   public error: { code: number; signal: string } | undefined | any

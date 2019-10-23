@@ -99,7 +99,14 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
       })
     }
   }
-  return <Dialog className='profile' onClose={() => !loading && props.onClose()} visible={props.open} forceRender>
+  return <Dialog
+    animation='zoom'
+    maskAnimation='fade'
+    className='profile'
+    onClose={() => !loading && props.onClose()}
+    visible={props.open}
+    forceRender
+  >
     <div className='left'>
       <div ref={ref} className='skin' />
       <div className='buttons' style={{ display: u && 'changeSkin' in l ? void 0 : 'none' }}>
