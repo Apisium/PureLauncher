@@ -77,10 +77,10 @@ const SideBar: React.FC = () => {
       </ul>
       <Dropdown open={open}>
         <ul className='top-bar'>{pages.map(it => <li key={it.path}>
-          <Link to={it.path}>{it.name}</Link>
+          <Link to={it.path} className={pathname === it.path ? 'active' : void 0}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-  <button className='btn btn-primary launch' onClick={gameModel.launch}>
+      <button className='btn btn-primary launch' onClick={gameModel.launch}>
         <i className='iconfont icon-icons-minecraft_pic' />{$('Play')}</button>
       <p className='version' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span></p>
