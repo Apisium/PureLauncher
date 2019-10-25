@@ -1,18 +1,10 @@
 import './list.less'
-import React, { useEffect as ue, useRef } from 'react'
+import E from 'electron'
+import React, { useRef } from 'react'
 
 const dev = process.env.NODE_ENV !== 'production'
 const Downloads: React.FC = () => {
-  const ref = useRef<any>()
-  if (dev) {
-    ue(() => {
-      const webview = ref.current
-      if (!webview) return
-      webview.addEventListener('dom-ready', () => {
-        webview.openDevTools()
-      })
-    })
-  }
+  const ref = useRef<E.WebviewTag>()
   return <div className='manager-list version-switch manager-versions manager-downloads'>
     <div className='list-top'>
       <span className='header'>{$('Downloads')}</span>

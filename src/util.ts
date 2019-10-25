@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import uuid from 'uuid-by-string'
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { platform } from 'os'
 import { Profile } from './plugin/Authenticator'
@@ -52,5 +52,32 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
       : { 'Content-Type': 'application/json' }
     : other.headers
 }).then(it => it.json().catch(() => null))
-export const genUUID = (t?: string) => uuid(t || Math.random().toString(32) + Math.random().toString(32))
+export const genUUID = (t?: string) => uuid(t || Math.random().toString() + Math.random().toString())
   .replace(/-/g, '')
+
+interface DownloadItem {
+  item: { url: string, file: string } | Array<{ url: string, file: string }>,
+  name?: string,
+  resolve: () => void,
+  reject: (e: number) => void
+}
+const downloadList: { [id: string]: DownloadItem } = { }
+export const download = (item: DownloadItem['item'], name?: string) => {
+  const id = Date.now().toString(36) + Math.random().toString(36)
+  let resolve: () => void
+  let reject: (e: number) => void
+  const promise = new Promise((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  downloadList[id] = { item, name, resolve, reject }
+  ipcRenderer.send('download', id, item, name)
+  return promise
+}
+;(global as any).download = download
+ipcRenderer.on('download-end', (_, id, type) => {
+  const obj = downloadList[id]
+  if (!obj) return
+  delete downloadList[id]
+  if (type) obj.reject(type); else obj.resolve()
+})

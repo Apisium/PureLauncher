@@ -12,7 +12,14 @@ body {
 }
 
 span {
+  font-size: 12px;
+  font-weight: lighter;
   color: var(--text-color-1);
+}
+
+span::before {
+  content: ' - ';
+  font-size: 16px;
 }
 
 li {
