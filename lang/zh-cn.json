@@ -71,5 +71,9 @@
   "Upload!": "立即上传",
   "Minecraft Skin File (.png)": "我的世界皮肤文件 (.png)",
   "Incorrect file format!": "文件格式不正确!",
-  "Please select the skin file.": "请选择你的皮肤文件"
+  "Please select the skin file.": "请选择你的皮肤文件",
+
+  "FINISHED": "已完成",
+  "CANCELED": "已取消",
+  "ERROR": "发生错误"
 }

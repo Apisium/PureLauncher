@@ -22,14 +22,41 @@ span::before {
   font-size: 16px;
 }
 
+div {
+  display: inline;
+  font-size: 17px;
+}
+
 li {
   cursor: default;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   margin-top: 8px;
+  vertical-align: middle;
   padding-bottom: 10px;
   border-bottom: 1px solid #555;
+  transition: transform 1s ease-in-out, color .3s;
+  transform: translateX(-110%);
+}
+li.finished div, li.error div, li.canceled div {
+  text-decoration: line-through;
+}
+li.error {
+  color: #f44336;
+}
+li::after {
+  font-weight: 200;
+  font-size: 12px;
+}
+li.finished::after {
+  content: ' (' var(--finished) ')';
+}
+li.error::after {
+  content: ' (' var(--error) ')';
+}
+li.canceled::after {
+  content: ' (' var(--canceled) ')';
 }
 
 ul {

@@ -38,13 +38,13 @@ const create = () => {
             }
           }
           if (downloadViewer)
-            downloadViewer.send('start-download', id, item.slice(3).map(it => basename(it)).join(', '), name)
+            downloadViewer.send('start-download', id, item.slice(3).map(it => basename(it.file)).join(', '), name)
           for (let j = 0; i < 5; i++) next()
         } else {
           const u = new URL(item.url)
           u.hash = id
           ctx.downloadURL(u.href)
-          if (downloadViewer) downloadViewer.send('start-download', id, basename(item.url), name)
+          if (downloadViewer) downloadViewer.send('start-download', id, basename(item.file), name)
         }
       } catch (e) {
         console.log(e)

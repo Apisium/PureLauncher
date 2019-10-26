@@ -11,11 +11,13 @@ let instance: any
 export const setInstance = (instance2: any) => void (instance = instance2)
 
 let current = zhCN
+export let currentName = 'zh-cn'
 
 export const applyLocate = (name: string, notUpdate: boolean = false) => {
   if (!(name in langs)) throw new Error('No such lang: ' + name)
   current = langs[name]
   moment.locale(name)
+  currentName = name
   if (!notUpdate) forceUpdate(instance.current)
 }
 
