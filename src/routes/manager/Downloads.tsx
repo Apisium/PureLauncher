@@ -15,6 +15,7 @@ const Downloads: React.FC = () => {
         --canceled: '${$('CANCELED')}';
       }
     `)
+    w.executeJavaScript(`window.__cancelText = '${$('CANCEL')}'`)
   }, [w])
   useEffect(() => {
     if (!w) return

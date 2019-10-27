@@ -4,7 +4,6 @@
 body {
   margin: 0;
   user-select: none;
-  pointer-events: none;
   color: var(--text-color-0);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
@@ -22,7 +21,7 @@ span::before {
   font-size: 16px;
 }
 
-div {
+.t {
   display: inline;
   font-size: 17px;
 }
@@ -35,11 +34,15 @@ li {
   margin-top: 8px;
   vertical-align: middle;
   padding-bottom: 10px;
+  position: relative;
   border-bottom: 1px solid #555;
   transition: transform 1s ease-in-out, color .3s;
   transform: translateX(-110%);
 }
-li.finished div, li.error div, li.canceled div {
+li:hover .b {
+  opacity: 1;
+}
+li.finished .t, li.error .t, li.canceled .t {
   text-decoration: line-through;
 }
 li.error {
@@ -57,6 +60,18 @@ li.error::after {
 }
 li.canceled::after {
   content: ' (' var(--canceled) ')';
+}
+
+.b {
+  z-index: 1;
+  opacity: 0;
+  display: flex;
+  transition: opacity .3s;
+  position: absolute;
+  right: 0;
+  top: -4px;
+  bottom: 0;
+  align-items: center;
 }
 
 ul {

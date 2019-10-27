@@ -15,8 +15,13 @@ const create = () => {
     .on('download-window-loaded', (e, id) => {
       downloadViewer = webContents.fromId(id).once('did-navigate', () => (downloadViewer = null))
       if (process.env.DOWNLOAD_DEV) downloadViewer.openDevTools()
+      e.reply('download-items', Object.entries(downloadItems).map(([id, { name, file }]) => ({ id, name, file })))
     })
-    .on('download', (e, id, item, name) => {
+    .on('cancel-download', (_, id) => {
+      const obj = downloadItems[id]
+      if (obj && !obj.stopped) (obj.multiple ? obj.item : [obj.item]).forEach(it => it.instance && it.instance.cancel())
+    })
+    .on('download', (_, id, item, name) => {
       if (!id || !item) throw new Error('Url is not exists.')
       const obj = downloadItems[id] = { item, name }
       try {
@@ -30,22 +35,23 @@ const create = () => {
           obj.alive = 0
           obj.finished = 0
           obj.stopped = false
+          obj.file = item.slice(3).map(it => basename(it.file)).join(', ')
           const next = obj.next = () => {
+            if (obj.stopped) return
             const g = urls.next()
             if (!g.done) {
               ctx.downloadUrl(g.value)
               obj.alive++
             }
           }
-          if (downloadViewer)
-            downloadViewer.send('start-download', id, item.slice(3).map(it => basename(it.file)).join(', '), name)
           for (let j = 0; i < 5; i++) next()
         } else {
           const u = new URL(item.url)
           u.hash = id
           ctx.downloadURL(u.href)
-          if (downloadViewer) downloadViewer.send('start-download', id, basename(item.file), name)
+          obj.file = basename(item.file)
         }
+        if (downloadViewer) downloadViewer.send('start-download', id, obj.file, name)
       } catch (e) {
         console.log(e)
       }
@@ -55,13 +61,16 @@ const create = () => {
   ctx.session.on('will-download', (e, i) => {
     const [id, cid] = new URL(i.getURL()).hash.slice(1).split('|', 2)
     const obj = downloadItems[id]
-    i.setSavePath(cid ? obj.item[parseInt(cid, 10)].file : obj.item.file)
+    const item = cid ? obj.item[parseInt(cid, 10)] : obj.item
+    item.instance = i
+    i.setSavePath(item.file)
     i
       .on('updated', (_, state) => {
         if (state === 'interrupted') {
           obj.stopped = true
           sendToAll('download-end', id, 2)
           items.delete(i)
+          obj.instance = null
           delete downloadItems[id]
         } else {
           if (!obj.multiple && downloadViewer)
@@ -70,6 +79,7 @@ const create = () => {
       })
       .once('done', (_, state) => {
         items.delete(i)
+        obj.instance = null
         switch (state) {
           case 'completed':
             if (obj.multiple) {

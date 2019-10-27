@@ -75,5 +75,6 @@
 
   "FINISHED": "已完成",
   "CANCELED": "已取消",
-  "ERROR": "发生错误"
+  "ERROR": "发生错误",
+  "CANCEL": "取消"
 }
