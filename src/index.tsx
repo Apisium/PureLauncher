@@ -2,6 +2,7 @@ import './index.css'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
+import './protocol/index'
 import { remote } from 'electron'
 import { newInstance } from 'rc-notification'
 

@@ -8,10 +8,12 @@ import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
 import pAll from 'p-all'
+import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
 const EXTRA_CONFIG = 'config.json'
+const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
 interface Version {
   name: string
@@ -59,6 +61,20 @@ export default class ProfilesModel extends Model {
 
   public readonly launchProfilePath: string
   public readonly extraConfigPath: string
+
+  public get selectedVersion () {
+    let version: Version
+    let time = -Infinity
+    for (const id in this.profiles) {
+      const v = this.profiles[id]
+      const t = moment(v.lastUsed).valueOf()
+      if (t > time && (this.settings.enableSnapshots || v.type !== 'latest-snapshot')) {
+        version = v
+        time = t
+      }
+    }
+    return version
+  }
 
   constructor (readonly root = getMinecraftRoot()) {
     super()
@@ -140,7 +156,7 @@ export default class ProfilesModel extends Model {
     fs.writeJsonSync(this.launchProfilePath, merge(json, {
       settings: this.selectedUser,
       selectedUser: this.selectedUser,
-      profile: this.profiles,
+      profiles: this.profiles,
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
     }))
@@ -153,7 +169,7 @@ export default class ProfilesModel extends Model {
     yield fs.writeJson(this.launchProfilePath, merge(json, {
       settings: this.selectedUser,
       selectedUser: this.selectedUser,
-      profile: this.profiles,
+      profiles: this.profiles,
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
     }))
@@ -204,7 +220,8 @@ export default class ProfilesModel extends Model {
       throw new Error('No such id: ' + id)
     }
     profile.lastUsed = new Date().toISOString()
-    yield* this.saveExtraConfigJson()
+    yield* this.saveLaunchProfileJson()
+    this.setTasks()
   }
 
   public * toggleSound () {
@@ -227,6 +244,43 @@ export default class ProfilesModel extends Model {
     yield* this.saveExtraConfigJson()
   }
 
+  public setTasks () {
+    const noTitle = $('No Title')
+    const lastRelease = $('last-release')
+    const lastSnapshot = $('last-snapshot')
+    const versions = Object
+      .entries(this.profiles)
+      .filter(v => this.settings.enableSnapshots || v[1].type !== 'latest-snapshot')
+      .sort((a, b) => moment(b[1].lastUsed).valueOf() - moment(a[1].lastUsed).valueOf())
+      .slice(0, 7)
+    switch (process.platform) {
+      case 'win32':
+        remote.app.setJumpList([
+          {
+            type: 'tasks',
+            name: $('Recent play'),
+            items: versions.map(([id, v]) => ({
+              icon,
+              type: 'task',
+              iconIndex: 0,
+              program: process.execPath,
+              args: `{"type":"launch","version":${JSON.stringify(id)}}`,
+              title: `${v.type === 'latest-release' ? lastRelease
+                : v.type === 'latest-snapshot' ? lastSnapshot : v.name || noTitle} (${v.lastVersionId})`
+            }))
+          }
+        ])
+        break
+      case 'darwin':
+        remote.app.dock.setMenu(remote.Menu.buildFromTemplate(versions.map(([id, v]) => ({
+          label: `${v.type === 'latest-release' ? lastRelease
+            : v.type === 'latest-snapshot' ? lastSnapshot : v.name || noTitle} (${v.lastVersionId})`,
+          click () { /* TODO: */ }
+        }))))
+        break
+    }
+  }
+
   public * setLocate (lang: string) {
     if (!(lang in langs)) throw new Error('No such lang: ' + lang)
     this.settings.locale = lang
@@ -242,6 +296,7 @@ export default class ProfilesModel extends Model {
     this.profiles = merge(this.profiles, json.profiles)
     if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()
     applyLocate(this.settings.locale, true)
+    this.setTasks()
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {

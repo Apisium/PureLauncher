@@ -32,15 +32,11 @@ const SideBar: React.FC = () => {
   const lastSnapshot = $('last-snapshot')
   const openVersionSwitch = () => setSwitch(true)
   const gameModel = useModel(GameModel)
-  const ver = Object
-    .values(pm.profiles)
-    .filter(it => it.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
-    .map(it => ({ name: it.name, type: it.type, version: it.lastVersionId, lastUsed: moment(it.lastUsed) }))
-    .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())[0]
+  const ver = pm.selectedVersion
   const u = pm.getCurrentProfile()
   const logged = !!u
   const versionName = `${ver.type === 'latest-release' ? lastRelease
-    : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.version})`
+    : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.lastVersionId})`
   return (
     <div className='side-bar'>
       <ToolTip
@@ -80,7 +76,7 @@ const SideBar: React.FC = () => {
           <Link to={it.path} className={pathname === it.path ? 'active' : void 0}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={gameModel.launch}>
+      <button className='btn btn-primary launch' onClick={() => gameModel.launch()}>
         <i className='iconfont icon-icons-minecraft_pic' />{$('Play')}</button>
       <p className='version' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span></p>

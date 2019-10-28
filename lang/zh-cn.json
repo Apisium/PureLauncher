@@ -76,5 +76,8 @@
   "FINISHED": "已完成",
   "CANCELED": "已取消",
   "ERROR": "发生错误",
-  "CANCEL": "取消"
+  "CANCEL": "取消",
+
+  "Open official website": "打开官网",
+  "Recent play": "快速启动"
 }

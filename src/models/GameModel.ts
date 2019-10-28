@@ -1,9 +1,10 @@
 import { Model } from 'use-model'
 import { Launcher } from '@xmcl/launch'
+import moment from 'moment'
 import ProfilesModel from './ProfilesModel'
 
 export default class GameModel extends Model {
-  public error: { code: number; signal: string } | undefined | any
+  public error: { code: number, signal: string } | undefined | any
   public status: 'ready' | 'launching' | 'launched'
 
   private profileModel = this.getModel(ProfilesModel)
@@ -33,13 +34,34 @@ export default class GameModel extends Model {
       }
     })
   }
-  public * launch () {
-    const { extraJson, root, getCurrentProfile } = this.profileModel()
+  public * launch (version?: string) {
+    const { extraJson, root, getCurrentProfile, selectedVersion } = this.profileModel()
     const { javaArgs, javaPath } = extraJson
 
     const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
 
+    if (!version) {
+      version = selectedVersion.lastVersionId
+      switch (selectedVersion.type) {
+        case 'latest-release':
+        case 'latest-snapshot':
+          version = selectedVersion.type
+      }
+    }
+
+    switch (version) {
+      case 'latest-release':
+        // TODO: Get the right version and download
+        break
+      case 'latest-snapshot':
+        // TODO: Get the right version and download
+        break
+      default:
+        // TODO: Check if version exists.
+    }
+
     const option: Launcher.Option = {
+      version,
       javaPath: javaPath || 'java',
       extraJVMArgs: javaArgs.split(' '),
       auth: {
@@ -49,7 +71,6 @@ export default class GameModel extends Model {
         userType: type || 'mojang' as any
       },
       gamePath: root,
-      version: '1.14.4',
       extraExecOption: {
         detached: true,
         env: {}

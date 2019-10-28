@@ -1,8 +1,28 @@
 const { basename } = require('path')
 const { app, BrowserWindow, ipcMain, webContents } = require('electron')
+const minimist = require('minimist')
 
 let window = null
 let downloadWindow = null
+
+const parseArgs = args => {
+  if (window) {
+    const data = minimist(args.slice(1))._[0]
+    window.webContents.send('pure-launcher-protocol', data)
+  }
+}
+
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', (_, argv) => {
+    if (window) {
+      if (window.isMinimized()) window.restore()
+      window.focus()
+    }
+    parseArgs(argv)
+  })
+} else app.quit()
+
+app.setAsDefaultProtocolClient('pure-launcher')
 
 const sendToAll = (...args) => webContents.getAllWebContents().forEach(it => it.send(...args))
 
@@ -140,7 +160,8 @@ const create = () => {
       clearInterval(timer)
       window = null
     })
-  if (process.env.NODE_ENV !== 'production') window.webContents.openDevTools()
+  if (process.env.DEV || !app.isPackaged) window.webContents.openDevTools()
+  parseArgs(process.argv)
 }
 
 app

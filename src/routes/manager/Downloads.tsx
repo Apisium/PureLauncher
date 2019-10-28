@@ -3,7 +3,7 @@ import E from 'electron'
 import { currentName } from '../../i18n'
 import React, { useRef, useEffect, useCallback } from 'react'
 
-const dev = process.env.NODE_ENV !== 'production'
+const dev = !!process.env.HMR_PORT
 const Downloads: React.FC = () => {
   const ref = useRef<E.WebviewTag>()
   const w = ref.current
