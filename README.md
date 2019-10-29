@@ -1,4 +1,6 @@
 # PureLauncher
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FApisium%2FPureLauncher.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FApisium%2FPureLauncher?ref=badge_shield)
+
 
 An awesome Minecraft Launcher.
 
@@ -38,3 +40,6 @@ npm run run
 ## License
 
 [MIT](./LICENSE)
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FApisium%2FPureLauncher.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FApisium%2FPureLauncher?ref=badge_large)
