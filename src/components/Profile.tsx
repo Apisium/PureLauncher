@@ -36,7 +36,9 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
     ref2.current = skinViewer
     return () => skinViewer.dispose()
   }, [ref.current])
-  useEffect(() => void (ref2.current && (ref2.current.animationPaused = !props.open)), [props.open])
+  useEffect(() => {
+    if (ref2.current) ref2.current.animationPaused = !props.open
+  }, [props.open])
   useEffect(() => {
     if (ref2.current) {
       if (skin) ref2.current.skinUrl = skin + '?' + pm.i
@@ -109,7 +111,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
   >
     <div className='left'>
       <div ref={ref} className='skin' />
-      <div className='buttons' style={{ display: u && 'changeSkin' in l ? void 0 : 'none' }}>
+      <div className='buttons' style={{ display: u && 'changeSkin' in l ? undefined : 'none' }}>
         <button className='btn btn-primary' disabled={loading} onClick={handleSkinChange}>
           {$(skin ? 'Upload!' : 'Change skin')}</button>
         <button className='btn btn-secondary' disabled={!skin || loading} onClick={() => setSkin('')}>

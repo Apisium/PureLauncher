@@ -30,8 +30,9 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
   public async login (options: { email: string, password: string }) {
     const m = __profilesModel()
     const p = Object.values(m.authenticationDatabase)
-    if (p.find(it => it.username.toLowerCase() === options.password.toLowerCase())
-      ) throw new Error($('You have already logged in with this account!'))
+    if (p.find(it => it.username.toLowerCase() === options.password.toLowerCase())) {
+      throw new Error($('You have already logged in with this account!'))
+    }
     const data = await fetchJson(BASE_URL + 'authenticate', true, {
       agent: 'Minecraft',
       username: options.email,
@@ -76,7 +77,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
       console.error(d)
       throw new Error($('Network connection failed!'))
     }
-    m.modify(n => void (delete n.authenticationDatabase[key]))
+    m.modify(n => delete n.authenticationDatabase[key])
     await saveFile()
   }
   public async refresh (key: string) {
@@ -112,7 +113,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
       })
     if (d && d.error) {
       console.error(d)
-      m.modify(n => void (delete n.authenticationDatabase[key]))
+      m.modify(n => delete n.authenticationDatabase[key])
       await saveFile()
       return false
     }

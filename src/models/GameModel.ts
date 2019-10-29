@@ -1,6 +1,5 @@
 import { Model } from 'use-model'
 import { Launcher } from '@xmcl/launch'
-import moment from 'moment'
 import ProfilesModel from './ProfilesModel'
 
 export default class GameModel extends Model {

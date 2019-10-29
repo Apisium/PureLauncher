@@ -3,6 +3,7 @@ import uuid from 'uuid-by-string'
 import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { platform } from 'os'
+import { exec } from 'child_process'
 import { Profile } from './plugin/Authenticator'
 
 export function getMinecraftRoot () {
@@ -13,8 +14,6 @@ export function getMinecraftRoot () {
 export const appDir = remote.app.getPath('userData')
 export const skinsDir = join(appDir, 'skins')
 fs.ensureDirSync(skinsDir, 1)
-
-import { exec } from 'child_process'
 
 export function getJavaVersion (path: string) {
   const parseVersion = (str: string) => {
@@ -47,8 +46,8 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
   ...other,
   method: post ? 'POST' : 'GET',
   body: JSON.stringify(body),
-  headers: body ?
-    other ? { ...other.headers, 'Content-Type': 'application/json' }
+  headers: body
+    ? other ? { ...other.headers, 'Content-Type': 'application/json' }
       : { 'Content-Type': 'application/json' }
     : other.headers
 }).then(it => it.json().catch(() => null))

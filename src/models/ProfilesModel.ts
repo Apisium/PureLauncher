@@ -200,17 +200,17 @@ export default class ProfilesModel extends Model {
   public * setMemory (mem: string) {
     const m = parseInt(mem, 10)
     this.extraJson.memory = Number.isNaN(m) || Object.is(m, Infinity) || m < 0 ? 0 : m
-    yield* this.saveExtraConfigJson()
+    yield * this.saveExtraConfigJson()
   }
 
   public * toggleBmclAPI () {
     this.extraJson.bmclAPI = !this.extraJson.bmclAPI
-    yield* this.saveExtraConfigJson()
+    yield * this.saveExtraConfigJson()
   }
 
   public * setArgs (args: string) {
     this.extraJson.javaArgs = args
-    yield* this.saveExtraConfigJson()
+    yield * this.saveExtraConfigJson()
   }
 
   public * setSelectedVersion (id: string) {
@@ -220,28 +220,28 @@ export default class ProfilesModel extends Model {
       throw new Error('No such id: ' + id)
     }
     profile.lastUsed = new Date().toISOString()
-    yield* this.saveLaunchProfileJson()
+    yield * this.saveLaunchProfileJson()
     this.setTasks()
   }
 
   public * toggleSound () {
     this.settings.soundOn = !this.settings.soundOn
-    yield* this.saveLaunchProfileJson()
+    yield * this.saveLaunchProfileJson()
   }
 
   public * toggleShowLog () {
     this.settings.showGameLog = !this.settings.showGameLog
-    yield* this.saveLaunchProfileJson()
+    yield * this.saveLaunchProfileJson()
   }
 
   public * toggleAnimation () {
-    this.extraJson.animation = this.extraJson.animation
-    yield* this.saveExtraConfigJson()
+    this.extraJson.animation = !this.extraJson.animation
+    yield * this.saveExtraConfigJson()
   }
 
   public * toggleSandbox () {
-    this.extraJson.sandbox = this.extraJson.sandbox
-    yield* this.saveExtraConfigJson()
+    this.extraJson.sandbox = !this.extraJson.sandbox
+    yield * this.saveExtraConfigJson()
   }
 
   public setTasks () {
@@ -284,7 +284,7 @@ export default class ProfilesModel extends Model {
   public * setLocate (lang: string) {
     if (!(lang in langs)) throw new Error('No such lang: ' + lang)
     this.settings.locale = lang
-    yield* this.saveLaunchProfileJson()
+    yield * this.saveLaunchProfileJson()
     applyLocate(lang)
   }
 

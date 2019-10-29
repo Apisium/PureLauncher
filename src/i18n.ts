@@ -8,7 +8,7 @@ export const langs = {
 }
 
 let instance: any
-export const setInstance = (instance2: any) => void (instance = instance2)
+export const setInstance = (instance2: any) => (instance = instance2)
 
 let current = zhCN
 export let currentName = 'zh-cn'

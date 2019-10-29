@@ -5,7 +5,7 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noImplicitAny": false,
@@ -13,7 +13,7 @@
     "strictNullChecks": false,
     "noEmit": true,
     "jsx": "react",
-    "lib": ["webworker", "scripthost", "dom"]
+    "lib": ["webworker", "scripthost", "dom", "es2019"]
   },
   "include": [
     "src"

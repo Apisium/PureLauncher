@@ -64,7 +64,7 @@ const create = () => {
               obj.alive++
             }
           }
-          for (let j = 0; i < 5; i++) next()
+          for (let j = 0; j < 5; j++) next()
         } else {
           const u = new URL(item.url)
           u.hash = id
@@ -77,7 +77,6 @@ const create = () => {
       }
     })
   const items = new Set()
-  let bytes = 0
   ctx.session.on('will-download', (e, i) => {
     const [id, cid] = new URL(i.getURL()).hash.slice(1).split('|', 2)
     const obj = downloadItems[id]
@@ -92,9 +91,8 @@ const create = () => {
           items.delete(i)
           obj.instance = null
           delete downloadItems[id]
-        } else {
-          if (!obj.multiple && downloadViewer)
-            downloadViewer.send('progress', id, i.getReceivedBytes() / i.getTotalBytes() * 100 | 0)
+        } else if (!obj.multiple && downloadViewer) {
+          downloadViewer.send('progress', id, i.getReceivedBytes() / i.getTotalBytes() * 100 | 0)
         }
       })
       .once('done', (_, state) => {
@@ -139,7 +137,7 @@ const create = () => {
     transparent: true,
     frame: false,
     show: false,
-    webPreferences: { webviewTag: true, nodeIntegration: true, nodeIntegrationInWorker: true  }
+    webPreferences: { webviewTag: true, nodeIntegration: true, nodeIntegrationInWorker: true }
   })
 
   window.loadFile('./dist/index.html')

@@ -29,7 +29,7 @@ const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = (props) 
           pm.setSelectedVersion(ver.key)
           props.onClose()
         }}>{ver.type === 'latest-release' ? lastRelease
-        : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
+            : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
           <span data-sound>({ver.lastVersionId})</span>
           <div data-sound>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div></li>)
       }

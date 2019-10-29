@@ -26,7 +26,7 @@ const Downloads: React.FC = () => {
     <div className='list-top'>
       <span className='header'>{$('Downloads')}</span>
       <a className='add-btn' onClick={() => ref.current && ref.current
-          .executeJavaScript('clearItems()').then(() => notice({ content: $('Success!') }))}>
+        .executeJavaScript('clearItems()').then(() => notice({ content: $('Success!') }))}>
         <i data-sound className='iconfont icon-shanchu_o' />
         <span data-sound>{$('Clear')}</span>
       </a>

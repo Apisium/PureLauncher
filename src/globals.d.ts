@@ -1,10 +1,11 @@
-import lang from '../lang/zh-cn.json'
+import Lang from '../lang/zh-cn.json'
 import Master from './plugin/index'
 import ProfilesModel from './models/ProfilesModel'
 
+type Keys = keyof typeof Lang
 interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
 declare global {
-  declare const $: (text: keyof typeof lang, ...args: string[]) => string
+  declare const $: (text: Keys, ...args: string[]) => string
   declare const __profilesModel: () => ProfilesModel
   declare const pluginMaster: Master
   declare const notice: (ctx: Ctx) => void

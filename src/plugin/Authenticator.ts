@@ -11,7 +11,7 @@ export interface Field {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement> & React.ClassAttributes<HTMLInputElement>
 }
 export const RegisterAuthenticator = (name: string, title: () => string, img: string, fields: Field[],
-link?: { name: () => string, url: () => string }) =>
+  link?: { name: () => string, url: () => string }) =>
   <T extends { new (...args: any[]): { } }> (C: T) => class RegisteredAuthenticator extends C {
     public [NAME] = name
     public [TITLE] = title

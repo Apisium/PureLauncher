@@ -17,12 +17,14 @@ const Home: React.FC = () => {
           localStorage.setItem('slides', JSON.stringify(Array.from(new DOMParser()
             .parseFromString(it, 'text/html')
             .getElementsByClassName('slideshow')[0]
-            .children).map(({ childNodes: [a, span] }) => ({
-              text: (span as HTMLSpanElement).innerText,
-              url: 'http://www.mcbbs.net/' + (a as HTMLAnchorElement).getAttribute('href'),
-              img: (a.childNodes[0] as HTMLImageElement).getAttribute('src')
+            .children
+          )
+            .map(({ childNodes: n }) => ({
+              text: (n[1] as HTMLSpanElement).innerText,
+              url: 'http://www.mcbbs.net/' + (n[0] as HTMLAnchorElement).getAttribute('href'),
+              img: (n[0].childNodes[0] as HTMLImageElement).getAttribute('src')
             }))))
-            localStorage.setItem('slidesTime', Date.now().toString())
+          localStorage.setItem('slidesTime', Date.now().toString())
         })
         .catch(console.error)
     }

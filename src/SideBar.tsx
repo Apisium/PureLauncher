@@ -65,7 +65,8 @@ const SideBar: React.FC = () => {
           className={pathname.startsWith('/manager') ? 'active' : null}
         >
           <a href='#' onClick={e => e.preventDefault()}><img src={managerIcon} />
-          <span data-sound>{$('Manager')}</span></a>
+            <span data-sound>{$('Manager')}</span>
+          </a>
         </li>
         <li className={pathname === '/settings' ? 'active' : null}>
           <Link to='/settings'><img src={settingsIcon} /><span data-sound>{$('Settings')}</span></Link>
@@ -73,7 +74,7 @@ const SideBar: React.FC = () => {
       </ul>
       <Dropdown open={open}>
         <ul className='top-bar'>{pages.map(it => <li key={it.path}>
-          <Link to={it.path} className={pathname === it.path ? 'active' : void 0}>{it.name}</Link>
+          <Link to={it.path} className={pathname === it.path ? 'active' : undefined}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
       <button className='btn btn-primary launch' onClick={() => gameModel.launch()}>

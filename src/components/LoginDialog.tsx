@@ -19,27 +19,27 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
   >
     {type === ''
       ? <>
-          <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>
-          <Link to='/manager/accounts' className='title title2' onClick={props.onClose}>
-            {$('Have already logged in? Click here!')}</Link>
-          <div className='heads'>
-            {Object.values(pluginMaster.logins).map(it => <div key={it[Auth.NAME]}>
-              <div
-                data-sound
-                className='head'
-                onClick={() => {
-                  setSubmitted(false)
-                  setType(it[Auth.NAME])
-                }}
-                style={{ backgroundImage: `url(${it[Auth.IMAGE]})` }}
-              />
-              <p>{it[Auth.TITLE]()}</p>
-            </div>)}
-          </div>
-        </>
+        <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>
+        <Link to='/manager/accounts' className='title title2' onClick={props.onClose}>
+          {$('Have already logged in? Click here!')}</Link>
+        <div className='heads'>
+          {Object.values(pluginMaster.logins).map(it => <div key={it[Auth.NAME]}>
+            <div
+              data-sound
+              className='head'
+              onClick={() => {
+                setSubmitted(false)
+                setType(it[Auth.NAME])
+              }}
+              style={{ backgroundImage: `url(${it[Auth.IMAGE]})` }}
+            />
+            <p>{it[Auth.TITLE]()}</p>
+          </div>)}
+        </div>
+      </>
       : <form
         key={type}
-        className={submitted ? 'submitted' : void 0}
+        className={submitted ? 'submitted' : undefined}
         onInvalid={() => setSubmitted(true)}
         onSubmit={e => {
           setSubmitted(true)
@@ -57,33 +57,33 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
             .catch(err => notice({ content: err.message, error: true })) // TODO:
             .finally(() => setLoading(false))
         }}>
-          {(currentLogin[Auth.FIELDS] as Auth.Field[]).map(it => <React.Fragment key={it.name}>
-            <label>{it.title()}</label>
-            <div className={'input2 ' + (loading ? 'disabled' : '')}>
-              <input {...it.inputProps} name={it.name} disabled={loading} />
-              <div className='dot0' />
-              <div className='dot1' />
-              <div className='dot2' />
-              <div className='dot3' />
-            </div>
-          </React.Fragment>)}
-          <div className='links'>
-            <span data-sound className='left' onClick={() => !loading && setType('')}>{$('Back')}</span>
-            {currentLogin[Auth.LINK] &&
-              <span data-sound className='right'
-                onClick={() => shell.openExternal(currentLogin[Auth.LINK].url())}>
-                {currentLogin[Auth.LINK].name()}
-              </span>
-            }
+        {(currentLogin[Auth.FIELDS] as Auth.Field[]).map(it => <React.Fragment key={it.name}>
+          <label>{it.title()}</label>
+          <div className={'input2 ' + (loading ? 'disabled' : '')}>
+            <input {...it.inputProps} name={it.name} disabled={loading} />
+            <div className='dot0' />
+            <div className='dot1' />
+            <div className='dot2' />
+            <div className='dot3' />
           </div>
-          <button
-            type='submit'
-            className='btn3'
-            disabled={loading}
-            style={{ marginTop: 8, width: '100%' }}
-          >{$(loading ? 'Loading...' : 'Log in')}</button>
-        </form>
-      }
+        </React.Fragment>)}
+        <div className='links'>
+          <span data-sound className='left' onClick={() => !loading && setType('')}>{$('Back')}</span>
+          {currentLogin[Auth.LINK] &&
+            <span data-sound className='right'
+              onClick={() => shell.openExternal(currentLogin[Auth.LINK].url())}>
+              {currentLogin[Auth.LINK].name()}
+            </span>
+          }
+        </div>
+        <button
+          type='submit'
+          className='btn3'
+          disabled={loading}
+          style={{ marginTop: 8, width: '100%' }}
+        >{$(loading ? 'Loading...' : 'Log in')}</button>
+      </form>
+    }
   </Dialog>
 }
 
