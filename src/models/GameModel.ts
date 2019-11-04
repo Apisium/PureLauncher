@@ -1,6 +1,8 @@
 import { Model } from 'use-model'
 import { Launcher } from '@xmcl/launch'
 import ProfilesModel from './ProfilesModel'
+import { Installer } from '@xmcl/installer'
+import { Version } from '@xmcl/version'
 
 export default class GameModel extends Model {
   public error: { code: number, signal: string } | undefined | any
@@ -34,7 +36,7 @@ export default class GameModel extends Model {
     })
   }
   public * launch (version?: string) {
-    const { extraJson, root, getCurrentProfile, selectedVersion } = this.profileModel()
+    const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest, ensureVersionManifest } = this.profileModel()
     const { javaArgs, javaPath } = extraJson
 
     const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
@@ -48,19 +50,27 @@ export default class GameModel extends Model {
       }
     }
 
+    let versionId: string
+
     switch (version) {
       case 'latest-release':
-        // TODO: Get the right version and download
+        yield ensureVersionManifest()
+        versionId = versionManifest.latest.release
+        yield this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
         break
       case 'latest-snapshot':
-        // TODO: Get the right version and download
+        yield ensureVersionManifest()
+        versionId = versionManifest.latest.snapshot
+        yield this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
         break
       default:
-        // TODO: Check if version exists.
+        versionId = version
+        yield this.ensureLocalVersion(root, versionId)
+        break
     }
 
     const option: Launcher.Option = {
-      version,
+      version: versionId,
       javaPath: javaPath || 'java',
       extraJVMArgs: javaArgs.split(' '),
       auth: {
@@ -94,5 +104,16 @@ export default class GameModel extends Model {
       }
       this.worker.addEventListener('message', onceLaunch)
     })
+  }
+  private async ensureMinecraftVersion (minecraft: string, version: Installer.VersionMeta) {
+    const task = Installer.installTask('client', version, minecraft)
+    // TODO: listen task progress
+    await task.execute()
+  }
+  private async ensureLocalVersion (minecraft: string, versionId: string) {
+    const resolved = await Version.parse(minecraft, versionId)
+    const task = Installer.installDependenciesTask(resolved)
+    // TODO: listen task progress
+    await task.execute()
   }
 }

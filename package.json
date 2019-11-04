@@ -49,7 +49,9 @@
     "@types/react-router-dom": "^5.1.1",
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
+    "@xmcl/installer": "0.1.9",
     "@xmcl/launch": "0.0.26",
+    "@xmcl/version": "^0.1.7",
     "cmake-js": "^6.0.0",
     "del-cli": "^3.0.0",
     "electron": "^6.1.2",
@@ -95,5 +97,6 @@
   "cmake-js": {
     "runtime": "electron",
     "runtimeVersion": "6.0.9"
-  }
+  },
+  "dependencies": {}
 }
