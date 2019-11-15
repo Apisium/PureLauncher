@@ -1,7 +1,7 @@
 import './profile.less'
 import React, { useRef, useEffect, useState } from 'react'
 import { join } from 'path'
-import { useModel } from 'use-model'
+import { useStore } from 'reqwq'
 import { TITLE, SkinChangeable } from '../plugin/Authenticator'
 import { skinsDir, cacheSkin } from '../util'
 import { promises as fs } from 'fs'
@@ -9,7 +9,7 @@ import { remote } from 'electron'
 import { SkinViewer, createOrbitControls, CompositeAnimation, WalkingAnimation,
   RotatingAnimation, isSlimSkin } from 'skinview3d'
 import Dialog from 'rc-dialog'
-import ProfilesModel from '../models/ProfilesModel'
+import ProfilesStore from '../models/ProfilesStore'
 
 const skinUrl = require('../assets/images/steve.png')
 
@@ -17,7 +17,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
   const ref = useRef<HTMLDivElement>()
   const ref2 = useRef<SkinViewer>()
   const ref3 = useRef<boolean>(false)
-  const pm = useModel(ProfilesModel)
+  const pm = useStore(ProfilesStore)
   const u = pm.getCurrentProfile()
   const [skin, setSkin] = useState('')
   useEffect(() => {

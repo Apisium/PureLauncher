@@ -1,15 +1,15 @@
 import './list.less'
 import React from 'react'
 import Avatar from '../../components/Avatar'
-import ProfilesModel from '../../models/ProfilesModel'
+import ProfilesStore from '../../models/ProfilesStore'
 import * as Auth from '../../plugin/Authenticator'
-import { useModel } from 'use-model'
+import { useStore } from 'reqwq'
 import { join } from 'path'
 import { skinsDir } from '../../util'
 
 const steve = require('../../assets/images/steve.png')
 const Profiles: React.FC = () => {
-  const pm = useModel(ProfilesModel)
+  const pm = useStore(ProfilesStore)
   return <div className='manager-list version-switch manager-versions manager-profiles'>
     <div className='list-top'>
       <span className='header'>{$('Accounts')}</span>

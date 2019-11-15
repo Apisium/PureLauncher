@@ -8,13 +8,13 @@ import LoginDialog from './components/LoginDialog'
 import VersionSwitch from './components/VersionSwitch'
 import useRouter from 'use-react-router'
 import Avatar from './components/Avatar'
-import ProfileModel from './models/ProfilesModel'
+import GameStore from './models/GameStore'
+import ProfilesStore from './models/ProfilesStore'
 import { Link } from 'react-router-dom'
 import { getPages } from './routes/Manager'
-import { useModel } from 'use-model'
+import { useStore } from 'reqwq'
 import { join } from 'path'
 import { skinsDir } from './util'
-import GameModel from './models/GameModel'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
@@ -26,12 +26,12 @@ const SideBar: React.FC = () => {
   const [openProfile, setProfile] = useState(false)
   const [openSwitch, setSwitch] = useState(false)
   const { location: { pathname } } = useRouter()
-  const pm = useModel(ProfileModel)
+  const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')
   const lastRelease = $('last-release')
   const lastSnapshot = $('last-snapshot')
   const openVersionSwitch = () => setSwitch(true)
-  const gameModel = useModel(GameModel)
+  const gs = useStore(GameStore)
   const ver = pm.selectedVersion
   const u = pm.getCurrentProfile()
   const logged = !!u
@@ -77,7 +77,7 @@ const SideBar: React.FC = () => {
           <Link to={it.path} className={pathname === it.path ? 'active' : undefined}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={() => gameModel.launch()}>
+      <button className='btn btn-primary launch' onClick={() => gs.launch()}>
         <i className='iconfont icon-icons-minecraft_pic' />{$('Play')}</button>
       <p className='version' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span></p>

@@ -1,4 +1,4 @@
-import { Model } from 'use-model'
+import { Store } from 'reqwq'
 import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../util'
 import { remote } from 'electron'
@@ -29,7 +29,7 @@ interface User {
   profiles: { [key: string]: { displayName: string } }
   properties: Array<{ [key: string]: string }>,
 }
-export default class ProfilesModel extends Model {
+export default class ProfilesStore extends Store {
   public i = 0
   public settings = {
     enableSnapshots: false,
@@ -109,8 +109,8 @@ export default class ProfilesModel extends Model {
     } catch (e) {
       this.extraJson.loginType = ''
       this.extraJson.selectedUser = ''
-      this.saveExtraConfigJsonSync()
       notice({ content: $('Current account is invalid, please re-login!') })
+      this.saveExtraConfigJsonSync()
     }
   }
 
@@ -126,8 +126,8 @@ export default class ProfilesModel extends Model {
     this.addI()
   }
 
-  public * setJavaPath () {
-    yield remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+  public async setJavaPath () {
+    await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
       title: $('Locate Java'),
       message: $('Locate the path of Java 8'),
       filters: [
@@ -142,10 +142,10 @@ export default class ProfilesModel extends Model {
     })
   }
 
-  public * loadAllConfigs () {
-    yield fs.readJson(this.launchProfilePath).then(j => this.loadLaunchProfileJson(j),
+  public async loadAllConfigs () {
+    await fs.readJson(this.launchProfilePath).then(j => this.loadLaunchProfileJson(j),
       e => this.onLoadLaunchProfileFailed(e))
-    yield fs.readJson(this.extraConfigPath).then(j => this.loadExtraConfigJson(j),
+    await fs.readJson(this.extraConfigPath).then(j => this.loadExtraConfigJson(j),
       e => this.onLoadExtraConfigFailed(e))
   }
 
@@ -162,11 +162,11 @@ export default class ProfilesModel extends Model {
     }))
   }
 
-  public * saveLaunchProfileJson () {
+  public async saveLaunchProfileJson () {
     // not throw but return a null
-    const json = yield fs.readJson(this.launchProfilePath, { throws: false }) || {}
+    const json = await fs.readJson(this.launchProfilePath, { throws: false }) || {}
 
-    yield fs.writeJson(this.launchProfilePath, merge(json, {
+    await fs.writeJson(this.launchProfilePath, merge(json, {
       settings: this.selectedUser,
       selectedUser: this.selectedUser,
       profiles: this.profiles,
@@ -175,18 +175,18 @@ export default class ProfilesModel extends Model {
     }))
   }
 
-  public * saveExtraConfigJson () {
-    yield fs.writeJson(this.extraConfigPath, this.extraJson)
+  public async saveExtraConfigJson () {
+    await fs.writeJson(this.extraConfigPath, this.extraJson)
   }
 
   public saveExtraConfigJsonSync () {
     fs.writeJsonSync(this.extraConfigPath, this.extraJson)
   }
 
-  public * setSelectedProfile (key: string, type?: Auth.default | string) {
+  public async setSelectedProfile (key: string, type?: Auth.default | string) {
     if (typeof type === 'string') type = pluginMaster.logins[type]
     if (!type) type = pluginMaster.logins[pluginMaster.getAllProfiles().find(it => it.key === key).type]
-    yield type.validate(key)
+    await type.validate(key)
     const name = type[Auth.NAME]
     if (name === YGGDRASIL) {
       this.selectedUser.account = key
@@ -197,51 +197,52 @@ export default class ProfilesModel extends Model {
     this.saveExtraConfigJsonSync()
   }
 
-  public * setMemory (mem: string) {
+  public async setMemory (mem: string) {
     const m = parseInt(mem, 10)
     this.extraJson.memory = Number.isNaN(m) || Object.is(m, Infinity) || m < 0 ? 0 : m
-    yield * this.saveExtraConfigJson()
+    await this.saveExtraConfigJson()
   }
 
-  public * toggleBmclAPI () {
+  public async toggleBmclAPI () {
     this.extraJson.bmclAPI = !this.extraJson.bmclAPI
-    yield * this.saveExtraConfigJson()
+    await this.saveExtraConfigJson()
   }
 
-  public * setArgs (args: string) {
+  public async setArgs (args: string) {
     this.extraJson.javaArgs = args
-    yield * this.saveExtraConfigJson()
+    await this.saveExtraConfigJson()
   }
 
-  public * setSelectedVersion (id: string) {
+  public async setSelectedVersion (id: string) {
     const profile = this.profiles[id]
     if (!profile) {
       notice({ content: $('No such version:') + ' ' + id, error: true })
       throw new Error('No such id: ' + id)
     }
     profile.lastUsed = new Date().toISOString()
-    yield * this.saveLaunchProfileJson()
+    await this.saveLaunchProfileJson()
     this.setTasks()
   }
 
-  public * toggleSound () {
+  public async toggleSound () {
     this.settings.soundOn = !this.settings.soundOn
-    yield * this.saveLaunchProfileJson()
+    await this.saveLaunchProfileJson()
   }
 
-  public * toggleShowLog () {
+  public async toggleShowLog () {
     this.settings.showGameLog = !this.settings.showGameLog
-    yield * this.saveLaunchProfileJson()
+    await this.saveLaunchProfileJson()
   }
 
-  public * toggleAnimation () {
+  public async toggleAnimation () {
+    console.log(this.extraJson)
     this.extraJson.animation = !this.extraJson.animation
-    yield * this.saveExtraConfigJson()
+    await this.saveExtraConfigJson()
   }
 
-  public * toggleSandbox () {
+  public async toggleSandbox () {
     this.extraJson.sandbox = !this.extraJson.sandbox
-    yield * this.saveExtraConfigJson()
+    await this.saveExtraConfigJson()
   }
 
   public setTasks () {
@@ -281,10 +282,10 @@ export default class ProfilesModel extends Model {
     }
   }
 
-  public * setLocate (lang: string) {
+  public async setLocate (lang: string) {
     if (!(lang in langs)) throw new Error('No such lang: ' + lang)
     this.settings.locale = lang
-    yield * this.saveLaunchProfileJson()
+    await this.saveLaunchProfileJson()
     applyLocate(lang)
   }
 

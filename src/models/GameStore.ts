@@ -1,12 +1,13 @@
-import { Model } from 'use-model'
+import { Store, injectStore } from 'reqwq'
 import { Launcher } from '@xmcl/launch'
-import ProfilesModel from './ProfilesModel'
+import ProfilesStore from './ProfilesStore'
 
-export default class GameModel extends Model {
+export default class GameStore extends Store {
   public error: { code: number, signal: string } | undefined | any
   public status: 'ready' | 'launching' | 'launched'
 
-  private profileModel = this.getModel(ProfilesModel)
+  @injectStore(ProfilesStore)
+  private profilesStore: ProfilesStore
   private worker: Worker = new Worker('../workers/launch.ts')
 
   constructor () {
@@ -33,8 +34,8 @@ export default class GameModel extends Model {
       }
     })
   }
-  public * launch (version?: string) {
-    const { extraJson, root, getCurrentProfile, selectedVersion } = this.profileModel()
+  public async launch (version?: string) {
+    const { extraJson, root, getCurrentProfile, selectedVersion } = this.profilesStore
     const { javaArgs, javaPath } = extraJson
 
     const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
@@ -78,7 +79,7 @@ export default class GameModel extends Model {
     this.status = 'launching'
     this.worker.postMessage(option)
 
-    yield new Promise((res, rej) => {
+    await new Promise((res, rej) => {
       const onceLaunch = (m: MessageEvent) => {
         const { state, error } = m.data
         switch (state) {

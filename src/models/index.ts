@@ -1,9 +1,9 @@
-import { getProvider } from 'use-model'
+import { newInstance } from 'reqwq'
 
-import ProfilesModel from './ProfilesModel'
-import GameModel from './GameModel'
+import ProfilesStore from './ProfilesStore'
+import GameStore from './GameStore'
 
-const P = getProvider(ProfilesModel, GameModel)
+const P = newInstance(ProfilesStore, GameStore)
 export default P
 
-window.__profilesModel = P.getModel(ProfilesModel) as any
+window.__profilesStore = P.getStore(ProfilesStore) as any

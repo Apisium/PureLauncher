@@ -2,12 +2,12 @@ import './settings.less'
 import React from 'react'
 import Switch from '../components/Switch'
 import ShowMore from '../components/ShowMore'
-import ProfilesModel from '../models/ProfilesModel'
+import ProfilesStore from '../models/ProfilesStore'
 import { langs } from '../i18n'
-import { useModel } from 'use-model'
+import { useStore } from 'reqwq'
 
 const Settings: React.FC = () => {
-  const pm = useModel(ProfilesModel)
+  const pm = useStore(ProfilesStore)
   return <div className='settings'>
     <form>
       <div className='group'>
