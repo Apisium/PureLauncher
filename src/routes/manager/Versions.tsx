@@ -1,11 +1,11 @@
 import './list.less'
 import React from 'react'
 import moment from 'moment'
-import ProfileModel from '../../models/ProfilesModel'
-import { useModel } from 'use-model'
+import ProfilesStore from '../../models/ProfilesStore'
+import { useStore } from 'reqwq'
 
 const Versions: React.FC = () => {
-  const pm = useModel(ProfileModel)
+  const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')
   const unknown = $('Unknown')
   const lastPlayed = $('Last played')

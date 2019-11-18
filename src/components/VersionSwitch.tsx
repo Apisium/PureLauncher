@@ -2,11 +2,11 @@ import './version-switch.less'
 import React from 'react'
 import Dialog from 'rc-dialog'
 import moment from 'moment'
-import ProfileModel from '../models/ProfilesModel'
-import { useModel } from 'use-model'
+import ProfilesStore from '../models/ProfilesStore'
+import { useStore } from 'reqwq'
 
 const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
-  const pm = useModel(ProfileModel)
+  const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')
   const unknown = $('Unknown')
   const lastPlayed = $('Last played')

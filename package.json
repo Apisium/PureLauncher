@@ -41,21 +41,23 @@
   },
   "homepage": "https://github.com/Apisium/PureLauncher#readme",
   "devDependencies": {
+    "@babel/core": "^7.7.2",
     "@types/fs-extra": "^8.0.1",
     "@types/lodash.merge": "^4.6.6",
-    "@types/node": "^12.12.3",
+    "@types/node": "^12.12.7",
     "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.9.3",
-    "@types/react-router-dom": "^5.1.1",
-    "@typescript-eslint/eslint-plugin": "^2.6.0",
-    "@typescript-eslint/parser": "^2.6.0",
+    "@types/react-dom": "^16.9.4",
+    "@types/react-router-dom": "^5.1.2",
+    "@typescript-eslint/eslint-plugin": "^2.6.1",
+    "@typescript-eslint/parser": "^2.6.1",
     "@xmcl/installer": "^1.0.0",
     "@xmcl/launch": "^1.0.0",
     "@xmcl/task": "^1.0.0",
     "@xmcl/version": "^1.0.0",
+    "babel-plugin-module-resolver": "^3.2.0",
     "cmake-js": "^6.0.0",
     "del-cli": "^3.0.0",
-    "electron": "^6.1.2",
+    "electron": "^6.1.4",
     "electron-build-env": "^0.2.0",
     "eslint": "^6.6.0",
     "eslint-config-standard": "^14.1.0",
@@ -74,22 +76,22 @@
     "node-addon-api": "^1.7.1",
     "p-all": "^2.1.0",
     "parcel": "^1.12.4",
-    "rc-dialog": "^7.5.12",
+    "rc-dialog": "^7.5.13",
     "rc-notification": "^3.3.1",
     "rc-tooltip": "^3.7.3",
-    "react": "^16.11.0",
+    "react": "^16.12.0",
     "react-deep-force-update": "^2.1.3",
     "react-dom": "^16.11.0",
     "react-image": "^2.2.1",
     "react-live-route": "^3.1.6",
     "react-router-dom": "^5.1.2",
     "react-slick": "^0.25.2",
+    "reqwq": "^0.2.0",
     "skinview3d": "^1.2.0-alpha.1",
     "slick-carousel": "^1.8.1",
-    "typescript": "^3.6.4",
-    "use-model": "git+https://github.com/ShirasawaSama/use-model.git",
+    "typescript": "^3.7.2",
     "use-react-router": "^1.0.7",
-    "uuid-by-string": "^3.0.1"
+    "uuid-by-string": "^3.0.2"
   },
   "browserslist": [
     "electron 6.0.9"
@@ -99,5 +101,8 @@
     "runtime": "electron",
     "runtimeVersion": "6.0.9"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@babel/traverse": "^7.7.2",
+    "@babel/types": "^7.7.2"
+  }
 }

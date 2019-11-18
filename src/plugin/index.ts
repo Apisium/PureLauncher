@@ -7,7 +7,7 @@ export default class Master {
     return Object.values(this.logins).flatMap(it => it.getAllProfiles())
   }
   public getCurrentLogin () {
-    const l = this.logins[__profilesModel().extraJson.loginType]
+    const l = this.logins[__profilesStore.extraJson.loginType]
     if (l) return l
     else throw new Error('') // TODO: show a dialog
   }

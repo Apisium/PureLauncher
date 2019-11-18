@@ -49,7 +49,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
           new FormData(e.target as HTMLFormElement).forEach((v, k) => (data[k] = v))
           currentLogin
             .login(data)
-            .then(key => __profilesModel().setSelectedProfile(key, currentLogin))
+            .then(key => __profilesStore.setSelectedProfile(key, currentLogin))
             .then(() => {
               notice({ content: $('Login succeeded!') })
               props.onClose()
