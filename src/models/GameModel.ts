@@ -3,6 +3,8 @@ import { Launcher } from '@xmcl/launch'
 import ProfilesModel from './ProfilesModel'
 import { Installer } from '@xmcl/installer'
 import { Version } from '@xmcl/version'
+import Task from '@xmcl/task'
+import { download } from '../util'
 
 export default class GameModel extends Model {
   public error: { code: number, signal: string } | undefined | any
@@ -106,14 +108,20 @@ export default class GameModel extends Model {
     })
   }
   private async ensureMinecraftVersion (minecraft: string, version: Installer.VersionMeta) {
-    const task = Installer.installTask('client', version, minecraft)
-    // TODO: listen task progress
-    await task.execute()
+    const task = Installer.installTask('client', version, minecraft, {
+      downloader ({ url, destination }) {
+        return download({ url, file: destination }).then(() => undefined)
+      }
+    })
+    await Task.execute(task)
   }
   private async ensureLocalVersion (minecraft: string, versionId: string) {
     const resolved = await Version.parse(minecraft, versionId)
-    const task = Installer.installDependenciesTask(resolved)
-    // TODO: listen task progress
-    await task.execute()
+    const task = Installer.installDependenciesTask(resolved, {
+      downloader ({ url, destination }) {
+        return download({ url, file: destination }).then(() => undefined)
+      }
+    })
+    await Task.execute(task)
   }
 }
