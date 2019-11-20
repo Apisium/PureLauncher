@@ -4,6 +4,7 @@ import { Installer } from '@xmcl/installer'
 import { Version } from '@xmcl/version'
 import Task from '@xmcl/task'
 import { download } from '../util'
+import ProfilesStore from './ProfilesStore'
 export default class GameStore extends Store {
   public status: 'ready' | 'launching' | 'launched'
 
@@ -17,7 +18,7 @@ export default class GameStore extends Store {
       const { state, error } = m.data
       switch (state) {
         case 'error':
-          this.error = error
+          // this.error = error
           console.error(error)
           this.status = 'ready'
           break
@@ -27,7 +28,7 @@ export default class GameStore extends Store {
           break
         case 'exit':
           if (m.data.code !== 0) {
-            this.error = ({ code: m.data.code, signal: m.data.signal })
+            // this.error = ({ code: m.data.code, signal: m.data.signal })
           }
           this.status = 'ready'
           console.log('exit')
@@ -54,18 +55,18 @@ export default class GameStore extends Store {
 
     switch (version) {
       case 'latest-release':
-        yield ensureVersionManifest()
+        await ensureVersionManifest()
         versionId = versionManifest.latest.release
-        yield this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
+        await this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
         break
       case 'latest-snapshot':
-        yield ensureVersionManifest()
+        await ensureVersionManifest()
         versionId = versionManifest.latest.snapshot
-        yield this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
+        await this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
         break
       default:
         versionId = version
-        yield this.ensureLocalVersion(root, versionId)
+        await this.ensureLocalVersion(root, versionId)
         break
     }
 
@@ -73,12 +74,10 @@ export default class GameStore extends Store {
       version: versionId,
       javaPath: javaPath || 'java',
       extraJVMArgs: javaArgs.split(' '),
-      auth: {
-        accessToken: accessToken || '',
-        selectedProfile: { id: uuid, name: displayName || username },
-        properties: {},
-        userType: type || 'mojang' as any
-      },
+      accessToken: accessToken || '',
+      gameProfile: { id: uuid, name: displayName || username },
+      properties: {},
+      userType: type || 'mojang' as any,
       gamePath: root,
       extraExecOption: {
         detached: true,
