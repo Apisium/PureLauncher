@@ -19,6 +19,8 @@
   "Delete": "删除",
   "Downloads": "下载",
   "Resources": "材质",
+  "Plugins": "插件",
+  "Servers": "服务器",
   "Saves": "地图",
   "Clear": "清理已完成项",
   "Error:": "发生错误:",
@@ -79,5 +81,16 @@
   "CANCEL": "取消",
 
   "Open official website": "打开官网",
-  "Recent play": "快速启动"
+  "Recent play": "快速启动",
+
+  "Detailed List": "详细列表",
+  "Install": "安装",
+  "Name": "名字",
+  "VersionId": "版本号",
+  "Author": "作者",
+  "Description": "描述",
+  "INSTALL": "确认安装",
+  "Minecraft Version": "我的世界版本",
+  "Apis": "前置API",
+  "Host": "地址"
 }

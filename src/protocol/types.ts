@@ -1,14 +1,18 @@
-export interface MinecraftApis { [id: string]: string }
-export interface Resource <T = any> { type: T }
-export interface ResourceVersion extends Resource<'version'> {
+export type MinecraftApis = Record<string, string>
+export interface Resource <T extends string = string> {
+  type: T
   id: string
+  time?: number
+  title?: string
+  author?: string
+  description?: string
+}
+export interface ResourceVersion extends Resource<'Version'> {
   version: string
   json: string | object
   mcVersion: string
   resources?: AllResources[]
   urls?: string[]
-  title?: string
-  author?: string
   source?: string
   website?: string
   api?: string[]
@@ -16,44 +20,45 @@ export interface ResourceVersion extends Resource<'version'> {
   extends?: string | ResourceVersion
   updateUrl?: string
 }
-export interface ResourceMod extends Resource<'mod'> {
-  id: string
+export interface ResourceMod extends Resource<'Mod'> {
   version: string
   urls: string[]
-  title?: string
-  author?: string
   source?: string
   website?: string
   mcVersion?: string
-  api?: MinecraftApis
+  apis?: MinecraftApis
   hashes?: string[]
   extends?: string | ResourceMod
   updateUrl?: string
 }
-export interface ResourceResourcesPack extends Resource<'resourcesPack'> {
-  id: string
+export interface ResourceResourcesPack extends Resource<'ResourcesPack'> {
   version: string
   urls: string[]
-  title?: string
-  author?: string
   source?: string
   website?: string
   hashes?: string[]
   extends?: string | ResourceResourcesPack
   updateUrl?: string
 }
-export interface ResourceServer extends Resource<'server'> {
+export interface ResourceServer extends Resource<'Server'> {
   ip: string
   port?: number
 }
-export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer
+export interface ResourcePlugin extends Resource<'Plugin'> {
+  version: string
+  url: string
+  source?: string
+  website?: string
+  hash?: string
+}
+export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer | ResourcePlugin
 
 export interface Protocol <T = any> { type: T }
-export interface ProtocolLaunch extends Protocol<'launch'> {
+export interface ProtocolLaunch extends Protocol<'Launch'> {
   version?: string | ResourceVersion
   options?: { ip: string, port?: number }
   autoInstall?: boolean
 }
-export interface ProtocolInstall extends Protocol<'install'> {
+export interface ProtocolInstall extends Protocol<'Install'> {
   resource: string | AllResources | ResourceVersion
 }

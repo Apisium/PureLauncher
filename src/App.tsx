@@ -9,6 +9,8 @@ import Settings from './routes/Settings'
 import Manager from './routes/Manager'
 import Master from './plugin/index'
 
+import InstallList from './components/InstallList'
+
 window.pluginMaster = new Master()
 
 const ref = createRef()
@@ -27,6 +29,7 @@ const App: React.FC = () => {
           <Redirect to='/manager/downloads' />
         </section>
       </HashRouter>
+      <InstallList />
     </Provider>
   )
 }

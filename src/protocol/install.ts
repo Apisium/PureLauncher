@@ -7,6 +7,7 @@ const get = (url: string) => fetch(url).then(r => r.json(), e => {
 export default async ({ resource: r }: T.ProtocolInstall) => {
   if (typeof r === 'string') r = await get(r) as T.AllResources | T.ResourceVersion
   switch (r.type) {
-    case 'server':
+    case 'Server':
   }
+  await global.__requestInstallResources(r)
 }

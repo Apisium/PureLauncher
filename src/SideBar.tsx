@@ -1,6 +1,5 @@
 import './side-bar.less'
 import React, { useState } from 'react'
-import moment from 'moment'
 import ToolTip from 'rc-tooltip'
 import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'

@@ -83,6 +83,7 @@
     "react-live-route": "^3.1.6",
     "react-router-dom": "^5.1.2",
     "react-slick": "^0.25.2",
+    "react-treebeard": "^3.2.4",
     "reqwq": "^0.2.0",
     "skinview3d": "^1.2.0-alpha.1",
     "slick-carousel": "^1.8.1",

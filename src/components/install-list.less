@@ -1,0 +1,37 @@
+.install-list {
+  p {
+    color: #444;
+    margin: 0;
+    font-size: 15px;
+    span {
+      font-size: 16px;
+      font-weight: bold;
+    }
+  }
+  .buttons {
+    display: flex;
+    margin-top: 8px;
+    button {
+      padding: .75em 1.3em;
+    }
+    .btn-primary {
+      margin-left: auto;
+    }
+    .btn-secondary {
+      margin-right: auto;
+    }
+  }
+  .list {
+    overflow: auto;
+    margin-top: 8px;
+    max-height: 150px;
+    &::-webkit-scrollbar {
+      width: 2px;
+      height: 1px;
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 2px;
+      background: #aaa;
+    }
+  }
+}
