@@ -1,4 +1,4 @@
-import { Store, injectStore } from 'reqwq'
+import { Store, injectStore, NOT_PROXY } from 'reqwq'
 import { Launcher } from '@xmcl/launch'
 import { Installer } from '@xmcl/installer'
 import { Version } from '@xmcl/version'
@@ -11,7 +11,7 @@ export default class GameStore extends Store {
 
   @injectStore(ProfilesStore)
   private profilesStore: ProfilesStore
-  private worker = Object.assign(new Worker('../workers/launch.ts'), { NOT_PROXY: true })
+  private worker = Object.assign(new Worker('../workers/launch.ts'), { [NOT_PROXY]: true })
 
   constructor () {
     super()
