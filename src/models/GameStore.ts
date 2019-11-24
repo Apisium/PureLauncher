@@ -37,7 +37,7 @@ export default class GameStore extends Store {
     })
   }
   public * launch (version?: string) {
-    const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest, ensureVersionManifest } = this.profileModel()
+    const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest, ensureVersionManifest } = this.profilesStore
     const { javaArgs, javaPath } = extraJson
 
     const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
@@ -89,7 +89,7 @@ export default class GameStore extends Store {
     this.status = 'launching'
     this.worker.postMessage(option)
 
-    await new Promise((res, rej) => {
+    yield new Promise((res, rej) => {
       const onceLaunch = (m: MessageEvent) => {
         const { state, error } = m.data
         switch (state) {
