@@ -88,7 +88,7 @@ export default class GameStore extends Store {
     this.status = 'launching'
     this.worker.postMessage(option)
 
-    yield new Promise((res, rej) => {
+    await new Promise((res, rej) => {
       const onceLaunch = (m: MessageEvent) => {
         const { state, error } = m.data
         switch (state) {
