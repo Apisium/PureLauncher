@@ -11,7 +11,7 @@ export default class GameStore extends Store {
 
   @injectStore(ProfilesStore)
   private profilesStore: ProfilesStore
-  private worker: Worker = new Worker('../workers/launch.ts')
+  private worker = Object.assign(new Worker('../workers/launch.ts'), { NOT_PROXY: true })
 
   constructor () {
     super()
