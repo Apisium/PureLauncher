@@ -10,8 +10,10 @@ import merge from 'lodash.merge'
 import pAll from 'p-all'
 import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
+import { Installer } from '@xmcl/installer'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
+const VERSION_MANIFEST = 'version_manifest.json'
 const EXTRA_CONFIG = 'config.json'
 const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
@@ -56,6 +58,14 @@ export default class ProfilesStore extends Store {
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M'
   }
+  public versionManifest: Installer.VersionMetaList = {
+    timestamp: '',
+    versions: [],
+    latest: {
+      release: '',
+      snapshot: ''
+    }
+  }
 
   public loginDialogVisible = false
 
@@ -91,6 +101,9 @@ export default class ProfilesStore extends Store {
     } catch (e) {
       this.onLoadExtraConfigFailed(e)
     }
+
+    this.loadVersionManifest()
+
     this.cacheSkins().catch(console.error)
   }
 
@@ -287,6 +300,30 @@ export default class ProfilesStore extends Store {
     this.settings.locale = lang
     await this.saveLaunchProfileJson()
     applyLocate(lang)
+  }
+
+  public async ensureVersionManifest () {
+    if (this.versionManifest.timestamp === '0') {
+      this.versionManifest = await Installer.updateVersionMeta()
+      this.saveVerionManifest()
+    }
+  }
+
+  public async refreshVersionManifest () {
+    this.versionManifest = await Installer.updateVersionMeta({ fallback: this.versionManifest })
+    this.saveVerionManifest()
+  }
+
+  private async saveVerionManifest () {
+    await fs.writeFile(join(this.root, VERSION_MANIFEST), JSON.stringify(this.versionManifest))
+  }
+
+  private async loadVersionManifest () {
+    try {
+      this.versionManifest = await fs.readFile(join(this.root, VERSION_MANIFEST)).then(b => JSON.parse(b.toString()))
+    } catch {
+      this.refreshVersionManifest()
+    }
   }
 
   private loadLaunchProfileJson (json: any) {
