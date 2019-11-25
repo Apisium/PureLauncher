@@ -6,8 +6,12 @@ import Task from '@xmcl/task'
 import { download } from '../util'
 import ProfilesStore from './ProfilesStore'
 
+export enum STATUS {
+  READY, LAUNCHING, LAUNCHED, DOWNLOADING
+}
+
 export default class GameStore extends Store {
-  public status: 'ready' | 'launching' | 'launched'
+  public status = STATUS.READY
 
   @injectStore(ProfilesStore)
   private profilesStore: ProfilesStore
@@ -21,17 +25,18 @@ export default class GameStore extends Store {
         case 'error':
           // this.error = error
           console.error(error)
-          this.status = 'ready'
+          notice({ content: $('Fail to launch!'), error: true })
+          this.status = STATUS.READY
           break
         case 'launched':
           console.log('launched!')
-          this.status = 'launched'
+          this.status = STATUS.LAUNCHED
           break
         case 'exit':
           if (m.data.code !== 0) {
             // this.error = ({ code: m.data.code, signal: m.data.signal })
           }
-          this.status = 'ready'
+          this.status = STATUS.READY
           console.log('exit')
           break
       }
@@ -54,6 +59,7 @@ export default class GameStore extends Store {
 
     let versionId: string
 
+    this.status = STATUS.DOWNLOADING
     switch (version) {
       case 'latest-release':
         await ensureVersionManifest()
@@ -85,7 +91,7 @@ export default class GameStore extends Store {
         env: {}
       }
     }
-    this.status = 'launching'
+    this.status = STATUS.LAUNCHING
     this.worker.postMessage(option)
 
     await new Promise((res, rej) => {

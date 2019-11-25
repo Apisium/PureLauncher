@@ -7,8 +7,9 @@ import LoginDialog from './components/LoginDialog'
 import VersionSwitch from './components/VersionSwitch'
 import useRouter from 'use-react-router'
 import Avatar from './components/Avatar'
-import GameStore from './models/GameStore'
+import GameStore, { STATUS } from './models/GameStore'
 import ProfilesStore from './models/ProfilesStore'
+import { Textfit } from 'react-textfit'
 import { Link } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
@@ -36,6 +37,22 @@ const SideBar: React.FC = () => {
   const logged = !!u
   const versionName = `${ver.type === 'latest-release' ? lastRelease
     : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.lastVersionId})`
+  let btnText: string
+  switch (gs.status) {
+    case STATUS.READY:
+      btnText = $('Play')
+      break
+    case STATUS.LAUNCHING:
+      btnText = $('Launching...')
+      break
+    case STATUS.LAUNCHED:
+      btnText = $('Launched')
+      break
+    case STATUS.DOWNLOADING:
+      btnText = $('Downloading...')
+      break
+    default: btnText = $('Unknown')
+  }
   return (
     <div className='side-bar'>
       <ToolTip
@@ -76,8 +93,8 @@ const SideBar: React.FC = () => {
           <Link to={it.path} className={pathname === it.path ? 'active' : undefined}>{it.name}</Link>
         </li>)}</ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={() => gs.launch()}>
-        <i className='iconfont icon-icons-minecraft_pic' />{$('Play')}</button>
+      <button className='btn btn-primary launch' onClick={() => gs.launch()} disabled={gs.status !== STATUS.READY}>
+        <i className='iconfont icon-icons-minecraft_pic' /><Textfit mode='single'>{btnText}</Textfit></button>
       <p className='version' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span></p>
       <p className='version' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>

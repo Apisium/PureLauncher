@@ -69,7 +69,7 @@
   box-shadow: 0 0 0 0 rgba(0,0,0,.15)
 }
 
-.btn:hover .grow::after {
+.btn:not(:disabled):hover .grow::after {
   box-shadow: 0 4px 0 0 rgba(0,0,0,.15)
 }
 
@@ -92,7 +92,7 @@
   box-shadow: 0 -4px rgba(21,108,0,.5) inset,0 4px rgba(100,253,31,.99) inset,-4px 0 rgba(100,253,31,.5) inset,4px 0 rgba(21,108,0,.5) inset;
 }
 
-.btn-primary:hover .grow,.btn-primary:hover::before {
+.btn-primary:not(:disabled):hover .grow,.btn-primary:not(:disabled):hover::before {
   background-color: #313131;
   box-shadow: 0 -4px rgba(0,0,0,.5) inset,0 4px rgba(255,255,255,.2) inset,-4px 0 rgba(255,255,255,.2) inset,4px 0 rgba(0,0,0,.5) inset
 }

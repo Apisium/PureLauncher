@@ -52,7 +52,9 @@
     font-size: 17px;
     transition: .3s;
     box-shadow: 0 0 16px 0px #36b03064;
-    // filter: var(--launch-filter);
+    &:disabled {
+      box-shadow: 0 0 16px 0px #ffffff64;
+    }
     &:hover {
       box-shadow: 0 0 16px 0px #ffffff44;
     }
