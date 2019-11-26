@@ -3,7 +3,7 @@ import { Launcher } from '@xmcl/launch'
 import { Installer } from '@xmcl/installer'
 import { Version } from '@xmcl/version'
 import Task from '@xmcl/task'
-import { download } from '../util'
+import { download } from '../utils/index'
 import ProfilesStore from './ProfilesStore'
 
 export enum STATUS {

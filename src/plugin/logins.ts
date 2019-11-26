@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import Authenticator, { RegisterAuthenticator, Profile, SkinChangeable } from './Authenticator'
-import { genUUID, fetchJson, appDir } from '../util'
+import { genUUID, fetchJson, appDir } from '../utils/index'
 import { join } from 'path'
 
 const BASE_URL = 'https://authserver.mojang.com/'

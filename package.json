@@ -42,6 +42,8 @@
   "homepage": "https://github.com/Apisium/PureLauncher#readme",
   "devDependencies": {
     "@babel/core": "^7.7.2",
+    "@babel/traverse": "^7.7.4",
+    "@babel/types": "^7.7.4",
     "@types/fs-extra": "^8.0.1",
     "@types/lodash.merge": "^4.6.6",
     "@types/node": "^12.12.7",
@@ -102,9 +104,5 @@
   "cmake-js": {
     "runtime": "electron",
     "runtimeVersion": "6.0.9"
-  },
-  "dependencies": {
-    "@babel/traverse": "^7.7.2",
-    "@babel/types": "^7.7.2"
   }
 }

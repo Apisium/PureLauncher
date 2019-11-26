@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import { join } from 'path'
 import { useStore } from 'reqwq'
 import { TITLE, SkinChangeable } from '../plugin/Authenticator'
-import { skinsDir, cacheSkin } from '../util'
+import { skinsDir, cacheSkin } from '../utils/index'
 import { promises as fs } from 'fs'
 import { remote } from 'electron'
 import { SkinViewer, createOrbitControls, CompositeAnimation, WalkingAnimation,

@@ -45,31 +45,6 @@ const styles = {
   }
 }
 
-// const temp: ResourceVersion = {
-//   id: 'minecraft',
-//   version: '0.0.1',
-//   json: { },
-//   mcVersion: '1.14.4',
-//   type: 'Version',
-//   description: '迷你世界真好玩，迷你世界天下第一!',
-//   title: '迷你世界1.14.4',
-//   resources: [
-//     {
-//       type: 'Mod',
-//       id: 'mini',
-//       version: '1.0.0',
-//       description: '迷你世界真好玩，迷你世界天下第一!',
-//       title: '迷你世界1.14.4',
-//       urls: []
-//     },
-//     {
-//       type: 'Server',
-//       id: 'hah',
-//       title: '迷你世界1.14.4',
-//       ip: '127.0.0.1'
-//     }
-//   ]
-// }
 let _setRes: any
 let resolve: any
 let reject: any

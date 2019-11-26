@@ -1,6 +1,6 @@
 import { Store } from 'reqwq'
 import { join, dirname } from 'path'
-import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../util'
+import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../utils/index'
 import { remote } from 'electron'
 import { platform } from 'os'
 import { YGGDRASIL } from '../plugin/logins'
@@ -28,8 +28,8 @@ interface Version {
 interface User {
   accessToken: string
   username: string
-  profiles: { [key: string]: { displayName: string } }
-  properties: Array<{ [key: string]: string }>,
+  profiles: Record<string, { displayName: string }>
+  properties: Array<Record<string, string>>,
 }
 export default class ProfilesStore extends Store {
   public i = 0
@@ -44,8 +44,8 @@ export default class ProfilesStore extends Store {
     account: '',
     profile: ''
   }
-  public profiles: { [key: string]: Version } = {}
-  public authenticationDatabase: { [key: string]: User } = {}
+  public profiles: Record<string, Version> = {}
+  public authenticationDatabase: Record<string, User> = {}
   public clientToken = genUUID()
   public extraJson = {
     javaPath: '',

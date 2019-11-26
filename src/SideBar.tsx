@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
 import { join } from 'path'
-import { skinsDir } from './util'
+import { skinsDir } from './utils/index'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')

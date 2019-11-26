@@ -5,7 +5,7 @@ import ProfilesStore from '../../models/ProfilesStore'
 import * as Auth from '../../plugin/Authenticator'
 import { useStore } from 'reqwq'
 import { join } from 'path'
-import { skinsDir } from '../../util'
+import { skinsDir } from '../../utils/index'
 
 const steve = require('../../assets/images/steve.png')
 const Profiles: React.FC = () => {
