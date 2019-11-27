@@ -5,11 +5,21 @@ import { shell } from 'electron'
 import { Link } from 'react-router-dom'
 import * as Auth from '../plugin/Authenticator'
 
+const getObjectLength = (obj: any) => {
+  let i = 0
+  for (const _ in obj) i++
+  return i
+}
 const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const [type, setType] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const currentLogin = pluginMaster.logins[type]
+  let width: number
+  if (!type) {
+    const len = getObjectLength(pluginMaster.logins)
+    width = len > 3 ? 570 / len - 30 : 130
+  }
   return <Dialog
     animation='zoom'
     maskAnimation='fade'
@@ -31,7 +41,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
                 setSubmitted(false)
                 setType(it[Auth.NAME])
               }}
-              style={{ backgroundImage: `url(${it[Auth.IMAGE]})` }}
+              style={{ backgroundImage: `url(${it[Auth.IMAGE]})`, width, height: width }}
             />
             <p>{it[Auth.TITLE]()}</p>
           </div>)}
@@ -58,9 +68,9 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
             .finally(() => setLoading(false))
         }}>
         {(currentLogin[Auth.FIELDS] as Auth.Field[]).map(it => <React.Fragment key={it.name}>
-          <label>{it.title()}</label>
+          <label htmlFor={it.name}>{it.title()}</label>
           <div className={'input2 ' + (loading ? 'disabled' : '')}>
-            <input {...it.inputProps} name={it.name} disabled={loading} />
+            <input {...it.inputProps} name={it.name} disabled={loading} id={it.name} />
             <div className='dot0' />
             <div className='dot1' />
             <div className='dot2' />

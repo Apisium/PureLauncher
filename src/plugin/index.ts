@@ -1,5 +1,6 @@
 import Authenticator from './Authenticator'
 import EventBus from '../utils/EventBus'
+import internal from './internal/index'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, WillUnloadable } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 
@@ -40,6 +41,7 @@ export default class Master extends EventBus {
   }
 
   public async unloadPlugin (plugin: Plugin) {
+    if (internal.has(plugin)) throw new Error('Build-in plugins can not be unloaded!')
     const info = this.checkPlugin(plugin)
     if ('willUnload' in plugin) await (plugin as WillUnloadable).willUnload()
     if (EVENTS in plugin) Object.entries<any>(plugin[EVENTS]).forEach(([name, fn]) => this.off(name, fn))

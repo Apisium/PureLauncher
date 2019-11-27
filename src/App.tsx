@@ -7,11 +7,14 @@ import Provider from './models/index'
 import Home from './routes/Home'
 import Settings from './routes/Settings'
 import Manager from './routes/Manager'
+
+import plugins from './plugin/internal/index'
 import Master from './plugin/index'
 
 import InstallList from './components/InstallList'
 
 window.pluginMaster = new Master()
+plugins.forEach(it => pluginMaster.loadPlugin(it))
 
 const ref = createRef()
 require('./i18n').setInstance(ref)

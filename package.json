@@ -98,11 +98,11 @@
     "uuid-by-string": "^3.0.2"
   },
   "browserslist": [
-    "electron 6.0.9"
+    "electron 6.1.4"
   ],
   "gypfile": true,
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "6.0.9"
+    "runtimeVersion": "6.1.4"
   }
 }

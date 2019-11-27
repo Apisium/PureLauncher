@@ -14,11 +14,11 @@ const saveFile = () => {
 }
 
 export const YGGDRASIL = 'yggdrasil'
-@RegisterAuthenticator(YGGDRASIL, () => $('Online Login'), require('../assets/images/steve.png'), [
+@RegisterAuthenticator(YGGDRASIL, () => $('Online Login'), require('../assets/images/steve-head.png'), [
   {
     name: 'email',
     title: () => $('Email'),
-    inputProps: { type: 'email', required: true }
+    inputProps: { type: 'email', required: true, autoFocus: true }
   },
   {
     name: 'password',
@@ -176,11 +176,11 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
 }
 
 export const OFFLINE = 'Offline'
-@RegisterAuthenticator(OFFLINE, () => $('Offline Login'), require('../assets/images/zombie.png'), [
+@RegisterAuthenticator(OFFLINE, () => $('Offline Login'), require('../assets/images/zombie-head.png'), [
   {
     name: 'username',
     title: () => $('Username'),
-    inputProps: { required: true, pattern: '\\w{2,16}' }
+    inputProps: { required: true, pattern: '\\w{2,16}', autoFocus: true }
   }
 ])
 export class Offline extends Authenticator {
