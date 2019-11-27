@@ -107,7 +107,7 @@ const InstallList: React.FC = () => {
 
   const [cursor, setCursor] = useState<any>(null)
 
-  if (!res) return <Dialog className='install-list' />
+  if (!res) return <Dialog className='install-list' animation='zoom' maskAnimation='fade' />
 
   let name: string
   let comp: any
@@ -144,7 +144,14 @@ const InstallList: React.FC = () => {
       name = $('Plugins')
       break
   }
-  return <Dialog title={$('Install') + '-' + name} className='install-list' visible>
+  return <Dialog
+    animation='zoom'
+    maskAnimation='fade'
+    title={$('Install') + '-' + name}
+    className='install-list'
+    onClose={reject}
+    visible
+  >
     <p><span>{$('Name')}: </span>{res.title || res.id}</p>
     {(res as any).version && <p><span>{$('VersionId')}: </span>{(res as any).version}</p>}
     {res.author && <p><span>{$('Author')}: </span>{res.author}</p>}

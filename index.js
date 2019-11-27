@@ -4,6 +4,6 @@ try {
   try {
     require('../app.asar/.')
   } catch (e1) {
-    require('./src/index.js')
+    require('./dist/src/main.js')
   }
 }

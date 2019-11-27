@@ -1,6 +1,7 @@
 import React, { createRef } from 'react'
 import SideBar from './SideBar'
 import useRoute from './useRoute'
+import { ipcRenderer } from 'electron'
 import { HashRouter, Redirect } from 'react-router-dom'
 
 import Provider from './models/index'
@@ -15,6 +16,8 @@ import InstallList from './components/InstallList'
 
 window.pluginMaster = new Master()
 plugins.forEach(it => pluginMaster.loadPlugin(it))
+
+ipcRenderer.on('pure-launcher-reload', () => location.reload())
 
 const ref = createRef()
 require('./i18n').setInstance(ref)

@@ -1,11 +1,32 @@
-const { basename } = require('path')
-const { app, BrowserWindow, ipcMain, webContents } = require('electron')
-const minimist = require('minimist')
+import { basename } from 'path'
+import { version } from '../package.json'
+import { app, BrowserWindow, ipcMain, webContents } from 'electron'
+import minimist from 'minimist'
+import Koa from 'koa'
+import Router from 'koa-router'
+import koaBody from 'koa-body'
 
-let window = null
-let downloadWindow = null
+let window: BrowserWindow = null
+let downloadWindow: BrowserWindow = null
 
-const parseArgs = args => {
+interface Item { file: string, url: string, instance?: any, length?: number }
+interface DownloadItem {
+  multiple?: boolean
+  alive?: number
+  name?: string
+  finished?: number
+  stopped?: boolean
+  file?: string
+  next: () => void
+  item: Item | Item[]
+}
+
+const info = {
+  versions: { ...process.versions, pure_launcher: version },
+  platform: process.platform,
+  arch: process.arch
+}
+const parseArgs = (args: string[]) => {
   if (window) {
     const data = minimist(args.slice(1))._[0]
     window.webContents.send('pure-launcher-protocol', data)
@@ -24,12 +45,12 @@ if (app.requestSingleInstanceLock()) {
 
 app.setAsDefaultProtocolClient('pure-launcher')
 
-const sendToAll = (...args) => webContents.getAllWebContents().forEach(it => it.send(...args))
+const sendToAll = (...args: any[]) => webContents.getAllWebContents().forEach(it => it.send.apply(it, args))
 
 const create = () => {
   downloadWindow = new BrowserWindow({ width: 1, height: 1, show: false })
   const ctx = downloadWindow.webContents
-  const downloadItems = { }
+  const downloadItems: Record<string, DownloadItem> = { }
   let downloadViewer
   ipcMain
     .on('download-window-loaded', (e, id) => {
@@ -39,15 +60,17 @@ const create = () => {
     })
     .on('cancel-download', (_, id) => {
       const obj = downloadItems[id]
-      if (obj && !obj.stopped) (obj.multiple ? obj.item : [obj.item]).forEach(it => it.instance && it.instance.cancel())
+      if (obj && !obj.stopped) {
+        ((obj.multiple ? obj.item : [obj.item]) as Item[]).forEach(it => it.instance && it.instance.cancel())
+      }
     })
-    .on('download', (_, id, item, name) => {
+    .on('download', (_, id, item: DownloadItem['item'], name) => {
       if (!id || !item) throw new Error('Url is not exists.')
-      const obj = downloadItems[id] = { item, name }
+      const obj = downloadItems[id] = { item, name } as DownloadItem
       try {
         if (Array.isArray(item)) {
           const urls = item.map((it, cid) => {
-            const u = new URL(item.url)
+            const u = new URL(it.url)
             u.hash = id + '|' + cid
             return u.href
           }).values()
@@ -60,7 +83,7 @@ const create = () => {
             if (obj.stopped) return
             const g = urls.next()
             if (!g.done) {
-              ctx.downloadUrl(g.value)
+              ctx.downloadURL(g.value)
               obj.alive++
             }
           }
@@ -89,7 +112,7 @@ const create = () => {
           obj.stopped = true
           sendToAll('download-end', id, 2)
           items.delete(i)
-          obj.instance = null
+          item.instance = null
           delete downloadItems[id]
         } else if (!obj.multiple && downloadViewer) {
           downloadViewer.send('progress', id, i.getReceivedBytes() / i.getTotalBytes() * 100 | 0)
@@ -97,7 +120,7 @@ const create = () => {
       })
       .once('done', (_, state) => {
         items.delete(i)
-        obj.instance = null
+        item.instance = null
         switch (state) {
           case 'completed':
             if (obj.multiple) {
@@ -160,6 +183,27 @@ const create = () => {
     })
   if (process.env.DEV || !app.isPackaged) window.webContents.openDevTools()
   parseArgs(process.argv)
+
+  const router = new Router()
+    .post('/protocol', ctx => {
+      window.webContents.send('pure-launcher-protocol', ctx.request.body)
+      ctx.body = { success: true }
+    })
+    .get('/info', ctx => {
+      ctx.body = info
+    })
+  if (process.env.DEV) {
+    router.get('/reload', ctx => {
+      window.webContents.reload()
+      ctx.body = { success: true }
+    })
+  }
+  new Koa()
+    .use((ctx, next) => (ctx.set('Access-Control-Allow-Origin', '*'), next()))
+    .use(koaBody({ urlencoded: false }))
+    .use(router.routes())
+    .on('error', console.error)
+    .listen(46781, '127.0.0.1')
 }
 
 app
