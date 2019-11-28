@@ -11,7 +11,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   version: string
   json: string | object
   mcVersion: string
-  resources?: AllResources[]
+  resources?: Record<string, AllResources>
   urls?: string[]
   source?: string
   website?: string

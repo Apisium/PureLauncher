@@ -34,6 +34,10 @@
   "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
   "Have already logged in? Click here!": "已经登陆了? 点击这里切换账户!",
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
+  "News:": "信息:",
+  "OK": "确认",
+  "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
+    "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",

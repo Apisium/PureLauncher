@@ -2,9 +2,11 @@ import { Store, injectStore, NOT_PROXY } from 'reqwq'
 import { Launcher } from '@xmcl/launch'
 import { Installer } from '@xmcl/installer'
 import { Version } from '@xmcl/version'
-import Task from '@xmcl/task'
 import { download } from '../utils/index'
+import { join } from 'path'
+import fs from 'fs-extra'
 import ProfilesStore from './ProfilesStore'
+import Task from '@xmcl/task'
 
 export enum STATUS {
   READY, LAUNCHING, LAUNCHED, DOWNLOADING
@@ -43,7 +45,8 @@ export default class GameStore extends Store {
     })
   }
   public async launch (version?: string) {
-    const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest, ensureVersionManifest } = this.profilesStore
+    const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest,
+      ensureVersionManifest, checkModsDirectory, modsPath } = this.profilesStore
     const { javaArgs, javaPath } = extraJson
 
     const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
@@ -76,6 +79,14 @@ export default class GameStore extends Store {
         await this.ensureLocalVersion(root, versionId)
         break
     }
+
+    await checkModsDirectory()
+    if (await fs.pathExists(modsPath)) {
+      const s = await fs.stat(modsPath)
+      if (s.isSymbolicLink()) await fs.unlink(modsPath)
+    }
+    const dest = join(root, 'versions', versionId, 'mods')
+    if (!await fs.pathExists(modsPath) && await fs.pathExists(dest)) await fs.symlink(dest, modsPath, 'dir')
 
     const option: Launcher.Option = {
       version: versionId,

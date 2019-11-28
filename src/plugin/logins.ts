@@ -4,9 +4,9 @@ import { genUUID, fetchJson, appDir } from '../utils/index'
 import { join } from 'path'
 
 const BASE_URL = 'https://authserver.mojang.com/'
-const saveFile = () => {
+const saveFile = async () => {
   try {
-    __profilesStore.saveLaunchProfileJsonSync()
+    await __profilesStore.saveLaunchProfileJson()
   } catch (e) {
     console.error(e)
     throw new Error('保存失败!')
@@ -51,16 +51,14 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     const sp = data.selectedProfile
     if (p.flatMap(it => Object.keys(it.profiles))
       .includes(sp.id)) throw new Error($('You have already logged in with this account!'))
-    m.modify(n => {
-      n.authenticationDatabase[data.user.id] = {
-        properties: [],
-        username: data.user.username,
-        accessToken: data.accessToken,
-        profiles: { [sp.id]: { displayName: sp.name } }
-      }
-      n.selectedUser.account = data.user.includes
-      n.selectedUser.profile = sp.id
-    })
+    m.authenticationDatabase[data.user.id] = {
+      properties: [],
+      username: data.user.username,
+      accessToken: data.accessToken,
+      profiles: { [sp.id]: { displayName: sp.name } }
+    }
+    m.selectedUser.account = data.user.includes
+    m.selectedUser.profile = sp.id
     await saveFile()
     return data.user.id as string
   }
@@ -77,7 +75,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
       console.error(d)
       throw new Error($('Network connection failed!'))
     }
-    m.modify(n => delete n.authenticationDatabase[key])
+    delete m.authenticationDatabase[key]
     await saveFile()
   }
   public async refresh (key: string) {
@@ -94,12 +92,10 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
       console.error(d)
       throw new Error($('Network connection failed!'))
     }
-    m.modify(n => {
-      const p2 = n.authenticationDatabase[key]
-      p2.accessToken = d.accessToken
-      p2.username = d.user.username
-      p2.profiles[d.selectedProfile.id].displayName = d.selectedProfile.name
-    })
+    const p2 = m.authenticationDatabase[key]
+    p2.accessToken = d.accessToken
+    p2.username = d.user.username
+    p2.profiles[d.selectedProfile.id].displayName = d.selectedProfile.name
     await saveFile()
   }
   public async validate (key: string) {
@@ -113,7 +109,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
       })
     if (d && d.error) {
       console.error(d)
-      m.modify(n => delete n.authenticationDatabase[key])
+      delete m.authenticationDatabase[key]
       await saveFile()
       return false
     }

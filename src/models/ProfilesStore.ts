@@ -5,6 +5,7 @@ import { remote } from 'electron'
 import { platform } from 'os'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
+import { stat, symlink, rename } from 'fs'
 import fs from 'fs-extra'
 import merge from 'lodash.merge'
 import pAll from 'p-all'
@@ -71,6 +72,7 @@ export default class ProfilesStore extends Store {
 
   public readonly launchProfilePath: string
   public readonly extraConfigPath: string
+  public readonly modsPath: string
 
   public get selectedVersion () {
     let version: Version
@@ -90,6 +92,7 @@ export default class ProfilesStore extends Store {
     super()
     this.launchProfilePath = join(this.root, LAUNCH_PROFILE)
     this.extraConfigPath = join(appDir, EXTRA_CONFIG)
+    this.modsPath = join(this.root, 'mods')
     try {
       this.loadLaunchProfileJson(fs.readJsonSync(this.launchProfilePath))
     } catch (e) {
@@ -102,13 +105,9 @@ export default class ProfilesStore extends Store {
       this.onLoadExtraConfigFailed(e)
     }
 
-    this.loadVersionManifest()
-
+    this.loadVersionManifest().catch(console.error)
     this.cacheSkins().catch(console.error)
-  }
-
-  public modify (fn: (t: this) => void) {
-    fn(this)
+    this.checkModsDirectory().catch(console.error)
   }
 
   public setLoginDialogVisible (state = true) { this.loginDialogVisible = state }
@@ -256,6 +255,26 @@ export default class ProfilesStore extends Store {
   public async toggleSandbox () {
     this.extraJson.sandbox = !this.extraJson.sandbox
     await this.saveExtraConfigJson()
+  }
+
+  public async checkModsDirectory () {
+    const v = this.selectedVersion
+    if (!v) return
+    const dir = this.modsPath
+    try {
+      const s = await fs.stat(dir)
+      if (!s.isDirectory() || s.isSymbolicLink()) return
+    } catch (e) { return }
+    const dest = join(this.root, 'versions', v.lastVersionId, 'mods')
+    if (await fs.pathExists(dest)) {
+      await fs.copy(dir, dest, { overwrite: false })
+      await fs.remove(dir)
+    } else await fs.rename(dir, dest)
+    await fs.symlink(dir, dest, 'dir')
+    openConfirmDialog({
+      text: $('Mods folder detected, which has been moved to the game version {0}\'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.', v.lastVersionId)
+    })
+    return v
   }
 
   public setTasks () {

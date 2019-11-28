@@ -75,7 +75,7 @@ const InstallList: React.FC = () => {
       const servers = []
       const resources = []
       const plugins = []
-      ;(res as ResourceVersion).resources.forEach(it => {
+      Object.values((res as ResourceVersion).resources).forEach(it => {
         switch (it.type) {
           case 'Mod':
             mods.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })

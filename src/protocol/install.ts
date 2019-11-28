@@ -18,8 +18,8 @@ export default async ({ resource: r }: T.ProtocolInstall) => {
   type: 'Version',
   description: '迷你世界真好玩，迷你世界天下第一!',
   title: '迷你世界1.14.4',
-  resources: [
-    {
+  resources: {
+    mini: {
       type: 'Mod',
       id: 'mini',
       version: '1.0.0',
@@ -27,11 +27,11 @@ export default async ({ resource: r }: T.ProtocolInstall) => {
       title: '迷你世界1.14.4',
       urls: []
     },
-    {
+    hah: {
       type: 'Server',
       id: 'hah',
       title: '迷你世界1.14.4',
       ip: '127.0.0.1'
     }
-  ]
+  }
 }).then(console.log)

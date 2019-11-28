@@ -1,6 +1,8 @@
-import React, { createRef } from 'react'
+import React, { createRef, useState } from 'react'
+import Dialog from 'rc-dialog'
 import SideBar from './SideBar'
 import useRoute from './useRoute'
+import { render, unmountComponentAtNode } from 'react-dom'
 import { ipcRenderer } from 'electron'
 import { HashRouter, Redirect } from 'react-router-dom'
 
@@ -39,5 +41,31 @@ const App: React.FC = () => {
     </Provider>
   )
 }
+
+global.openConfirmDialog = (data: { text: string, title?: string, cancelButton?: boolean }) => new Promise(r => {
+  const elm = document.createElement('div')
+  const E = () => {
+    const [open, setOpen] = useState(true)
+    const fn = (t: boolean) => {
+      r(t)
+      setOpen(false)
+      setTimeout(unmountComponentAtNode, 1000, elm)
+    }
+    return <Dialog
+      visible={open}
+      animation='zoom'
+      destroyOnClose
+      maskAnimation='fade'
+      onClose={() => fn(false)}
+      title={data.title || $('News:')}
+      children={data.text}
+      footer={<>
+        <button className='btn btn-primary' onClick={() => fn(true)}>{$('OK')}</button>
+        {data.cancelButton && <button className='btn btn-secondary' onClick={() => fn(false)}>{$('CANCEL')}</button>}
+      </>}
+    />
+  }
+  render(<E />, elm)
+})
 
 export default App
