@@ -33,6 +33,7 @@
     "promise/param-names": "off",
     "no-unused-vars": "off",
     "object-curly-newline": "off",
-    "no-sequences": "off"
+    "no-sequences": "off",
+    "no-eval": "off"
   }
 }

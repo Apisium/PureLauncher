@@ -53,19 +53,20 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
 }).then(it => it.json().catch(() => null))
 export const genUUID = (t?: string) => uuid(t || Math.random().toString() + Math.random().toString())
   .replace(/-/g, '')
+export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 
 interface DownloadItem {
-  item: { url: string, file: string } | Array<{ url: string, file: string }>,
-  name?: string,
-  resolve: () => void,
+  item: { url: string, file: string } | Array<{ url: string, file: string }>
+  name?: string
+  resolve: () => void
   reject: (e: number) => void
 }
 const downloadList: { [id: string]: DownloadItem } = { }
 export const download = (item: DownloadItem['item'], name?: string) => {
-  const id = Date.now().toString(36) + Math.random().toString(36)
+  const id = genId()
   let resolve: () => void
   let reject: (e: number) => void
-  const promise = new Promise((res, rej) => {
+  const promise = new Promise<void>((res, rej) => {
     resolve = res
     reject = rej
   })
@@ -73,7 +74,6 @@ export const download = (item: DownloadItem['item'], name?: string) => {
   ipcRenderer.send('download', id, item, name)
   return promise
 }
-;(global as any).download = download
 ipcRenderer.on('download-end', (_, id, type) => {
   const obj = downloadList[id]
   if (!obj) return

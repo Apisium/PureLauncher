@@ -1,14 +1,16 @@
 import * as T from './types'
 
-const get = (url: string) => fetch(url).then(r => r.json(), e => {
+const get = (url: string) => fetch(url, { cache: 'no-cache' }).then(r => r.json(), e => {
   console.error(e)
   throw new Error($('Network connection failed!'))
 })
 
 export default async ({ resource: r }: T.ProtocolInstall) => {
   if (typeof r === 'string') r = await get(r) as T.AllResources | T.ResourceVersion
-  await pluginMaster.emitSync('protocolInstallRequest', r)
-  if (await global.__requestInstallResources(r)) await pluginMaster.emitSync('protocolInstallResource', r)
+  if (!r.id) return
+  const obj: T.InstallView<any> = { }
+  await pluginMaster.emitSync('protocolInstallProcess', r, obj)
+  if (await global.__requestInstallResources(r, obj)) await pluginMaster.emitSync('protocolInstallResource', r)
 }
 (global as any).hhh = () => global.__requestInstallResources({
   id: 'minecraft',
@@ -34,4 +36,4 @@ export default async ({ resource: r }: T.ProtocolInstall) => {
       ip: '127.0.0.1'
     }
   }
-}).then(console.log)
+} as T.ResourceVersion).then(console.log)

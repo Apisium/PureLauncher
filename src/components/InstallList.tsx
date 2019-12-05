@@ -48,23 +48,27 @@ const styles = {
 let _setRes: any
 let resolve: any
 let reject: any
-global.__requestInstallResources = (d: any) => {
+let view: InstallView
+global.__requestInstallResources = (d: any, _view: any) => {
   if (reject) reject()
-  _setRes(d)
-  return new Promise(a => {
+  view = _view
+  const ret = new Promise<boolean>(a => {
     resolve = () => {
-      a(true)
       _setRes(null)
       resolve = reject = null
+      a(true)
     }
     reject = () => {
-      a(false)
       _setRes(null)
       resolve = reject = null
+      a(false)
     }
   })
+  _setRes(d)
+  return ret
 }
 
+interface InstallView { element?: React.ReactElement, versionPicker?: boolean }
 const InstallList: React.FC = () => {
   const [res, setRes] = useState<Resource>(null)
   _setRes = setRes
@@ -107,7 +111,7 @@ const InstallList: React.FC = () => {
 
   const [cursor, setCursor] = useState<any>(null)
 
-  if (!res) return <Dialog className='install-list' animation='zoom' maskAnimation='fade' />
+  if (!res) return <Dialog className='install-list' animation='zoom' maskAnimation='fade' destroyOnClose />
 
   let name: string
   let comp: any

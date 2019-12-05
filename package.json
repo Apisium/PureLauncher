@@ -110,5 +110,8 @@
   "cmake-js": {
     "runtime": "electron",
     "runtimeVersion": "6.1.4"
-  }
+  },
+  "files": [
+    "packages/**/*.js"
+  ]
 }

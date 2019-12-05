@@ -36,6 +36,9 @@
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
   "OK": "确认",
+  "Successfully installed resources!": "资源安装成功!",
+  "Failed to install resources!": "资源安装失败!",
+  "Hash is different: {0} -> {1}": "哈希值不相同: {0} -> {1}",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
 

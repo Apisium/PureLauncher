@@ -8,20 +8,11 @@ const downloadProgs: { [id: string]: HTMLProgressElement } = { }
 const downloadButtons: { [id: string]: HTMLDivElement } = { }
 let finished: string[] = []
 
-const addItem = (_: any, id: string, file: string, name?: string) => {
+const addItem = (_: any, id: string, file: string, name?: string, finish = false) => {
   if (id in downloadItems) return
-  const p = downloadProgs[id] = document.createElement('progress')
-  p.setAttribute('value', '-1')
-  p.setAttribute('max', '100')
   const li = downloadItems[id] = document.createElement('li')
   const div = document.createElement('div')
-  const div2 = downloadButtons[id] = document.createElement('div')
-  const btn = document.createElement('button')
   div.className = 't'
-  div2.className = 'b'
-  btn.className = 'btn2 danger'
-  btn.innerText = (window as any).__cancelText
-  btn.onclick = () => ipcRenderer.send('download-cancel', id)
   if (name) {
     const span = document.createElement('span')
     span.innerText = file
@@ -31,15 +22,31 @@ const addItem = (_: any, id: string, file: string, name?: string) => {
     div.innerText = file
     li.append(div)
   }
+  if (finish) {
+    li.className = 'finished'
+    list.insertBefore(li, list.firstChild)
+    finished.push(id)
+    setTimeout(() => (li.style.transform = 'none'), 100)
+    return
+  }
+  const p = downloadProgs[id] = document.createElement('progress')
+  p.setAttribute('value', '-1')
+  p.setAttribute('max', '100')
+  const div2 = downloadButtons[id] = document.createElement('div')
+  const btn = document.createElement('button')
+  div2.className = 'b'
+  btn.className = 'btn2 danger'
+  btn.innerText = (window as any).__cancelText
+  btn.onclick = () => ipcRenderer.send('download-cancel', id)
   div2.append(btn)
   li.append(div2, p)
-  list.append(li)
+  list.insertBefore(li, list.firstChild)
   setTimeout(() => (li.style.transform = 'none'), 100)
 }
 ipcRenderer
   .on('start-download', addItem)
   .on('progress', (_, id, p) => {
-    const prog = downloadItems[id]
+    const prog = downloadProgs[id]
     if (prog) prog.setAttribute('value', p)
   })
   .on('download-end', (_, id, type) => {
@@ -53,7 +60,7 @@ ipcRenderer
       finished.push(id)
     }
   })
-  .on('download-items', (_, items) => items.forEach((it: any) => addItem(null, it.id, it.file, it.name)))
+  .on('download-items', (_, items) => items.forEach((it: any) => addItem(null, it.id, it.file, it.name, true)))
   .send('download-window-loaded', remote.getCurrentWebContents().id)
 
 ;(window as any).clearItems = () => {

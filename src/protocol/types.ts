@@ -1,3 +1,5 @@
+import { ReactElement } from 'react'
+
 export type MinecraftApis = Record<string, string>
 export interface Resource <T extends string = string> {
   type: T
@@ -11,7 +13,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   version: string
   json: string | object
   mcVersion: string
-  resources?: Record<string, AllResources>
+  resources?: Record<string, AllResources> | string
   urls?: string[]
   source?: string
   website?: string
@@ -43,6 +45,7 @@ export interface ResourceResourcesPack extends Resource<'ResourcesPack'> {
 export interface ResourceServer extends Resource<'Server'> {
   ip: string
   port?: number
+  hideAddress?: boolean
 }
 export interface ResourcePlugin extends Resource<'Plugin'> {
   version: string
@@ -62,3 +65,4 @@ export interface ProtocolLaunch extends Protocol<'Launch'> {
 export interface ProtocolInstall extends Protocol<'Install'> {
   resource: string | AllResources | ResourceVersion
 }
+export interface InstallView <T extends Resource> { render?: (r: T) => ReactElement, versionPicker?: boolean }

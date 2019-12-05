@@ -23,4 +23,4 @@ export const applyLocate = (name: string, notUpdate: boolean = false) => {
 
 declare const $: (text: keyof typeof zhCN, ...args: string[]) => string
 ;(window as any).$ = (text: keyof typeof zhCN, ...args: string[]) =>
-  text in current ? current[text].replace(/{(\d)}/, (_, i) => args[i]) : text
+  text in current ? current[text].replace(/{(\d)}/g, (_, i) => args[i]) : text

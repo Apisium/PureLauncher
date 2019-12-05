@@ -1,10 +1,12 @@
 import { basename } from 'path'
 import { version } from '../package.json'
-import { app, BrowserWindow, ipcMain, webContents } from 'electron'
+import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem } from 'electron'
 import minimist from 'minimist'
 import Koa from 'koa'
 import Router from 'koa-router'
 import koaBody from 'koa-body'
+
+const PORT = (process.env.PORT && parseInt(process.env.PORT, 10)) || 46781
 
 let window: BrowserWindow = null
 let downloadWindow: BrowserWindow = null
@@ -17,6 +19,7 @@ interface DownloadItem {
   finished?: number
   stopped?: boolean
   file?: string
+  sentProgress?: boolean
   next: () => void
   item: Item | Item[]
 }
@@ -78,6 +81,7 @@ const create = () => {
           obj.alive = 0
           obj.finished = 0
           obj.stopped = false
+          obj.sentProgress = false
           obj.file = item.slice(3).map(it => basename(it.file)).join(', ')
           const next = obj.next = () => {
             if (obj.stopped) return
@@ -99,13 +103,17 @@ const create = () => {
         console.log(e)
       }
     })
-  const items = new Set()
+  const items = new Set<IDownloadItem>()
   ctx.session.on('will-download', (e, i) => {
     const [id, cid] = new URL(i.getURL()).hash.slice(1).split('|', 2)
     const obj = downloadItems[id]
     const item = cid ? obj.item[parseInt(cid, 10)] : obj.item
     item.instance = i
     i.setSavePath(item.file)
+    if (obj.multiple && !obj.sentProgress) {
+      obj.sentProgress = true
+      sendToAll('progress', id, 1 / obj.item.length * 100 | 0)
+    }
     i
       .on('updated', (_, state) => {
         if (state === 'interrupted') {
@@ -185,6 +193,7 @@ const create = () => {
   parseArgs(process.argv)
 
   const router = new Router()
+    .options('*', ctx => (ctx.status = 200))
     .post('/protocol', ctx => {
       window.webContents.send('pure-launcher-protocol', ctx.request.body)
       ctx.body = { success: true }
@@ -199,11 +208,16 @@ const create = () => {
     })
   }
   new Koa()
-    .use((ctx, next) => (ctx.set('Access-Control-Allow-Origin', '*'), next()))
+    .use((ctx, next) => {
+      ctx.set('Access-Control-Allow-Origin', '*')
+      ctx.set('Access-Control-Allow-Method', '*')
+      ctx.set('Access-Control-Allow-Headers', 'Content-Type')
+      return next()
+    })
     .use(koaBody({ urlencoded: false }))
     .use(router.routes())
     .on('error', console.error)
-    .listen(46781, '127.0.0.1')
+    .listen(PORT, '127.0.0.1')
 }
 
 app
