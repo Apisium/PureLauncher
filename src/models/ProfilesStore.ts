@@ -3,6 +3,7 @@ import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../utils/index'
 import { remote } from 'electron'
 import { platform } from 'os'
+import { Installer } from '@xmcl/installer'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
@@ -10,7 +11,6 @@ import merge from 'lodash.merge'
 import pAll from 'p-all'
 import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
-import { Installer } from '@xmcl/installer'
 
 const LAUNCH_PROFILE = 'launcher_profiles.json'
 const VERSION_MANIFEST = 'version_manifest.json'
@@ -85,6 +85,13 @@ export default class ProfilesStore extends Store {
       }
     }
     return version
+  }
+
+  public get sortedVersions () {
+    let arr = Object.entries(this.profiles)
+    if (!this.settings.enableSnapshots) arr = arr.filter(([_, ver]) => ver.type !== 'latest-snapshot')
+    return arr.map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
+      .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
   }
 
   constructor (readonly root = getMinecraftRoot()) {

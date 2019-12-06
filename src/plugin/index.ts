@@ -12,7 +12,7 @@ export default class Master extends EventBus {
     return Object.values(this.logins).flatMap(it => it.getAllProfiles())
   }
   public getCurrentLogin () {
-    const l = this.logins[__profilesStore.extraJson.loginType]
+    const l = this.logins[profilesStore.extraJson.loginType]
     if (l) return l
     else throw new Error('') // TODO: show a dialog
   }

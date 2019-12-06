@@ -6,7 +6,7 @@ import { join } from 'path'
 const BASE_URL = 'https://authserver.mojang.com/'
 const saveFile = async () => {
   try {
-    await __profilesStore.saveLaunchProfileJson()
+    await profilesStore.saveLaunchProfileJson()
   } catch (e) {
     console.error(e)
     throw new Error('保存失败!')
@@ -28,7 +28,7 @@ export const YGGDRASIL = 'yggdrasil'
 ], { name: () => $('Register'), url: () => 'https://my.minecraft.net/store/minecraft/#register' })
 export class Yggdrasil extends Authenticator implements SkinChangeable {
   public async login (options: { email: string, password: string }) {
-    const m = __profilesStore
+    const m = profilesStore
     const p = Object.values(m.authenticationDatabase)
     if (p.find(it => it.username.toLowerCase() === options.password.toLowerCase())) {
       throw new Error($('You have already logged in with this account!'))
@@ -63,7 +63,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     return data.user.id as string
   }
   public async logout (key: string) {
-    const m = __profilesStore
+    const m = profilesStore
     const p = m.authenticationDatabase[key]
     if (!p) return
     const d = await fetchJson(BASE_URL + 'invalidate', true, { accessToken: p.accessToken, clientToken: m.clientToken })
@@ -79,7 +79,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     await saveFile()
   }
   public async refresh (key: string) {
-    const m = __profilesStore
+    const m = profilesStore
     const p = m.authenticationDatabase[key]
     if (!p) throw new Error($('Account does not exists!'))
     const d = await fetchJson(BASE_URL + 'refresh', true, {
@@ -99,7 +99,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     await saveFile()
   }
   public async validate (key: string) {
-    const m = __profilesStore
+    const m = profilesStore
     const p = m.authenticationDatabase[key]
     if (!p) throw new Error($('Account does not exists!'))
     const d = await fetchJson(BASE_URL + 'validate', true, { clientToken: m.clientToken, accessToken: p.accessToken })
@@ -116,7 +116,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     return true
   }
   public getData (key: string) {
-    const m = __profilesStore
+    const m = profilesStore
     const p = m.authenticationDatabase[key]
     if (!p) throw new Error($('Account does not exists!'))
     const uuid = Object.keys(p.profiles)[0]
@@ -133,7 +133,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     }
   }
   public getAllProfiles () {
-    const m = __profilesStore
+    const m = profilesStore
     const clientToken = m.clientToken
     return Object
       .entries(m.authenticationDatabase)

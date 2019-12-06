@@ -13,7 +13,7 @@
     "notice": "readonly",
     "$": "readonly",
     "pluginMaster": "readonly",
-    "__profilesStore": "readonly",
+    "profilesStore": "readonly",
     "openConfirmDialog": "readonly"
   },
   "parser": "@typescript-eslint/parser",

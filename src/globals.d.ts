@@ -8,7 +8,7 @@ interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
 interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean }
 declare global {
   declare const $: (text: Keys, ...args: string[]) => string
-  declare const __profilesStore: ProfilesStore
+  declare const profilesStore: ProfilesStore
   declare const pluginMaster: Master
   declare const notice: (ctx: Ctx) => void
   declare const installResources: (data: Resources) => Promise<void>
@@ -17,7 +17,7 @@ declare global {
   declare interface Window {
     $: $
     pluginMaster: Master
-    __profilesStore: ProfilesStore
+    profilesStore: ProfilesStore
     notice: (ctx: Ctx) => void
     installResources: (data: Resources) => Promise<void>
     __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
@@ -27,11 +27,17 @@ declare global {
     interface Global {
       $: $
       pluginMaster: Master
-      __profilesStore: ProfilesStore
+      profilesStore: ProfilesStore
       notice: (ctx: Ctx) => void
       installResources: (data: Resources) => Promise<void>
       __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
       openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
     }
   }
+}
+
+declare module 'lodash.memoize' {
+  type F = <T extends Function> (fn: T) => T
+  const f: F
+  export default f
 }

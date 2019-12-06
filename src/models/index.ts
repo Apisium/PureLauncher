@@ -6,4 +6,4 @@ import GameStore from './GameStore'
 const P = newInstance(ProfilesStore, GameStore)
 export default P
 
-window.__profilesStore = P.getStore(ProfilesStore)
+window.profilesStore = P.getStore(ProfilesStore)

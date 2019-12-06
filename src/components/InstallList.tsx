@@ -1,8 +1,8 @@
 import './install-list.less'
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useMemo } from 'react'
 import Dialog from 'rc-dialog'
 import { Treebeard } from 'react-treebeard'
-import { ResourceVersion, Resource, ResourceMod, ResourceServer } from '../protocol/types'
+import { ResourceVersion, Resource, ResourceMod, ResourceServer, InstallView } from '../protocol/types'
 
 const styles = {
   tree: {
@@ -68,7 +68,6 @@ global.__requestInstallResources = (d: any, _view: any) => {
   return ret
 }
 
-interface InstallView { element?: React.ReactElement, versionPicker?: boolean }
 const InstallList: React.FC = () => {
   const [res, setRes] = useState<Resource>(null)
   _setRes = setRes
@@ -160,7 +159,7 @@ const InstallList: React.FC = () => {
     {(res as any).version && <p><span>{$('VersionId')}: </span>{(res as any).version}</p>}
     {res.author && <p><span>{$('Author')}: </span>{res.author}</p>}
     {res.description && <p><span>{$('Description')}: </span>{res.description}</p>}
-    {comp}
+    {comp}{view && view.render && <view.render />}
     <div className='buttons'>
       <button className='btn btn-primary' onClick={resolve}>{$('INSTALL')}</button>
       <button className='btn btn-secondary' onClick={reject}>{$('CANCEL')}</button>

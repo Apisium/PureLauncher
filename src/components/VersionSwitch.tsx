@@ -20,18 +20,13 @@ const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = (props) 
     visible={props.open}
   >
     <ul>
-      {Object
-        .entries(pm.profiles)
-        .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
-        .map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
-        .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
-        .map(ver => <li data-sound key={ver.key} onClick={() => {
-          pm.setSelectedVersion(ver.key)
-          props.onClose()
-        }}>{ver.type === 'latest-release' ? lastRelease
-            : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
-          <span data-sound>({ver.lastVersionId})</span>
-          <div data-sound>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div></li>)
+      {pm.sortedVersions.map(ver => <li data-sound key={ver.key} onClick={() => {
+        pm.setSelectedVersion(ver.key)
+        props.onClose()
+      }}>{ver.type === 'latest-release' ? lastRelease
+          : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
+        <span data-sound>({ver.lastVersionId})</span>
+        <div data-sound>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div></li>)
       }
     </ul>
   </Dialog>

@@ -65,4 +65,8 @@ export interface ProtocolLaunch extends Protocol<'Launch'> {
 export interface ProtocolInstall extends Protocol<'Install'> {
   resource: string | AllResources | ResourceVersion
 }
-export interface InstallView <T extends Resource> { render?: (r: T) => ReactElement, versionPicker?: boolean }
+export interface InstallView {
+  [key: string]: any
+  [key: number]: any
+  render?: (...args: any[]) => ReactElement
+}
