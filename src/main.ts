@@ -112,7 +112,7 @@ const create = () => {
     i.setSavePath(item.file)
     if (obj.multiple && !obj.sentProgress) {
       obj.sentProgress = true
-      sendToAll('progress', id, 1 / obj.item.length * 100 | 0)
+      sendToAll('progress', id, 0)
     }
     i
       .on('updated', (_, state) => {

@@ -51,6 +51,7 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
       : { 'Content-Type': 'application/json' }
     : other.headers
 }).then(it => it.json().catch(() => null))
+export const getJson = (url: string) => fetch(url, { cache: 'no-cache' }).then(r => r.json())
 export const genUUID = (t?: string) => uuid(t || Math.random().toString() + Math.random().toString())
   .replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)

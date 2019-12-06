@@ -1,6 +1,6 @@
 import { plugin, Plugin, event } from '../Plugin'
 import { version } from '../../../package.json'
-import { download, genId, appDir } from '../../utils/index'
+import { download, genId, appDir, getJson } from '../../utils/index'
 import { remote } from 'electron'
 import { join } from 'path'
 import { createHash } from 'crypto'
@@ -11,8 +11,8 @@ import * as T from '../../protocol/types'
 @plugin({ id: '@pure-launcher/resource-installer', version, description: $("PureLauncher's built-in plugin") })
 export default class ResourceInstaller extends Plugin {
   @event()
-  public async protocolInstallProcess (r: T.AllResources | T.ResourceVersion, o: T.InstallView<any>) {
-    console.log(r)
+  public async protocolInstallProcess (r: T.AllResources | T.ResourceVersion, o?: T.InstallView<any>) {
+    if (!o) return
     switch (r.type) {
       case 'Mod':
         o.versionPicker = true
@@ -20,18 +20,18 @@ export default class ResourceInstaller extends Plugin {
       case 'Version':
         if (r.resources) {
           await pAll(Object.entries(r.resources).map(([key, v]) => typeof v === 'string' &&
-            (() => fetch(v).then(it => it.json()).then(it => (r.resources[key] = it)))), { concurrency: 8 })
+            (() => getJson(v).then(it => (r.resources[key] = it)))).filter(Boolean), { concurrency: 8 })
         }
     }
   }
-  @event()
+  @event(null, true)
   public async protocolInstallResource (r: T.AllResources | T.ResourceVersion) {
     switch (r.type) {
       case 'Server':
-        // TODO:
+        await this.installServer(r)
         break
       case 'Mod':
-        // TODO:
+        await this.installMod(r)
         break
       case 'ResourcesPack':
         await this.installResourcePack(r)
@@ -45,9 +45,19 @@ export default class ResourceInstaller extends Plugin {
     }
   }
 
+  public async installServer (r: T.ResourceServer) {
+  }
+
   public async installVersion (r: T.ResourceVersion) {
   }
+
   public async installResourcePack (r: T.ResourceResourcesPack) {
+    let ext = r.extends
+    if (ext) {
+      if (typeof ext === 'string') ext = await getJson(ext)
+      await pluginMaster.emitSync('protocolInstallProcess', ext)
+      await this.installResourcePack(ext as T.ResourceResourcesPack)
+    }
     const p = join(remote.app.getPath('temp'), genId())
     const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     await fs.mkdir(p)
@@ -74,11 +84,11 @@ export default class ResourceInstaller extends Plugin {
       r.hashes = hashes
       json[r.id] = r
       await fs.outputJson(jsonPath, json)
-      notice({ content: $('Successfully installed resources!') })
-    } catch (e) {
-      console.error(e)
-      notice({ error: true, content: $('Failed to install resources!') })
+    } finally {
       await fs.remove(p).catch(console.error)
     }
+  }
+
+  public async installMod (r: T.ResourceMod) {
   }
 }
