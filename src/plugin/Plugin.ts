@@ -5,10 +5,7 @@ export const EVENTS = Symbol('Events')
 export const PLUGIN_INFO = Symbol('PluginInfo')
 export type PluginInfo = Pick<ResourcePlugin, Exclude<keyof ResourcePlugin, 'type' | 'url'>>
 export class Plugin {
-
-}
-export interface WillUnloadable {
-  willUnload (): any
+  public onUnload () { }
 }
 export const event = (name?: string, interruptible = false) => (target: any, key: string, d: PropertyDescriptor) => {
   const f = d.value

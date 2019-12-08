@@ -19,6 +19,8 @@ import InstallList from './components/InstallList'
 window.pluginMaster = new Master()
 plugins.forEach(it => pluginMaster.loadPlugin(it))
 
+;(window as any).PureLauncherPluginExports = require('./plugin/exports')
+
 ipcRenderer.on('pure-launcher-reload', () => location.reload())
 
 const ref = createRef()

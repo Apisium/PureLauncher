@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "babel-plugin-dollar",
     "reqwq/babel-plugin.js",
     ["module-resolver", { "alias": { "reqwq": "reqwq/dist/esnext/index.js" } }]
   ]

@@ -88,6 +88,7 @@ export default class ProfilesStore extends Store {
   }
 
   public get sortedVersions () {
+    if (!this.profiles) return []
     let arr = Object.entries(this.profiles)
     if (!this.settings.enableSnapshots) arr = arr.filter(([_, ver]) => ver.type !== 'latest-snapshot')
     return arr.map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))

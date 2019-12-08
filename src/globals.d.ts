@@ -1,6 +1,7 @@
 import Lang from '../lang/zh-cn.json'
 import Master from './plugin/index'
 import ProfilesStore from './models/ProfilesStore'
+import { GetStore } from 'reqwq'
 import { Resources, Resource, InstallView } from './protocol/types'
 
 type Keys = keyof typeof Lang
@@ -10,6 +11,7 @@ declare global {
   declare const $: (text: Keys, ...args: string[]) => string
   declare const profilesStore: ProfilesStore
   declare const pluginMaster: Master
+  declare const __getStore: GetStore
   declare const notice: (ctx: Ctx) => void
   declare const installResources: (data: Resources) => Promise<void>
   declare const __requestInstallResources: (data: Resources, views?: InstallView) => Promise<boolean>
@@ -18,6 +20,7 @@ declare global {
     $: $
     pluginMaster: Master
     profilesStore: ProfilesStore
+    __getStore: GetStore
     notice: (ctx: Ctx) => void
     installResources: (data: Resources) => Promise<void>
     __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
@@ -26,6 +29,7 @@ declare global {
   declare module NodeJS {
     interface Global {
       $: $
+      __getStore: GetStore
       pluginMaster: Master
       profilesStore: ProfilesStore
       notice: (ctx: Ctx) => void
@@ -34,10 +38,4 @@ declare global {
       openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
     }
   }
-}
-
-declare module 'lodash.memoize' {
-  type F = <T extends Function> (fn: T) => T
-  const f: F
-  export default f
 }
