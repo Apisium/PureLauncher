@@ -19,18 +19,11 @@ body {
   top: 80px;
   height: 516px;
   color: var(--text-color-0);
-  filter: drop-shadow(2px 4px 4px #00000037);
-  /* animation: shadow 3s ease-in-out infinite; */
+  filter: drop-shadow(1px 4px 6px #00000077);
   -webkit-app-region: drag;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol';
-}
-
-@keyframes shadow {
-  0% { filter: drop-shadow(2px 4px 4px #00000037) }
-  50% { filter: drop-shadow(2px 4px 8px #00000067) }
-  0% { filter: drop-shadow(2px 4px 4px #00000037) }
 }
 
 a { color: var(--text-color-0) }

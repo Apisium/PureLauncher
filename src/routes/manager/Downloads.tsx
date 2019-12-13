@@ -1,27 +1,27 @@
 import './list.less'
-import E from 'electron'
+import E, { WebviewTag } from 'electron'
 import { currentName } from '../../i18n'
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useLayoutEffect } from 'react'
 
 const dev = !!process.env.HMR_PORT
 const Downloads: React.FC = () => {
   const ref = useRef<E.WebviewTag>()
   const w = ref.current
-  const cb = useCallback(() => {
-    w.insertCSS(`
-      body {
-        --finished: '${$('FINISHED')}';
-        --error: '${$('ERROR')}';
-        --canceled: '${$('CANCELED')}';
-      }
-    `)
-    w.executeJavaScript(`window.__cancelText = '${$('CANCEL')}'`)
-  }, [w])
-  useEffect(() => {
-    if (!w) return
-    w.addEventListener('dom-ready', cb)
+  useLayoutEffect(() => {
+    const elm = document.getElementById('downloads-webview') as any as WebviewTag
+    const cb = () => {
+      elm.insertCSS(`
+        body {
+          --finished: '${$('FINISHED')}';
+          --error: '${$('ERROR')}';
+          --canceled: '${$('CANCELED')}';
+        }
+      `)
+      elm.executeJavaScript(`window.__cancelText = '${$('CANCEL')}'`)
+    }
+    elm.addEventListener('dom-ready', cb)
     return () => w.removeEventListener('dom-ready', cb)
-  }, [w])
+  }, [currentName])
   return <div className='manager-list version-switch manager-versions manager-downloads'>
     <div className='list-top'>
       <span className='header'>{$('Downloads')}</span>
@@ -31,7 +31,13 @@ const Downloads: React.FC = () => {
         <span data-sound>{$('Clear')}</span>
       </a>
     </div>
-    <webview ref={ref} key={currentName} src='downloads.html' nodeintegration={dev.toString() as any} />
+    <webview
+      id='downloads-webview'
+      ref={ref}
+      key={currentName}
+      src='downloads.html'
+      nodeintegration={dev.toString() as any}
+    />
   </div>
 }
 

@@ -1,3 +1,4 @@
+import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
 
 export { Plugin, plugin, event } from './Plugin'
@@ -8,13 +9,17 @@ export { default as Dots } from '../components/Dots'
 export { default as Dropdown } from '../components/Dropdown'
 export { default as Switch } from '../components/Switch'
 export { default as ShowMore } from '../components/ShowMore'
-export { download, genId, genUUID, getJson, fetchJson, appDir } from '../utils/index'
+export { default as createVersionSelector } from '../components/VersionSelector'
+export { default as installResource } from '../protocol/index'
+export { download, genId, genUUID, getJson, fetchJson, appDir, makeTempDir, DownloadItem } from '../utils/index'
 export { STATUS as LAUNCH_STATUS }
 
 export const $: Window['$'] = (window as any).__$pli0
 export const pluginMaster = window.pluginMaster
 export const profilesStore = window.profilesStore
+export const notice = window.notice
+export const openConfirmDialog = window.openConfirmDialog
 
-const gs = __getStore(GameStore)
+const gs = P.getStore(GameStore)
 export const launch = gs.launch
 export const getLaunchStatus = () => gs.status

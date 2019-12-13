@@ -189,6 +189,11 @@ const create = () => {
       clearInterval(timer)
       window = null
     })
+    .webContents.on('will-navigate', (e, u) => {
+      const url = new URL(u)
+      const url1 = new URL(window.webContents.getURL())
+      if (url.origin !== url1.origin || url.pathname !== url1.pathname) e.preventDefault()
+    })
   if (process.env.DEV || !app.isPackaged) window.webContents.openDevTools()
   parseArgs(process.argv)
 

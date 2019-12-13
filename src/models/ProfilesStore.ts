@@ -1,4 +1,4 @@
-import { Store } from 'reqwq'
+import { Store, NOT_PROXY } from 'reqwq'
 import { join, dirname } from 'path'
 import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../utils/index'
 import { remote } from 'electron'
@@ -17,7 +17,7 @@ const VERSION_MANIFEST = 'version_manifest.json'
 const EXTRA_CONFIG = 'config.json'
 const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
-interface Version {
+export interface Version {
   name: string
   icon: string
   created: string
@@ -58,7 +58,8 @@ export default class ProfilesStore extends Store {
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M'
   }
-  public versionManifest: Installer.VersionMetaList = {
+  public versionManifest: Installer.VersionMetaList & { [NOT_PROXY]: true } = {
+    [NOT_PROXY]: true,
     timestamp: '',
     versions: [],
     latest: {
@@ -76,15 +77,16 @@ export default class ProfilesStore extends Store {
   public get selectedVersion () {
     let version: Version
     let time = -Infinity
-    for (const id in this.profiles) {
-      const v = this.profiles[id]
+    let key = ''
+    for (key in this.profiles) {
+      const v = this.profiles[key]
       const t = moment(v.lastUsed).valueOf()
       if (t > time && (this.settings.enableSnapshots || v.type !== 'latest-snapshot')) {
         version = v
         time = t
       }
     }
-    return version
+    return { ...version, key }
   }
 
   public get sortedVersions () {
@@ -185,13 +187,14 @@ export default class ProfilesStore extends Store {
     // not throw but return a null
     const json = await fs.readJson(this.launchProfilePath, { throws: false }) || {}
 
-    await fs.writeJson(this.launchProfilePath, merge(json, {
-      settings: this.selectedUser,
+    const data: Pick<this, 'settings' | 'selectedUser' | 'profiles' | 'authenticationDatabase' | 'clientToken'> = {
+      settings: this.settings,
       selectedUser: this.selectedUser,
       profiles: this.profiles,
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
-    }))
+    }
+    await fs.writeJson(this.launchProfilePath, merge(json, data))
   }
 
   public async saveExtraConfigJson () {
@@ -330,17 +333,21 @@ export default class ProfilesStore extends Store {
 
   public async ensureVersionManifest () {
     if (this.versionManifest.timestamp === '0') {
-      this.versionManifest = await Installer.updateVersionMeta()
-      this.saveVerionManifest()
+      const data: any = await Installer.updateVersionMeta()
+      data[NOT_PROXY] = true
+      this.versionManifest = data
+      this.saveVersionManifest()
     }
   }
 
   public async refreshVersionManifest () {
-    this.versionManifest = await Installer.updateVersionMeta({ fallback: this.versionManifest })
-    this.saveVerionManifest()
+    const data: any = await Installer.updateVersionMeta({ fallback: this.versionManifest })
+    data[NOT_PROXY] = true
+    this.versionManifest = data
+    this.saveVersionManifest()
   }
 
-  private async saveVerionManifest () {
+  private async saveVersionManifest () {
     await fs.writeFile(join(this.root, VERSION_MANIFEST), JSON.stringify(this.versionManifest))
   }
 

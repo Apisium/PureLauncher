@@ -12,7 +12,7 @@ export const event = (name?: string, interruptible = false) => (target: any, key
   if (interruptible) f[INTERRUPTIBLE] = true
   ;(target[EVENTS] || (target[EVENTS] = {}))[name || key] = f
 }
-export const plugin = (info: PluginInfo) => <T extends Plugin> (c: T) => {
+export const plugin = (info: PluginInfo) => <T extends typeof Plugin> (c: T) => {
   if (!info.id) throw new Error('this plugin without id!')
   c[PLUGIN_INFO] = Object.freeze(info)
   return c

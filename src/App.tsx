@@ -16,10 +16,12 @@ import Master from './plugin/index'
 
 import InstallList from './components/InstallList'
 
-window.pluginMaster = new Master()
+Object.defineProperty(window, 'pluginMaster', { value: new Master() })
 plugins.forEach(it => pluginMaster.loadPlugin(it))
 
-;(window as any).PureLauncherPluginExports = require('./plugin/exports')
+Object.defineProperty(window, 'PureLauncherPluginExports', {
+  value: Object.freeze(require('./plugin/exports'))
+})
 
 ipcRenderer.on('pure-launcher-reload', () => location.reload())
 

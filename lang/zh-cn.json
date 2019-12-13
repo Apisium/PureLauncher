@@ -104,5 +104,6 @@
   "INSTALL": "确认安装",
   "Minecraft Version": "我的世界版本",
   "Apis": "前置API",
-  "Host": "地址"
+  "Host": "地址",
+  "Target Version": "目标版本"
 }

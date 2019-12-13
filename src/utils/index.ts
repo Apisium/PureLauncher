@@ -56,14 +56,15 @@ export const genUUID = (t?: string) => uuid(t || Math.random().toString() + Math
   .replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 
-interface DownloadItem {
-  item: { url: string, file: string } | Array<{ url: string, file: string }>
+export interface DownloadItem { url: string, file: string }
+interface DownloadList {
+  item: DownloadItem | DownloadItem[]
   name?: string
   resolve: () => void
   reject: (e: number) => void
 }
-const downloadList: { [id: string]: DownloadItem } = { }
-export const download = (item: DownloadItem['item'], name?: string) => {
+const downloadList: { [id: string]: DownloadList } = { }
+export const download = (item: DownloadList['item'], name?: string) => {
   const id = genId()
   let resolve: () => void
   let reject: (e: number) => void
@@ -81,3 +82,9 @@ ipcRenderer.on('download-end', (_, id, type) => {
   delete downloadList[id]
   if (type) obj.reject(type); else obj.resolve()
 })
+
+export const makeTempDir = async () => {
+  const p = join(remote.app.getPath('temp'), genId())
+  await fs.mkdir(p)
+  return p
+}

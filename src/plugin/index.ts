@@ -1,5 +1,5 @@
 import Authenticator from './Authenticator'
-import EventBus from '../utils/EventBus'
+import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
 import internal from './internal/index'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
@@ -26,7 +26,9 @@ export default class Master extends EventBus {
     if (EVENTS in p) {
       Object.entries<Function>(p[EVENTS]).forEach(([name, fn]) => {
         if (typeof fn !== 'function') return
-        this.on(name, p[EVENTS][name] = fn.bind(p))
+        const f = p[EVENTS][name] = fn.bind(p)
+        if (fn[INTERRUPTIBLE]) f[INTERRUPTIBLE] = true
+        this.on(name, f)
       })
     }
     this.plugins[info.id] = p
