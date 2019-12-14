@@ -22,6 +22,15 @@ npm run compile
 npm run build
 ```
 
+Use taobao registry:
+
+```bash
+set REGISTRY=https://registry.npm.taobao.org/
+set dist-url=http://npm.taobao.org/mirrors/atom-shell
+set ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
+set ELECTRON_CUSTOM_DIR=7.1.5
+```
+
 ## Development
 
 ```bash
