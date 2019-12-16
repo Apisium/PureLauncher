@@ -7,7 +7,7 @@ import { Installer } from '@xmcl/installer'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import fs from 'fs-extra'
-import merge from 'lodash.merge'
+import merge from 'lodash/merge'
 import pAll from 'p-all'
 import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
@@ -148,19 +148,20 @@ export default class ProfilesStore extends Store {
   }
 
   public async setJavaPath () {
-    await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+    const ret = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
       title: $('Locate Java'),
       message: $('Locate the path of Java 8'),
       filters: [
         { name: $('Executable File (Javaw)'), extensions: platform() === 'win32' ? ['exe'] : [] }
       ]
-    }, ([file]) => {
-      const version = getJavaVersion(file)
-      if (version) {
-        this.extraJson.javaPath = file
-        this.saveExtraConfigJsonSync()
-      } else notice({ content: $('Incorrect java version!'), error: true })
     })
+    if (ret.canceled) return
+    const file = ret.filePaths[0]
+    const version = getJavaVersion(file)
+    if (version) {
+      this.extraJson.javaPath = file
+      this.saveExtraConfigJsonSync()
+    } else notice({ content: $('Incorrect java version!'), error: true })
   }
 
   public async loadAllConfigs () {

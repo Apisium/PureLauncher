@@ -13,10 +13,10 @@ const mappings = {
   }
 }
 
-ipcRenderer.on('pure-launcher-protocol', (_, args: string) => {
+ipcRenderer.on('pure-launcher-protocol', (_, args: any) => {
   try {
     const data: T.Protocol = typeof args === 'string' ? JSON.parse(args) : args
-    if (!data || typeof args !== 'object') return
+    if (!data || typeof data !== 'object') return
     if (data.type in mappings) mappings[data.type](data)
   } catch (e) {
     console.error(e)

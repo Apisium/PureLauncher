@@ -1,15 +1,11 @@
 import { basename } from 'path'
-import { version } from '../package.json'
 import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem } from 'electron'
 import minimist from 'minimist'
-import Koa from 'koa'
-import Router from 'koa-router'
-import koaBody from 'koa-body'
-
-const PORT = (process.env.PORT && parseInt(process.env.PORT, 10)) || 46781
+import createServer from './createServer'
 
 let window: BrowserWindow = null
 let downloadWindow: BrowserWindow = null
+;(process.env as any)['D' + 'EV'] = process.env.NODE_ENV !== 'production'
 
 interface Item { file: string, url: string, instance?: any, length?: number }
 interface DownloadItem {
@@ -24,11 +20,6 @@ interface DownloadItem {
   item: Item | Item[]
 }
 
-const info = {
-  versions: { ...process.versions, pure_launcher: version },
-  platform: process.platform,
-  arch: process.arch
-}
 const parseArgs = (args: string[]) => {
   if (window) {
     const data = minimist(args.slice(1))._[0]
@@ -194,35 +185,10 @@ const create = () => {
       const url1 = new URL(window.webContents.getURL())
       if (url.origin !== url1.origin || url.pathname !== url1.pathname) e.preventDefault()
     })
-  if (process.env.DEV || !app.isPackaged) window.webContents.openDevTools()
+  if (process.env.DEV || process.env['D' + 'EV'] || !app.isPackaged) window.webContents.openDevTools()
   parseArgs(process.argv)
 
-  const router = new Router()
-    .options('*', ctx => (ctx.status = 200))
-    .post('/protocol', ctx => {
-      window.webContents.send('pure-launcher-protocol', ctx.request.body)
-      ctx.body = { success: true }
-    })
-    .get('/info', ctx => {
-      ctx.body = info
-    })
-  if (process.env.DEV) {
-    router.get('/reload', ctx => {
-      window.webContents.reload()
-      ctx.body = { success: true }
-    })
-  }
-  new Koa()
-    .use((ctx, next) => {
-      ctx.set('Access-Control-Allow-Origin', '*')
-      ctx.set('Access-Control-Allow-Method', '*')
-      ctx.set('Access-Control-Allow-Headers', 'Content-Type')
-      return next()
-    })
-    .use(koaBody({ urlencoded: false }))
-    .use(router.routes())
-    .on('error', console.error)
-    .listen(PORT, '127.0.0.1')
+  createServer(window)
 }
 
 app
