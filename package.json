@@ -12,6 +12,8 @@
     "watch": "parcel watch index.html src/main.ts --target electron --public-url . --no-autoinstall",
     "build": "del-cli dist && parcel build index.html src/main.ts --target electron --public-url . --bundle-node-modules --no-source-maps",
     "test": "npm run lint",
+    "postinstall": "npm run build:web-api",
+    "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist",
     "compile": "npm run compile:cpp && npm run compile:rust",
     "compile:cpp": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- cmake-js compile",
     "compile:rust": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
@@ -58,6 +60,7 @@
     "@xmcl/version": "^1.0.4",
     "babel-plugin-dollar": "file:packages/babel-plugin-dollar",
     "babel-plugin-module-resolver": "^4.0.0",
+    "bili": "^4.8.1",
     "del-cli": "^3.0.0",
     "electron": "^7.1.5",
     "eslint": "^6.7.2",

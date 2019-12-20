@@ -4,11 +4,10 @@
   "private": true,
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "dependencies": {
+  "devDependencies": {
     "bili": "^4.8.1"
   },
   "scripts": {
-    "postinstall": "npm run build",
     "build": "bili index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal"
   }
 }
