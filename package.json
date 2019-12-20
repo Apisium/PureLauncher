@@ -99,10 +99,5 @@
   },
   "browserslist": [
     "electron 6.1.6"
-  ],
-  "gypfile": false,
-  "cmake-js": {
-    "runtime": "electron",
-    "runtimeVersion": "7.1.5"
-  }
+  ]
 }
