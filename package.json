@@ -60,7 +60,6 @@
     "@xmcl/version": "^1.0.4",
     "babel-plugin-dollar": "file:packages/babel-plugin-dollar",
     "babel-plugin-module-resolver": "^4.0.0",
-    "bili": "^4.8.1",
     "del-cli": "^3.0.0",
     "electron": "^7.1.5",
     "eslint": "^6.7.2",
@@ -102,5 +101,8 @@
   },
   "browserslist": [
     "electron 6.1.6"
-  ]
+  ],
+  "dependencies": {
+    "bili": "^4.8.1"
+  }
 }
