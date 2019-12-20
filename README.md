@@ -1,6 +1,19 @@
-# PureLauncher
+# PureLauncher ![GitHub package.json version](https://img.shields.io/github/package-json/v/Apisium/PureLauncher) ![GitHub](https://img.shields.io/github/license/Apisium/PureLauncher) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 An awesome Minecraft Launcher.
+
+## Features
+
+- 🚀 Fast launching.
+- 💘 Beautiful GUI.
+- 🎉 Custom protocol.
+- 🤔 Powerful extension and rich API.
+- 🎁 One-click download and install resources.
+- ✨ And more...
+
+## Documentation
+
+[https://github.com/Apisium/PureLauncher/wiki](https://github.com/Apisium/PureLauncher/wiki)
 
 ## Build
 
@@ -39,7 +52,7 @@ npm start
 npm run run
 ```
 
-## Author
+## Authors
 
 - Shirasawa
 - CI010

@@ -104,12 +104,5 @@
   "cmake-js": {
     "runtime": "electron",
     "runtimeVersion": "7.1.5"
-  },
-  "files": [
-    "src/**/*",
-    "packages/**/*"
-  ],
-  "dependencies": {
-    "pure-launcher-api": "file:packages/web-api"
   }
 }
