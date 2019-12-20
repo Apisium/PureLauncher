@@ -53,6 +53,7 @@ export interface ResourcePlugin extends Resource<'Plugin'> {
   source?: string
   website?: string
   hash?: string
+  dependencies?: Record<string, ResourcePlugin | string>
 }
 export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer | ResourcePlugin
 

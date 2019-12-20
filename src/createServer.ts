@@ -20,7 +20,7 @@ const ERROR = '{"error":true}'
 const SUCCESS = '{"success":true}'
 
 export default (window: BrowserWindow) => createServer((req, res) => (async () => {
-  if (process.env.DEV) console.log(` \u001b[1;33m${req.method}: \u001b[37m${req.url}\u001b[0m`)
+  if (__DEV__) console.log(` \u001b[1;33m${req.method}: \u001b[37m${req.url}\u001b[0m`)
   let body: string
   switch (req.method) {
     case 'OPTION':
@@ -32,7 +32,7 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
           body = INFO
           break
         case '/reload':
-          if (process.env.DEV) {
+          if (__DEV__) {
             window.webContents.reload()
             body = SUCCESS
             break
@@ -72,9 +72,9 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
   }
   res.writeHead(body ? 200 : 404, HEADERS).end(body)
 })().catch(e => {
-  if (process.env.DEV) console.error(e)
+  if (__DEV__) console.error(e)
   if (!res.finished) {
     if (!res.headersSent) res.writeHead(500, HEADERS)
     res.end(ERROR)
   }
-})).on('error', e => process.env.DEV && console.error(e)).listen(PORT)
+})).on('error', e => __DEV__ && console.error(e)).listen(PORT)

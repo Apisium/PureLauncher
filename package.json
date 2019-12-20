@@ -10,8 +10,8 @@
     "start": "parcel index.html src/main.ts --no-autoinstall --target electron --public-url .",
     "run": "electron .",
     "watch": "parcel watch index.html src/main.ts --target electron --public-url . --no-autoinstall",
-    "build": "del-cli dist && parcel build index.html src/main.ts --target electron --public-url . --bundle-node-modules --no-source-maps --no-cache",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "del-cli dist && parcel build index.html src/main.ts --target electron --public-url . --bundle-node-modules --no-source-maps",
+    "test": "npm run lint",
     "compile": "npm run compile:cpp && npm run compile:rust",
     "compile:cpp": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- cmake-js compile",
     "compile:rust": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
@@ -108,5 +108,8 @@
   "files": [
     "src/**/*",
     "packages/**/*"
-  ]
+  ],
+  "dependencies": {
+    "pure-launcher-api": "file:packages/web-api"
+  }
 }

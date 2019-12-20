@@ -8,6 +8,7 @@ type Keys = keyof typeof Lang
 interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
 interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean }
 declare global {
+  declare const __DEV__: boolean
   declare const $: (text: Keys, ...args: string[]) => string
   declare const profilesStore: ProfilesStore
   declare const pluginMaster: Master
@@ -18,6 +19,7 @@ declare global {
   declare const openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
   declare interface Window {
     $: $
+    __DEV__: boolean
     pluginMaster: Master
     profilesStore: ProfilesStore
     __getStore: GetStore
@@ -29,6 +31,7 @@ declare global {
   declare module NodeJS {
     interface Global {
       $: $
+      __DEV__: boolean
       __getStore: GetStore
       pluginMaster: Master
       profilesStore: ProfilesStore

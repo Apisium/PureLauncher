@@ -11,13 +11,11 @@ import Home from './routes/Home'
 import Settings from './routes/Settings'
 import Manager from './routes/Manager'
 
-import plugins from './plugin/internal/index'
 import Master from './plugin/index'
 
 import InstallList from './components/InstallList'
 
 Object.defineProperty(window, 'pluginMaster', { value: new Master() })
-plugins.forEach(it => pluginMaster.loadPlugin(it))
 
 Object.defineProperty(window, 'PureLauncherPluginExports', {
   value: Object.freeze(require('./plugin/exports'))

@@ -15,7 +15,8 @@
     "pluginMaster": "readonly",
     "profilesStore": "readonly",
     "openConfirmDialog": "readonly",
-    "__getStore": "readonly"
+    "__getStore": "readonly",
+    "__DEV__": "readonly"
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

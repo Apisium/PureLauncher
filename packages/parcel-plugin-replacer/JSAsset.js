@@ -2,7 +2,7 @@ const ParcelJSAsset = require('parcel/lib/assets/JSAsset')
 
 const map = {
   'process.env.NODE_ENV': process.env.NODE_ENV === 'production' ? `'${process.env.NODE_ENV}'` : '$&',
-  'process.env.DEV': process.env.NODE_ENV !== 'production'
+  __DEV__: process.env.NODE_ENV !== 'production'
 }
 const keys = []
 const values = []
@@ -17,9 +17,6 @@ Object.entries(map).forEach(([key, value]) => {
 module.exports = class JSAsset extends ParcelJSAsset {
   parse (code) {
     code = keys.reduce((p, key, i) => p.replace(key, values[i]), code)
-    return super.parse(code).catch(e => {
-      console.log(code)
-      throw e
-    })
+    return super.parse(code)
   }
 }

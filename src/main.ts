@@ -1,6 +1,7 @@
 import { basename } from 'path'
 import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem } from 'electron'
 import minimist from 'minimist'
+import isDev from './utils/isDev'
 import createServer from './createServer'
 
 let window: BrowserWindow = null
@@ -163,6 +164,7 @@ const create = () => {
   })
 
   window.loadFile('./dist/index.html')
+  window.webContents.executeJavaScript('window.aaaa=23333')
   const timer = setInterval(() => {
     if (items.size) {
       let total = 0
@@ -185,7 +187,7 @@ const create = () => {
       const url1 = new URL(window.webContents.getURL())
       if (url.origin !== url1.origin || url.pathname !== url1.pathname) e.preventDefault()
     })
-  if (process.env.DEV || process.env['D' + 'EV'] || !app.isPackaged) window.webContents.openDevTools()
+  if (isDev) window.webContents.openDevTools()
   parseArgs(process.argv)
 
   createServer(window)

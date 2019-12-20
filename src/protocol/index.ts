@@ -1,8 +1,8 @@
 import { ipcRenderer } from 'electron'
+import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import Install from './install'
 import P from '../models/index'
-import { protocol } from '../../packages/web-api/exports'
 import GameStore from '../models/GameStore'
 
 const gameStore = P.getStore(GameStore)

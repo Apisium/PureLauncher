@@ -3,8 +3,10 @@ import { INTERRUPTIBLE } from '../utils/EventBus'
 
 export const EVENTS = Symbol('Events')
 export const PLUGIN_INFO = Symbol('PluginInfo')
-export type PluginInfo = Pick<ResourcePlugin, Exclude<keyof ResourcePlugin, 'type' | 'url'>>
+export type PluginInfo = Pick<ResourcePlugin, Exclude<keyof ResourcePlugin, 'type' | 'url' | 'dependencies'>>
+  & { dependencies?: string[] }
 export class Plugin {
+  public static [PLUGIN_INFO]: PluginInfo = null
   public onUnload () { }
 }
 export const event = (name?: string, interruptible = false) => (target: any, key: string, d: PropertyDescriptor) => {

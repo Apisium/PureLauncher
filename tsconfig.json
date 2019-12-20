@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "strictNullChecks": false,
     "noEmit": true,
-    "isolatedModules": true,
+    "declaration": true,
     "jsx": "react",
     "lib": ["webworker", "scripthost", "dom", "es2019"]
   },
