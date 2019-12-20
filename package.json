@@ -13,7 +13,7 @@
     "build": "del-cli dist && parcel build index.html src/main.ts --target electron --public-url . --bundle-node-modules --no-source-maps",
     "test": "npm run lint",
     "postinstall": "npm run build:web-api",
-    "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist",
+    "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules",
     "compile": "npm run compile:cpp && npm run compile:rust",
     "compile:cpp": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- cmake-js compile",
     "compile:rust": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
