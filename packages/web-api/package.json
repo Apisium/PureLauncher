@@ -8,6 +8,6 @@
     "bili": "^4.8.1"
   },
   "scripts": {
-    "build": "bili index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal"
+    "build": "bili index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal --bundle-node-modules"
   }
 }
