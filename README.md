@@ -13,24 +13,23 @@ An awesome Minecraft Launcher.
 
 ## Documentation
 
+For plugins developers, resource creators, testers and advanced users:
+
 [https://github.com/Apisium/PureLauncher/wiki](https://github.com/Apisium/PureLauncher/wiki)
 
 ## Build
 
+**Please do not use [Yarn](https://yarnpkg.com) !**
+
 ### Requirements
 
 - Nodejs v12.0.0+
-- Python v2.7
-- A proper C/C++ compiler toolchain
-- [CMake](https://cmake.org/)
 - [Rust](https://rustup.rs/)
 
 ### Commands
 
 ```bash
 npm i
-
-npm run compile
 
 npm run build
 ```
@@ -44,11 +43,13 @@ set ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
 set ELECTRON_CUSTOM_DIR=7.1.5
 ```
 
-## Development
+### Development
 
 ```bash
+# Run debugging server:
 npm start
 
+# Run Electron:
 npm run run
 ```
 

@@ -1,12 +1,13 @@
 import Authenticator from './Authenticator'
 import internal from './internal/index'
 import isDev from '../utils/isDev'
+import fs from 'fs-extra'
 import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { appDir } from '../utils/index'
+import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
-import fs from 'fs-extra'
 
 export const PLUGINS_ROOT = join(appDir, 'plugins')
 
@@ -18,11 +19,21 @@ export default class Master extends EventBus {
   public constructor () {
     super()
     internal.forEach(it => this.loadPlugin(it))
-    this
-      .loadPlugins()
-      .catch(console.error)
-      .then(() => isDev && process.env.LOAD_PLUGIN && this.loadPlugin(new (require(process.env.LOAD_PLUGIN))()))
-      .catch(console.error)
+    const p = this.loadPlugins().catch(console.error)
+    if (isDev) {
+      const path = remote.process.env.DEV_PLUGIN
+      if (path) {
+        console.log(`%c${$('Debugging plugin')}: %c` + path, 'color:#36b030', 'color:#777')
+        p.then(it => {
+          const m = require(path)
+          this.loadPlugin(new ((m && m.default) || m)())
+        }).catch(e => {
+          fs.pathExists(path).then(i => !i && ipcRenderer.send('dev-reset-devPlugin'))
+          console.error(e)
+        })
+      }
+    }
+    p.finally(() => pluginMaster.emit('loaded'))
   }
 
   public getAllProfiles () {
@@ -106,14 +117,16 @@ export default class Master extends EventBus {
     plugins = plugins.filter(It => {
       const info = It[PLUGIN_INFO]
       if (Array.isArray(info.dependencies) && info.dependencies.length) return true
-      try { this.loadPlugin(new It()) } catch (e) { console.error('Fail to load plugin: ' + info.id, e) }
+      try { this.loadPlugin(new ((It as any).default || It)()) } catch (e) {
+        console.error('Fail to load plugin: ' + info.id, e)
+      }
     }).sort((a, b) => a[PLUGIN_INFO].dependencies.length - b[PLUGIN_INFO].dependencies.length)
     let len = plugins.length
     while (plugins.length && len-- > 0) {
       const temp = plugins.filter(It => {
         const info = It[PLUGIN_INFO]
         if (info.dependencies.some(it => !(it in this.plugins))) return true
-        try { this.loadPlugin(new It()) } catch (e) {
+        try { this.loadPlugin(new ((It as any).default || It)()) } catch (e) {
           console.error('Fail to load plugin: ' + info.id, e)
           return true
         }

@@ -1,4 +1,5 @@
-import { BrowserWindow } from 'electron'
+import isDev from './utils/isDev'
+import { BrowserWindow, ipcMain } from 'electron'
 import { createServer } from 'http'
 import { version } from '../package.json'
 
@@ -11,13 +12,10 @@ const HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type'
 }
 
-const INFO = JSON.stringify({
-  versions: { ...process.versions, pure_launcher: version },
-  platform: process.platform,
-  arch: process.arch
-})
 const ERROR = '{"error":true}'
 const SUCCESS = '{"success":true}'
+
+ipcMain.on('dev-reset-devPlugin', () => (process.env.DEV_PLUGIN = ''))
 
 export default (window: BrowserWindow) => createServer((req, res) => (async () => {
   if (__DEV__) console.log(` \u001b[1;33m${req.method}: \u001b[37m${req.url}\u001b[0m`)
@@ -29,14 +27,20 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
     case 'GET':
       switch (req.url) {
         case '/info':
-          body = INFO
+          body = JSON.stringify({
+            isDev,
+            devPlugin: process.env.DEV_PLUGIN,
+            versions: { ...process.versions, pure_launcher: version },
+            platform: process.platform,
+            arch: process.arch
+          })
           break
         case '/reload':
-          if (__DEV__) {
+          if (isDev) {
             window.webContents.reload()
             body = SUCCESS
-            break
           }
+          break
       }
       break
     case 'POST': {
@@ -59,13 +63,20 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
       })
       switch (req.url) {
         case '/protocol':
-          if (!window) {
-            body = ERROR
-            break
-          }
           window.webContents.send('pure-launcher-protocol', data)
           body = SUCCESS
           break
+        case '/setDevPlugin':
+          if (isDev) {
+            try {
+              const json = JSON.parse(data)
+              process.env.DEV_PLUGIN = json.path
+              body = SUCCESS
+            } catch (e) {
+              console.error(e)
+              body = ERROR
+            }
+          }
       }
       break
     }

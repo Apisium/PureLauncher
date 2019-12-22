@@ -4,6 +4,8 @@ export type types = T
 
 /* eslint-disable camelcase */
 export interface PureLauncherInfo {
+  isDev: boolean,
+  devPlugin: string,
   arch: string
   platform: string
   versions: {
@@ -27,9 +29,10 @@ export interface PureLauncherInfo {
   }
 }
 
-export const post: <T> (url: string, body: any) => Promise<T>
+export const post: <T = any> (url: string, body: any) => Promise<T>
 export const setPort: (port: number) => void
 export const getPort: () => number
 export const reload: () => Promise<boolean>
 export const info: () => Promise<PureLauncherInfo>
 export const protocol: (data: T.Protocol) => Promise<any>
+export const setDevPlugin: (path: string) => Promise<boolean>

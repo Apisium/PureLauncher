@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "index.d.ts",
   "devDependencies": {
+    "@babel/core": "^7.7.7",
     "bili": "^4.8.1"
   },
   "scripts": {
