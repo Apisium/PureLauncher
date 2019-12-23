@@ -70,14 +70,11 @@
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-standard": "^4.0.1",
     "framer-motion": "^1.7.0",
-    "fs-extra": "^8.1.0",
     "husky": "^3.1.0",
     "less": "^3.10.3",
     "lodash": "^4.17.15",
-    "minimist": "^1.2.0",
     "moment": "^2.24.0",
     "p-all": "^2.1.0",
-    "parcel": "^1.12.4",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
     "parcel-plugin-replacer": "file:packages/parcel-plugin-replacer",
     "rc-dialog": "^7.6.0",
@@ -99,10 +96,20 @@
     "use-react-router": "^1.0.7",
     "uuid-by-string": "^3.0.2"
   },
+  "bin": {
+    "pl-plugin-dev": "packages/plugin/cli.js"
+  },
   "browserslist": [
     "electron 6.1.6"
   ],
   "dependencies": {
-    "bili": "^4.8.1"
+    "asar": "^2.0.3",
+    "bili": "^4.8.1",
+    "chalk": "^3.0.0",
+    "fs-extra": "^8.1.0",
+    "minimist": "^1.2.0",
+    "node-fetch": "^2.6.0",
+    "parcel": "^1.12.4",
+    "v8-compile-cache": "^2.1.0"
   }
 }
