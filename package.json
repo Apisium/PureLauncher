@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src/ --ext .js,.ts,.tsx",
-    "lint:fix": "eslint src/ --fix --ext .js,.ts,.tsx",
+    "fix": "eslint src/ packages/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --no-autoinstall --target electron --public-url .",
     "run": "electron .",
     "watch": "parcel watch index.html src/main.ts --target electron --public-url . --no-autoinstall",
@@ -14,7 +14,7 @@
     "test": "npm run lint",
     "postinstall": "npm run build:web-api",
     "clean": "del-cli dist",
-    "build:web-api": "bili node_modules/ --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules",
+    "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules",
     "compile": "npm run compile:cpp && npm run compile:rust",
     "compile:cpp": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- cmake-js compile",
     "compile:rust": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
@@ -47,6 +47,8 @@
     "@babel/core": "^7.7.5",
     "@babel/traverse": "^7.7.4",
     "@babel/types": "^7.7.4",
+    "@emotion/core": "^10.0.27",
+    "@emotion/styled": "^10.0.27",
     "@types/fs-extra": "^8.0.1",
     "@types/minimist": "^1.2.0",
     "@types/node": "^12.12.17",
@@ -90,13 +92,14 @@
     "react-router-dom": "^5.1.2",
     "react-slick": "^0.25.2",
     "react-textfit": "^1.1.0",
-    "react-treebeard": "^3.2.4",
     "reqwq": "^0.2.0",
+    "shallowequal": "^1.1.0",
     "skinview3d": "^1.2.0-alpha.1",
     "slick-carousel": "^1.8.1",
     "typescript": "^3.7.3",
     "use-react-router": "^1.0.7",
-    "uuid-by-string": "^3.0.2"
+    "uuid-by-string": "^3.0.2",
+    "velocity-react": "^1.4.3"
   },
   "bin": {
     "pl-plugin-dev": "packages/plugin/cli.js"
@@ -113,5 +116,8 @@
     "node-fetch": "^2.6.0",
     "parcel": "^1.12.4",
     "v8-compile-cache": "^2.1.0"
+  },
+  "replacer": {
+    "@['\"]lodash.debounce['\"]": "'lodash/debounce'"
   }
 }

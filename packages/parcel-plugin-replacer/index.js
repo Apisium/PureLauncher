@@ -8,4 +8,5 @@ module.exports = b => {
   b.addAssetType('jsm', js)
   b.addAssetType('ts', ts)
   b.addAssetType('tsx', ts)
+  b.addAssetType('json', require.resolve('./JSONAsset'))
 }

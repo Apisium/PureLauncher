@@ -1,49 +1,8 @@
 import './install-list.less'
 import React, { useState, useMemo } from 'react'
 import Dialog from 'rc-dialog'
-import { Treebeard } from 'react-treebeard'
+import Treebeard from './treebeard/index'
 import { ResourceVersion, Resource, ResourceMod, ResourceServer, InstallView } from '../protocol/types'
-
-const styles = {
-  tree: {
-    base: {
-      color: '#444',
-      backgroundColor: undefined
-    },
-    node: {
-      activeLink: { backgroundColor: undefined },
-      toggle: {
-        base: {
-          position: 'relative',
-          display: 'inline-block',
-          verticalAlign: 'top',
-          marginLeft: -5,
-          height: 24,
-          width: 24
-        },
-        wrapper: {
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          margin: '-7px 0 0 -7px',
-          height: 14
-        },
-        height: 14,
-        width: 14,
-        arrow: {
-          fill: '#777',
-          strokeWidth: 0,
-          transform: 'scale(0.7)'
-        }
-      },
-      header: { base: {
-        color: '#444',
-        display: 'inline-block',
-        verticalAlign: 'top'
-      } }
-    }
-  }
-}
 
 let _setRes: any
 let resolve: any
@@ -117,7 +76,7 @@ const InstallList: React.FC = () => {
   switch (res.type) {
     case 'Version':
       name = $('Version')
-      comp = <div className='list'><Treebeard style={styles} data={data} onToggle={(node: any, toggled: any) => {
+      comp = <div className='list'><Treebeard data={data} onToggle={(node: any, toggled: any) => {
         if (cursor) cursor.active = false
         node.active = true
         if (node.children) node.toggled = toggled
