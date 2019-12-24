@@ -27,7 +27,7 @@ export const YGGDRASIL = 'yggdrasil'
   }
 ], { name: () => $('Register'), url: () => 'https://my.minecraft.net/store/minecraft/#register' })
 export class Yggdrasil extends Authenticator implements SkinChangeable {
-  public async login (options: { email: string; password: string }) {
+  public async login (options: { email: string, password: string }) {
     const m = profilesStore
     const p = Object.values(m.authenticationDatabase)
     if (p.find(it => it.username.toLowerCase() === options.password.toLowerCase())) {

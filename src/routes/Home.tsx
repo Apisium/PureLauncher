@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { shell } from 'electron'
 
 const Home: React.FC = () => {
-  const [slides, setSlides] = useState<Array<{ text: string; url: string; img: string }>>([])
-  const [news, setNews] = useState<Array<{ title: string; classify: string; link: string; time: string }>>([])
+  const [slides, setSlides] = useState<Array<{ text: string, url: string, img: string }>>([])
+  const [news, setNews] = useState<Array<{ title: string, classify: string, link: string, time: string }>>([])
   useEffect(() => {
     let time = +localStorage.getItem('slidesTime') || 0
     let promise = Promise.resolve()

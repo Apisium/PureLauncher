@@ -48,7 +48,7 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
   let full = true
   let instance: any
   Notification.newInstance({ getContainer: () => content }, it => (instance = it))
-  window.notice = (ctx: { content: React.ReactNode; duration?: number; error?: boolean }) => {
+  window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => {
     if (!ctx.duration) ctx.duration = 5
     const ac = ctx as any
     ac.style = { }

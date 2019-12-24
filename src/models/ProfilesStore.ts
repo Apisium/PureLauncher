@@ -18,18 +18,18 @@ const EXTRA_CONFIG = 'config.json'
 const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
 export interface Version {
-  name: string;
-  icon: string;
-  created: string;
-  lastUsed: string;
-  lastVersionId: string;
-  type: 'latest-snapshot' | 'latest-release' | 'custom';
+  name: string
+  icon: string
+  created: string
+  lastUsed: string
+  lastVersionId: string
+  type: 'latest-snapshot' | 'latest-release' | 'custom'
 }
 interface User {
-  accessToken: string;
-  username: string;
-  profiles: Record<string, { displayName: string }>;
-  properties: Array<Record<string, string>>;
+  accessToken: string
+  username: string
+  profiles: Record<string, { displayName: string }>
+  properties: Array<Record<string, string>>
 }
 export default class ProfilesStore extends Store {
   public i = 0

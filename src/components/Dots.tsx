@@ -3,10 +3,10 @@ import React from 'react'
 import ToolTip from 'rc-tooltip'
 
 interface P {
-  count: number;
-  active: number;
-  names: string[];
-  onChange: (p: number) => void;
+  count: number
+  active: number
+  names: string[]
+  onChange: (p: number) => void
 }
 const Dots: React.FC<P> = props => {
   const arr = new Array(props.count)

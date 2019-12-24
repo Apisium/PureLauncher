@@ -66,6 +66,7 @@
     "jsx-a11y/no-onchange": "off",
     "react/jsx-indent": "off",
     "react/prop-types": "off",
-    "react/no-children-prop": "off"
+    "react/no-children-prop": "off",
+    "@typescript-eslint/member-delimiter-style": ["error", { "multiline": { "delimiter": "none", "requireLast": false }, "singleline": { "delimiter": "comma" } }]
   }
 }

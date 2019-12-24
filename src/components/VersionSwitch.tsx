@@ -5,7 +5,7 @@ import ProfilesStore from '../models/ProfilesStore'
 import { useStore } from 'reqwq'
 
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-const VersionSwitch: React.FC<{ open: boolean; onClose: () => void }> = props => {
+const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')
   const unknown = $('Unknown')

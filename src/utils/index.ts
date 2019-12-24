@@ -56,12 +56,12 @@ export const genUUID = (t?: string) => uuid(t || Math.random().toString() + Math
   .replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 
-export interface DownloadItem { url: string; file: string }
+export interface DownloadItem { url: string, file: string }
 interface DownloadList {
-  item: DownloadItem | DownloadItem[];
-  name?: string;
-  resolve: () => void;
-  reject: (e: number) => void;
+  item: DownloadItem | DownloadItem[]
+  name?: string
+  resolve: () => void
+  reject: (e: number) => void
 }
 const downloadList: { [id: string]: DownloadList } = { }
 export const download = (item: DownloadList['item'], name?: string) => {

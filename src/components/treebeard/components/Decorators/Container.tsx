@@ -2,14 +2,14 @@ import React, { PureComponent } from 'react'
 import { VelocityComponent } from 'velocity-react'
 
 class Container extends PureComponent<{
-  customStyles?: any;
-  style: any;
-  decorators: any;
-  terminal: any;
-  onClick: any;
-  onSelect?: any;
-  animations: any;
-  node: any;
+  customStyles?: any
+  style: any
+  decorators: any
+  terminal: any
+  onClick: any
+  onSelect?: any
+  animations: any
+  node: any
 }> {
   renderToggle () {
     const { animations } = this.props

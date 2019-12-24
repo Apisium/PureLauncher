@@ -13,7 +13,7 @@ const getObjectLength = (obj: any) => {
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-const LoginDialog: React.FC<{ open: boolean; onClose: () => void }> = props => {
+const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const [type, setType] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)

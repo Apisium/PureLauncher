@@ -73,7 +73,7 @@ export default class ResourceInstaller extends Plugin {
       await this.installResourcePack(ext as T.ResourceResourcesPack)
     }
     const p = await makeTempDir()
-    const urls: Array<{ url: string; file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
+    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     try {
       const hashes = await downloadAndCheckHash(urls, r)
       const dir = join(profilesStore.root, 'resourcepacks')
@@ -117,7 +117,7 @@ export default class ResourceInstaller extends Plugin {
       await this.installMod(ext as T.ResourceMod, o, dir)
     }
     const p = await makeTempDir()
-    const urls: Array<{ url: string; file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
+    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     try {
       const hashes = await downloadAndCheckHash(urls, r)
       await pAll(urls.map((it, i) => () => {
