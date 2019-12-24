@@ -27,6 +27,7 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
     case 'GET':
       switch (req.url) {
         case '/info':
+          /* eslint-disable @typescript-eslint/camelcase */
           body = JSON.stringify({
             isDev,
             devPlugin: process.env.DEV_PLUGIN,

@@ -5,7 +5,13 @@
     "node": true
   },
   "extends": [
-    "standard"
+    "standard",
+    "standard-react",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:jsx-a11y/recommended"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -28,14 +34,38 @@
   },
   "plugins": [
     "react",
+    "jsx-a11y",
     "@typescript-eslint"
   ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "rules": {
     "lines-between-class-members": "off",
     "promise/param-names": "off",
-    "no-unused-vars": "off",
     "object-curly-newline": "off",
     "no-sequences": "off",
-    "no-eval": "off"
+    "no-eval": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "no-empty": "off",
+    "prefer-spread": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "require-atomic-updates": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "args": "after-used", "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }],
+    "react/display-name": "off",
+    "react/jsx-closing-bracket-location": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "react/jsx-closing-tag-location": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "react/jsx-handler-names": "off",
+    "jsx-a11y/no-onchange": "off",
+    "react/jsx-indent": "off",
+    "react/prop-types": "off",
+    "react/no-children-prop": "off"
   }
 }

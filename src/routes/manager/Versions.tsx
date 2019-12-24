@@ -15,7 +15,8 @@ const Versions: React.FC = () => {
     <div className='list-top'>
       <span className='header'>{$('Versions List')}</span>
       <a className='add-btn'><i data-sound className='iconfont icon-shuliang-zengjia_o' />
-        <span data-sound>{$('Add new...')}</span></a>
+        <span data-sound>{$('Add new...')}</span>
+      </a>
     </div>
     <ul className='scroll-bar'>
       {Object
@@ -24,16 +25,14 @@ const Versions: React.FC = () => {
         .map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
         .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
         .map(ver => <li key={ver.key}>{ver.type === 'latest-release' ? lastRelease
-          : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle
-        }
+          : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle}
         <span>({ver.lastVersionId})</span>
         <div className='time'>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div>
         <div className='buttons'>
           <button className='btn2'>{$('Mods')}</button>
           <button className='btn2 danger'>{$('Delete')}</button>
         </div>
-        </li>)
-      }
+        </li>)}
     </ul>
   </div>
 }

@@ -44,7 +44,7 @@ const App: React.FC = () => {
   )
 }
 
-global.openConfirmDialog = (data: { text: string, title?: string, cancelButton?: boolean }) => new Promise(r => {
+global.openConfirmDialog = (data: { text: string; title?: string; cancelButton?: boolean }) => new Promise(r => {
   const elm = document.createElement('div')
   const E = () => {
     const [open, setOpen] = useState(true)

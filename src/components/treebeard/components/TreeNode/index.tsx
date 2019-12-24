@@ -13,13 +13,13 @@ const Li = styled('li', {
 })(((arg: any) => arg.style) as any)
 
 class TreeNode extends PureComponent<{
-  onSelect?: any,
-  onToggle?: any,
-  style: any,
-  customStyles?: any,
-  node: any,
-  decorators: any,
-  animations: any
+  onSelect?: any;
+  onToggle?: any;
+  style: any;
+  customStyles?: any;
+  node: any;
+  decorators: any;
+  animations: any;
 }> {
   onClick () {
     const { node, onToggle } = this.props
@@ -56,7 +56,7 @@ class TreeNode extends PureComponent<{
 
     if (node.loading) {
       return (
-        <Loading decorators={decorators} style={style}/>
+        <Loading decorators={decorators} style={style} />
       )
     }
 

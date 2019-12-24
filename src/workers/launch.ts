@@ -1,8 +1,8 @@
 import { Launcher } from '@xmcl/launch'
 
 const noCheck: Launcher.PrecheckService = {
-  async ensureLibraries () {},
-  async ensureNatives () {}
+  async ensureLibraries () { /* empty */ },
+  async ensureNatives () { /* empty */ }
 }
 
 let firstRun = true
@@ -16,7 +16,7 @@ addEventListener('message', function (e) {
     option = { ...option, ...noCheck }
   }
   Launcher.launch(option).then(p => {
-    p.stdout.on('data', (data) => {
+    p.stdout.on('data', () => {
       // console.log(data.toString())
     })
     p.on('exit', (code, signal) => {

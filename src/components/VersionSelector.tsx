@@ -24,7 +24,8 @@ export default (o: InstallView, prop: string | number | symbol = 'selectedVersio
           {vers.map(it =>
             <option value={it.key} key={it.key}>{it.type === 'latest-release' ? lastRelease
               : it.type === 'latest-snapshot' ? lastSnapshot
-                : it.name || it.lastVersionId} ({it.lastVersionId})</option>)}
+                : it.name || it.lastVersionId} ({it.lastVersionId})
+            </option>)}
         </select>
       </p>
     </>

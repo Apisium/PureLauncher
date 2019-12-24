@@ -7,7 +7,6 @@ import pAll from 'p-all'
 import fs from 'fs-extra'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
-import { Version } from '../../models/ProfilesStore'
 
 const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: string[] }) =>
   download(urls.length === 1 ? urls[0] : urls, r.title || r.id)
@@ -22,7 +21,7 @@ const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: s
 
 @plugin({ id: '@pure-launcher/resource-installer', version, description: $("PureLauncher's built-in plugin") })
 export default class ResourceInstaller extends Plugin {
-  public onUnload () {}
+  public onUnload () { /* empty */ }
   @event()
   public async protocolInstallProcess (r: T.AllResources | T.ResourceVersion, o?: T.InstallView) {
     if (!o) return
@@ -59,10 +58,10 @@ export default class ResourceInstaller extends Plugin {
     }
   }
 
-  public async installServer (r: T.ResourceServer) {
+  public async installServer (_: T.ResourceServer) {
   }
 
-  public async installVersion (r: T.ResourceVersion) {
+  public async installVersion (_: T.ResourceVersion) {
   }
 
   public async installResourcePack (r: T.ResourceResourcesPack) {
@@ -74,7 +73,7 @@ export default class ResourceInstaller extends Plugin {
       await this.installResourcePack(ext as T.ResourceResourcesPack)
     }
     const p = await makeTempDir()
-    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
+    const urls: Array<{ url: string; file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     try {
       const hashes = await downloadAndCheckHash(urls, r)
       const dir = join(profilesStore.root, 'resourcepacks')
@@ -97,7 +96,7 @@ export default class ResourceInstaller extends Plugin {
   public async installMod (r: T.ResourceMod, o: T.InstallView, dir?: string) {
     if (typeof r !== 'object' || r.type !== 'Mod' || !r.id) throw new TypeError('Incorrect resource type!')
     if (!dir) {
-      const version = profilesStore.profiles[o.selectedVersion]!
+      const version = profilesStore.profiles[o.selectedVersion]
       let id = version.lastVersionId
       switch (version.type) {
         case 'latest-snapshot':
@@ -118,7 +117,7 @@ export default class ResourceInstaller extends Plugin {
       await this.installMod(ext as T.ResourceMod, o, dir)
     }
     const p = await makeTempDir()
-    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
+    const urls: Array<{ url: string; file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     try {
       const hashes = await downloadAndCheckHash(urls, r)
       await pAll(urls.map((it, i) => () => {

@@ -13,7 +13,7 @@ const Profiles: React.FC = () => {
   return <div className='manager-list version-switch manager-versions manager-profiles'>
     <div className='list-top'>
       <span className='header'>{$('Accounts')}</span>
-      <a className='add-btn' onClick={() => pm.setLoginDialogVisible()}>
+      <a className='add-btn' role='button' onClick={() => pm.setLoginDialogVisible()}>
         <i data-sound className='iconfont icon-shuliang-zengjia_o' />
         <span data-sound>{$('Add account')}</span>
       </a>
@@ -23,13 +23,16 @@ const Profiles: React.FC = () => {
       {it.displayName ? <>{it.username} <span>{it.displayName}</span></> : it.username}
       <div className='time'>{pluginMaster.logins[it.type][Auth.TITLE]()}</div>
       <div className='buttons'>
-        <button className='btn2' onClick={() =>
-          pm.setSelectedProfile(it.key, it.type)
-            .then(() => notice({ content: $('Success!') }))
-            .catch(e => {
-              console.error(e)
-              notice({ content: $('Failed!'), error: true })
-            })}>{$('Use')}</button>
+        <button
+          className='btn2' onClick={() =>
+            pm.setSelectedProfile(it.key, it.type)
+              .then(() => notice({ content: $('Success!') }))
+              .catch(e => {
+                console.error(e)
+                notice({ content: $('Failed!'), error: true })
+              })}
+        >{$('Use')}
+        </button>
         <button className='btn2 danger'>{$('Log out')}</button>
       </div>
     </li>)}

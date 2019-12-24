@@ -48,7 +48,7 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
   let full = true
   let instance: any
   Notification.newInstance({ getContainer: () => content }, it => (instance = it))
-  window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => {
+  window.notice = (ctx: { content: React.ReactNode; duration?: number; error?: boolean }) => {
     if (!ctx.duration) ctx.duration = 5
     const ac = ctx as any
     ac.style = { }
@@ -109,8 +109,9 @@ clickSound.oncanplay = () => document.addEventListener('click', e => {
 document.getElementById('close').onclick = () => setTimeout(() => remote.app.quit(), 500)
 document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
 
-var timer1: NodeJS.Timeout
-var timer2: NodeJS.Timeout
+/* eslint-disable @typescript-eslint/no-unused-vars */
+let timer1: NodeJS.Timeout
+let timer2: NodeJS.Timeout
 function startAnimation () {
   chicken.style.opacity = '1'
   timer1 = setInterval(() => {

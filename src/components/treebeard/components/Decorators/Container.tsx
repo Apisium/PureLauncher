@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
 import { VelocityComponent } from 'velocity-react'
 
 class Container extends PureComponent<{
-  customStyles?: any,
-  style: any,
-  decorators: any,
-  terminal: any,
-  onClick: any,
-  onSelect?: any,
-  animations: any,
-  node: any
+  customStyles?: any;
+  style: any;
+  decorators: any;
+  terminal: any;
+  onClick: any;
+  onSelect?: any;
+  animations: any;
+  node: any;
 }> {
   renderToggle () {
     const { animations } = this.props
@@ -28,7 +27,7 @@ class Container extends PureComponent<{
 
   renderToggleDecorator () {
     const { style, decorators, onClick } = this.props
-    return <decorators.Toggle style={style.toggle} onClick={onClick}/>
+    return <decorators.Toggle style={style.toggle} onClick={onClick} />
   }
 
   render () {
@@ -38,7 +37,7 @@ class Container extends PureComponent<{
     return (
       <div style={node.active ? { ...style.container } : { ...style.link }}>
         {!terminal ? this.renderToggle() : null}
-        <decorators.Header node={node} style={style.header} customStyles={customStyles || {}} onSelect={onSelect}/>
+        <decorators.Header node={node} style={style.header} customStyles={customStyles || {}} onSelect={onSelect} />
       </div>
     )
   }

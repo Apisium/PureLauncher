@@ -24,7 +24,7 @@ export default class Master extends EventBus {
       const path = remote.process.env.DEV_PLUGIN
       if (path) {
         console.log(`%c${$('Debugging plugin')}: %c` + path, 'color:#36b030', 'color:#777')
-        p.then(it => {
+        p.then(() => {
           const m = require(path)
           this.loadPlugin(new ((m && m.default) || m)())
         }).catch(e => {

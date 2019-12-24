@@ -13,10 +13,10 @@ const Toggle = ({ style, onClick }) => {
   const points = `0,0 0,${height} ${width},${midHeight}`
 
   return (
-    <div style={style.base} onClick={onClick}>
+    <div style={style.base} onClick={onClick} role='button'>
       <Div style={style.wrapper}>
         <svg {...{ height, width }}>
-          <Polygon points={points} style={style.arrow}/>
+          <Polygon points={points} style={style.arrow} />
         </svg>
       </Div>
     </div>

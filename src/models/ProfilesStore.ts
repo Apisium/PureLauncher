@@ -18,18 +18,18 @@ const EXTRA_CONFIG = 'config.json'
 const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
 export interface Version {
-  name: string
-  icon: string
-  created: string
-  lastUsed: string
-  lastVersionId: string
-  type: 'latest-snapshot' | 'latest-release' | 'custom'
+  name: string;
+  icon: string;
+  created: string;
+  lastUsed: string;
+  lastVersionId: string;
+  type: 'latest-snapshot' | 'latest-release' | 'custom';
 }
 interface User {
-  accessToken: string
-  username: string
-  profiles: Record<string, { displayName: string }>
-  properties: Array<Record<string, string>>,
+  accessToken: string;
+  username: string;
+  profiles: Record<string, { displayName: string }>;
+  properties: Array<Record<string, string>>;
 }
 export default class ProfilesStore extends Store {
   public i = 0
@@ -316,7 +316,7 @@ export default class ProfilesStore extends Store {
         ])
         break
       case 'darwin':
-        remote.app.dock.setMenu(remote.Menu.buildFromTemplate(versions.map(([id, v]) => ({
+        remote.app.dock.setMenu(remote.Menu.buildFromTemplate(versions.map(([_id, v]) => ({
           label: `${v.type === 'latest-release' ? lastRelease
             : v.type === 'latest-snapshot' ? lastSnapshot : v.name || noTitle} (${v.lastVersionId})`,
           click () { /* TODO: */ }

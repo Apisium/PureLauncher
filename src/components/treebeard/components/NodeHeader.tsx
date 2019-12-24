@@ -3,13 +3,13 @@ import deepEqual from 'lodash/isEqual'
 import shallowEqual from 'shallowequal'
 
 class NodeHeader extends Component<{
-  style: any,
-  customStyles?: any,
-  decorators: any,
-  animations: boolean | any,
-  node: any,
-  onClick: any,
-  onSelect: any
+  style: any;
+  customStyles?: any;
+  decorators: any;
+  animations: boolean | any;
+  node: any;
+  onClick: any;
+  onSelect: any;
 }> {
   shouldComponentUpdate (nextProps) {
     const props = this.props

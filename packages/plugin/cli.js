@@ -52,7 +52,7 @@ switch (argv._[0]) {
     process.exit(-1)
 }
 
-;(async () => {
+(async () => {
   if (BUILD) {
     if (argv.remove) {
       await fs.remove(DIST)

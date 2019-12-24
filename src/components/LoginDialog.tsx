@@ -7,10 +7,13 @@ import * as Auth from '../plugin/Authenticator'
 
 const getObjectLength = (obj: any) => {
   let i = 0
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   for (const _ in obj) i++
   return i
 }
-const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
+
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+const LoginDialog: React.FC<{ open: boolean; onClose: () => void }> = props => {
   const [type, setType] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -31,11 +34,13 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
       ? <>
         <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>
         <Link to='/manager/accounts' className='title title2' onClick={props.onClose}>
-          {$('Have already logged in? Click here!')}</Link>
+          {$('Have already logged in? Click here!')}
+        </Link>
         <div className='heads'>
           {Object.values(pluginMaster.logins).map(it => <div key={it[Auth.NAME]}>
             <div
               data-sound
+              role='img'
               className='head'
               onClick={() => {
                 setSubmitted(false)
@@ -66,7 +71,8 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
             })
             .catch(err => notice({ content: err.message, error: true })) // TODO:
             .finally(() => setLoading(false))
-        }}>
+        }}
+      >
         {(currentLogin[Auth.FIELDS] as Auth.Field[]).map(it => <React.Fragment key={it.name}>
           <label htmlFor={it.name}>{it.title()}</label>
           <div className={'input2 ' + (loading ? 'disabled' : '')}>
@@ -78,22 +84,23 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
           </div>
         </React.Fragment>)}
         <div className='links'>
-          <span data-sound className='left' onClick={() => !loading && setType('')}>{$('Back')}</span>
+          <span data-sound className='left' role='button' onClick={() => !loading && setType('')}>{$('Back')}</span>
           {currentLogin[Auth.LINK] &&
-            <span data-sound className='right'
-              onClick={() => shell.openExternal(currentLogin[Auth.LINK].url())}>
+            <span
+              data-sound className='right' role='button'
+              onClick={() => shell.openExternal(currentLogin[Auth.LINK].url())}
+            >
               {currentLogin[Auth.LINK].name()}
-            </span>
-          }
+            </span>}
         </div>
         <button
           type='submit'
           className='btn3'
           disabled={loading}
           style={{ marginTop: 8, width: '100%' }}
-        >{$(loading ? 'Loading...' : 'Log in')}</button>
-      </form>
-    }
+        >{$(loading ? 'Loading...' : 'Log in')}
+        </button>
+      </form>}
   </Dialog>
 }
 

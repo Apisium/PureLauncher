@@ -76,13 +76,16 @@ const InstallList: React.FC = () => {
   switch (res.type) {
     case 'Version':
       name = $('Version')
-      comp = <div className='list'><Treebeard data={data} onToggle={(node: any, toggled: any) => {
-        if (cursor) cursor.active = false
-        node.active = true
-        if (node.children) node.toggled = toggled
-        setCursor(node)
-        setData(Object.assign({}, data))
-      }} /></div>
+      comp = <div className='list'><Treebeard
+        data={data} onToggle={(node: any, toggled: any) => {
+          if (cursor) cursor.active = false
+          node.active = true
+          if (node.children) node.toggled = toggled
+          setCursor(node)
+          setData(Object.assign({}, data))
+        }}
+      />
+      </div>
       break
     case 'Mod': {
       name = $('Mods')

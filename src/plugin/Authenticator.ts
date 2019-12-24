@@ -6,12 +6,12 @@ export const LINK = Symbol('Link')
 export const TITLE = Symbol('Title')
 export const IMAGE = Symbol('Image')
 export interface Field {
-  name: string
-  title: () => string
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement> & React.ClassAttributes<HTMLInputElement>
+  name: string;
+  title: () => string;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement> & React.ClassAttributes<HTMLInputElement>;
 }
 export const RegisterAuthenticator = (name: string, title: () => string, img: string, fields: Field[],
-  link?: { name: () => string, url: () => string }) =>
+  link?: { name: () => string; url: () => string }) =>
   <T extends { new (...args: any[]): { } }> (C: T) => class RegisteredAuthenticator extends C {
     public [NAME] = name
     public [TITLE] = title
@@ -21,14 +21,14 @@ export const RegisterAuthenticator = (name: string, title: () => string, img: st
   }
 
 export interface Profile {
-  clientToken: string
-  accessToken: string
-  uuid: string
-  username: string
-  type: string
-  displayName?: string
-  skinUrl?: string
-  key: string
+  clientToken: string;
+  accessToken: string;
+  uuid: string;
+  username: string;
+  type: string;
+  displayName?: string;
+  skinUrl?: string;
+  key: string;
 }
 
 export default abstract class Authenticator {
@@ -40,5 +40,5 @@ export default abstract class Authenticator {
   public abstract getAllProfiles (): Profile[]
 }
 export interface SkinChangeable {
-  changeSkin (key: string, path: string, slim: boolean): Promise<void>
+  changeSkin (key: string, path: string, slim: boolean): Promise<void>;
 }

@@ -29,7 +29,7 @@ const Settings: React.FC = () => {
       </div>
       <div className='group'>
         <label>{$('JVM ARGUMENTS')}</label>
-        <input value={pm.extraJson.javaArgs} onChange={e => pm.setArgs(e.target.value)}/>
+        <input value={pm.extraJson.javaArgs} onChange={e => pm.setArgs(e.target.value)} />
       </div>
       <div className='group'>
         <label>{$('LANGUAGE')}</label>

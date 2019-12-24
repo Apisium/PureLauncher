@@ -13,7 +13,7 @@ import ProfilesStore from '../models/ProfilesStore'
 
 const skinUrl = require('../assets/images/steve.png')
 
-const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
+const Profile: React.FC<{ open: boolean; onClose: () => void }> = (props) => {
   const ref = useRef<HTMLDivElement>()
   const ref2 = useRef<SkinViewer>()
   const ref3 = useRef<boolean>(false)
@@ -113,17 +113,22 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
       <div ref={ref} className='skin' />
       <div className='buttons' style={{ display: u && 'changeSkin' in l ? undefined : 'none' }}>
         <button className='btn btn-primary' disabled={loading} onClick={handleSkinChange}>
-          {$(skin ? 'Upload!' : 'Change skin')}</button>
+          {$(skin ? 'Upload!' : 'Change skin')}
+        </button>
         <button className='btn btn-secondary' disabled={!skin || loading} onClick={() => setSkin('')}>
-          {$('Cancel upload')}</button>
+          {$('Cancel upload')}
+        </button>
       </div>
     </div>
     <div className='right'>
       <div className='buttons'>
-        <button className='btn btn-primary' disabled={loading} onClick={() => {
-          props.onClose()
-          pm.setLoginDialogVisible(true)
-        }}>{$('Add account')}</button>
+        <button
+          className='btn btn-primary' disabled={loading} onClick={() => {
+            props.onClose()
+            pm.setLoginDialogVisible(true)
+          }}
+        >{$('Add account')}
+        </button>
         <button className='btn btn-secondary' disabled={loading} onClick={console.log}>{$('Log out')}</button>
       </div>
       <div className='text'>{$('Quick account switching:')}</div>

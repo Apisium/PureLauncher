@@ -27,7 +27,7 @@ export const YGGDRASIL = 'yggdrasil'
   }
 ], { name: () => $('Register'), url: () => 'https://my.minecraft.net/store/minecraft/#register' })
 export class Yggdrasil extends Authenticator implements SkinChangeable {
-  public async login (options: { email: string, password: string }) {
+  public async login (options: { email: string; password: string }) {
     const m = profilesStore
     const p = Object.values(m.authenticationDatabase)
     if (p.find(it => it.username.toLowerCase() === options.password.toLowerCase())) {
@@ -151,7 +151,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
         } : null
       }).filter(Boolean)
   }
-  public async changeSkin (key: string, path: string, slim: boolean = false) {
+  public async changeSkin (key: string, path: string, slim = false) {
     const p = this.getData(key)
     const body = new FormData()
     if (slim) body.append('model', 'slim')

@@ -73,36 +73,40 @@ const SideBar: React.FC = () => {
       <p className='name'>{logged ? u.username : $('NOT LOGGED-IN')}</p>
       <ul className='list'>
         <li className={pathname === '/home' ? 'active' : null}>
-          <Link to='/home'><img src={homeIcon} /><span data-sound>{$('Home')}</span></Link>
+          <Link to='/home'><img src={homeIcon} alt='' /><span data-sound>{$('Home')}</span></Link>
         </li>
         <li
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
           className={pathname.startsWith('/manager') ? 'active' : null}
         >
-          <a href='#' onClick={e => e.preventDefault()}><img src={managerIcon} />
+          <a href='#' onClick={e => e.preventDefault()}><img src={managerIcon} alt='' />
             <span data-sound>{$('Manager')}</span>
           </a>
         </li>
         <li className={pathname === '/settings' ? 'active' : null}>
-          <Link to='/settings'><img src={settingsIcon} /><span data-sound>{$('Settings')}</span></Link>
+          <Link to='/settings'><img src={settingsIcon} alt='' /><span data-sound>{$('Settings')}</span></Link>
         </li>
       </ul>
       <Dropdown open={open}>
         <ul className='top-bar'>{pages.map(it => <li key={it.path}>
           <Link to={it.path} className={pathname === it.path ? 'active' : undefined}>{it.name}</Link>
-        </li>)}</ul>
+        </li>)}
+        </ul>
       </Dropdown>
       <button className='btn btn-primary launch' onClick={() => gs.launch()} disabled={gs.status !== STATUS.READY}>
-        <i className='iconfont icon-icons-minecraft_pic' /><Textfit mode='single'>{btnText}</Textfit></button>
-      <p className='version' data-sound onClick={openVersionSwitch}>
-        {$('Version')}: <span data-sound>{versionName}</span></p>
-      <p className='version' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>
-        [{$('Click here to switch versions')}]</p>
+        <i className='iconfont icon-icons-minecraft_pic' /><Textfit mode='single'>{btnText}</Textfit>
+      </button>
+      <a className='version' role='button' data-sound onClick={openVersionSwitch}>
+        {$('Version')}: <span data-sound>{versionName}</span>
+      </a>
+      <a className='version' role='button' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>
+        [{$('Click here to switch versions')}]
+      </a>
       <Profile onClose={() => setProfile(false)} open={openProfile} />
       <LoginDialog onClose={() => pm.setLoginDialogVisible(false)} open={pm.loginDialogVisible} />
       <VersionSwitch onClose={() => setSwitch(false)} open={openSwitch} />
-    </div >
+    </div>
   )
 }
 

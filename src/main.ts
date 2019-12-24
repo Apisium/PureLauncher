@@ -8,17 +8,17 @@ let window: BrowserWindow = null
 let downloadWindow: BrowserWindow = null
 ;(process.env as any)['D' + 'EV'] = process.env.NODE_ENV !== 'production'
 
-interface Item { file: string, url: string, instance?: any, length?: number }
+interface Item { file: string; url: string; instance?: any; length?: number }
 interface DownloadItem {
-  multiple?: boolean
-  alive?: number
-  name?: string
-  finished?: number
-  stopped?: boolean
-  file?: string
-  sentProgress?: boolean
-  next: () => void
-  item: Item | Item[]
+  multiple?: boolean;
+  alive?: number;
+  name?: string;
+  finished?: number;
+  stopped?: boolean;
+  file?: string;
+  sentProgress?: boolean;
+  next: () => void;
+  item: Item | Item[];
 }
 
 const parseArgs = (args: string[]) => {

@@ -25,8 +25,11 @@ const Downloads: React.FC = () => {
   return <div className='manager-list version-switch manager-versions manager-downloads'>
     <div className='list-top'>
       <span className='header'>{$('Downloads')}</span>
-      <a className='add-btn' onClick={() => ref.current && ref.current
-        .executeJavaScript('clearItems()').then(() => notice({ content: $('Success!') }))}>
+      <a
+        role='button'
+        className='add-btn' onClick={() => ref.current && ref.current
+          .executeJavaScript('clearItems()').then(() => notice({ content: $('Success!') }))}
+      >
         <i data-sound className='iconfont icon-shanchu_o' />
         <span data-sound>{$('Clear')}</span>
       </a>
