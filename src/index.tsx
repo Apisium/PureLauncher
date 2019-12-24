@@ -3,9 +3,9 @@ import './utils/isDev'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
+import Notification from 'rc-notification'
 import './protocol/index'
 import { remote } from 'electron'
-import { newInstance } from 'rc-notification'
 
 const colors1 = ['7e512f', '8c6a48', '8b6428', '885b3c', '754b2e', 'c38a58', '775237', '775236',
   '905536', '675432', '735337', '754b2e', '975a35', '70472f', '8c6948', '5f4939', '7e512f',
@@ -47,7 +47,7 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
   const content = document.getElementById('main-content')
   let full = true
   let instance: any
-  newInstance({ getContainer: () => content }, it => (instance = it))
+  Notification.newInstance({ getContainer: () => content }, it => (instance = it))
   window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => {
     if (!ctx.duration) ctx.duration = 5
     const ac = ctx as any

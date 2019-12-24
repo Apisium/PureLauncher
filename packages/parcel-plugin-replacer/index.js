@@ -1,8 +1,11 @@
 module.exports = b => {
-  const path = require.resolve('./JSAsset')
-  b.addAssetType('js', path)
-  b.addAssetType('jsx', path)
-  b.addAssetType('es6', path)
-  b.addAssetType('mjs', path)
-  b.addAssetType('jsm', path)
+  const js = require.resolve('./JSAsset')
+  const ts = require.resolve('./TypeScriptAsset')
+  b.addAssetType('js', js)
+  b.addAssetType('jsx', js)
+  b.addAssetType('es6', js)
+  b.addAssetType('mjs', js)
+  b.addAssetType('jsm', js)
+  b.addAssetType('ts', ts)
+  b.addAssetType('tsx', ts)
 }

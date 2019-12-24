@@ -1,0 +1,9 @@
+{
+  "name": "parcel-plugin-v8-cache",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Shirasawa",
+  "dependencies": {
+    "terser": "^4.4.3"
+  }
+}
