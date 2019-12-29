@@ -95,6 +95,7 @@
     "react-slick": "^0.25.2",
     "react-textfit": "^1.1.0",
     "reqwq": "^0.2.0",
+    "semver": "^7.1.1",
     "shallowequal": "^1.1.0",
     "skinview3d": "^1.2.0-alpha.1",
     "slick-carousel": "^1.8.1",
@@ -110,6 +111,7 @@
     "electron 6.1.6"
   ],
   "dependencies": {
+    "@types/lodash": "^4.14.149",
     "asar": "^2.0.3",
     "bili": "^4.8.1",
     "chalk": "^3.0.0",

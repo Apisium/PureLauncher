@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="opacity:0;transition:opacity .6s">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval'">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>PureLauncher | 我的世界启动器</title>
@@ -13,9 +13,9 @@
   <div id="top" class="top"></div>
   <main id="root"></main>
   <div id="top-logo"><img src="src/assets/images/logo.png"></img></div>
+  <div class="blocks" id="blocks0"></div>
   <div class="blocks" id="blocks1"></div>
   <div class="blocks" id="blocks2"></div>
-  <div class="blocks" id="blocks3"></div>
   <div id="chicken"><img src="src/assets/images/chicken.gif"></img></div>
   <button id="close">
     <svg data-sound="true" version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
@@ -66,6 +66,37 @@
     </svg>
   </button>
   <style>.hide { display: none !important }</style>
+  <script>
+    (() => {
+      const blocks0 = document.getElementById('blocks0')
+      const blocks1 = document.getElementById('blocks1')
+      const blocks2 = document.getElementById('blocks2')
+      const count = window.innerWidth / 20 | 0
+      const colors2 = ['#7e512f', '#8c6a48', '#8b6428', '#885b3c', '#754b2e', '#c38a58', '#775237', '#775236',
+        '#905536', '#675432', '#735337', '#754b2e', '#975a35', '#70472f', '#8c6948', '#5f4939',
+        '#7e512f', '#8b6428', '#675d46', '#645634', '#6f6449']
+      const colors0 = ['#9bbf56', '#869f43', '#7fad3a', '#7ab53f', '#7ab139', '#7a993f', '#a5c95e', '#87b43e']
+      const colors1 = colors0.concat(colors2.slice(5))
+      const temp = document.createDocumentFragment()
+      const fn = (i, c, b) => {
+        const l = c.length
+        while (i++ < count) {
+          const elm = document.createElement('div')
+          elm.style.backgroundColor = c[Math.random() * l | 0]
+          temp.appendChild(elm)
+        }
+        const r = Array.from(temp.childNodes)
+        b.appendChild(temp)
+        return r
+      }
+      window.topBar = {
+        containers: [blocks0, blocks1, blocks2],
+        colors: [colors0, colors1, colors2],
+        blocks: [fn(0, colors0, blocks0), fn(2, colors1, blocks1), fn(16, colors2, blocks2)]
+      }
+      document.addEventListener('DOMContentLoaded', () => (document.getElementsByTagName('html')[0].style.opacity = '1'))
+    })()
+  </script>
   <script src="src/index.tsx"></script>
 </body>
 </html>

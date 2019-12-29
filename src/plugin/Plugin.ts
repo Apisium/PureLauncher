@@ -3,7 +3,7 @@ import { INTERRUPTIBLE } from '../utils/EventBus'
 
 export const EVENTS = Symbol('Events')
 export const PLUGIN_INFO = Symbol('PluginInfo')
-export type PluginInfo = Pick<ResourcePlugin, Exclude<keyof ResourcePlugin, 'type' | 'url' | 'dependencies'>>
+export type PluginInfo = Pick<ResourcePlugin, Exclude<keyof ResourcePlugin, 'type' | 'url' | 'dependencies' | 'extension'>>
   & { dependencies?: string[] }
 export class Plugin {
   public static [PLUGIN_INFO]: PluginInfo = null

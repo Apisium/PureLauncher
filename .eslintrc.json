@@ -22,7 +22,8 @@
     "profilesStore": "readonly",
     "openConfirmDialog": "readonly",
     "__getStore": "readonly",
-    "__DEV__": "readonly"
+    "__DEV__": "readonly",
+    "topBar": "readonly"
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -67,6 +68,7 @@
     "react/jsx-indent": "off",
     "react/prop-types": "off",
     "react/no-children-prop": "off",
+    "object-property-newline": "off",
     "@typescript-eslint/member-delimiter-style": ["error", { "multiline": { "delimiter": "none", "requireLast": false }, "singleline": { "delimiter": "comma" } }]
   }
 }

@@ -3,6 +3,7 @@ import uuid from 'uuid-by-string'
 import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { platform } from 'os'
+import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 
@@ -51,7 +52,7 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
       : { 'Content-Type': 'application/json' }
     : other.headers
 }).then(it => it.json().catch(() => null))
-export const getJson = (url: string) => fetch(url, { cache: 'no-cache' }).then(r => r.json())
+export const getJson = <T = any> (url: string) => fetch(url, { cache: 'no-cache' }).then(r => r.json()) as Promise<T>
 export const genUUID = (t?: string) => uuid(t || Math.random().toString() + Math.random().toString())
   .replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
@@ -88,3 +89,10 @@ export const makeTempDir = async () => {
   await fs.mkdir(p)
   return p
 }
+
+export const sha1 = (file: string) => new Promise<string>((resolve, e) => {
+  const s = createHash('sha1').setEncoding('hex')
+  fs.createReadStream(file).on('error', e).pipe(s).on('error', e).on('finish', () => resolve(s.read()))
+})
+
+export const md5 = (d: BinaryLike) => createHash('md5').update(d).digest('hex')

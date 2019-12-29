@@ -1,27 +1,28 @@
 import { plugin, Plugin, event } from '../Plugin'
+import { PLUGINS_ROOT } from '../index'
 import { version } from '../../../package.json'
-import { download, makeTempDir, appDir, getJson, DownloadItem } from '../../utils/index'
-import { join } from 'path'
-import { createHash } from 'crypto'
+import { download, makeTempDir, appDir, getJson, DownloadItem, sha1, genId } from '../../utils/index'
+import { join, dirname } from 'path'
+import { gte, valid } from 'semver'
 import pAll from 'p-all'
 import fs from 'fs-extra'
+import install from '../../protocol/install'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
 
+export const allowExtensions = ['.js', '.mjs', '.asar']
+
+const checkHash = (file: string, hash: string) => sha1(file).then(it => {
+  if (hash !== it) return it
+  else throw new Error($('Hash is different: {0} -> {1}', it, hash))
+})
 const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: string[] }) =>
   download(urls.length === 1 ? urls[0] : urls, r.title || r.id)
-    .then(() => pAll(urls.map((it, i) => () => new Promise<string>((resolve, e) => {
-      const s = createHash('sha1').setEncoding('hex')
-      fs.createReadStream(it.file).on('error', e).pipe(s).on('error', e).on('finish', () => {
-        const hash = s.read() as string
-        if (!r.hashes || hash === r.hashes[i]) resolve(hash)
-        else e(new Error($('Hash is different: {0} -> {1}', hash, r.hashes[i])))
-      })
-    })), { concurrency: 6 }))
+    .then(() => pAll(urls.map((it, i) => r.hashes ? () => checkHash(it.file, r.hashes[i])
+      : () => sha1(it.file)), { concurrency: 6 }))
 
 @plugin({ id: '@pure-launcher/resource-installer', version, description: $("PureLauncher's built-in plugin") })
 export default class ResourceInstaller extends Plugin {
-  public onUnload () { /* empty */ }
   @event()
   public async protocolInstallProcess (r: T.AllResources | T.ResourceVersion, o?: T.InstallView) {
     if (!o) return
@@ -50,10 +51,10 @@ export default class ResourceInstaller extends Plugin {
         await this.installResourcePack(r)
         break
       case 'Plugin':
-        // TODO:
+        await this.installPlugin(r, true, o)
         break
       case 'Version':
-        await this.installVersion(r)
+        await this.installVersion(r, o)
         break
     }
   }
@@ -61,17 +62,36 @@ export default class ResourceInstaller extends Plugin {
   public async installServer (_: T.ResourceServer) {
   }
 
-  public async installVersion (_: T.ResourceVersion) {
+  public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
+    if (!T.isVersion(r)) throw new TypeError('Incorrect resource type!')
+    if (!/^[.\w-]/.test(r.mcVersion)) throw new Error(`The mcVersion (${r.mcVersion}) is illegal!`)
+    if (r.extends) {
+      const obj = { confirmed: o.confirmed }
+      await install(r.extends, false, true, T.isVersion, obj)
+      if (obj.confirmed) o.confirmed = true
+    }
+    let json = r.json
+    if (typeof json === 'string') json = await getJson<object>(json)
+    ;(json as any).id = r.mcVersion
+    await pluginMaster.emitSync('processResourceVersionJson', json)
+    o.resolvedId = r.mcVersion
+    const dir = o.resolvedDir = join(profilesStore.root, 'versions', r.mcVersion)
+    await fs.ensureDir(dir)
+    // TODO: install version
+    await fs.writeJson(join(dir, r.mcVersion + '.json'), json)
+    if (typeof r.resources === 'object') {
+      await pAll(Object.values(r.resources).map(it => () =>
+        install(it, false, true, r => T.isResource(r) && !T.isVersion(r), o)))
+    }
   }
 
   public async installResourcePack (r: T.ResourceResourcesPack) {
-    if (typeof r !== 'object' || r.type !== 'ResourcesPack' || !r.id) throw new TypeError('Incorrect resource type!')
-    let ext = r.extends
-    if (ext) {
-      if (typeof ext === 'string') ext = await getJson(ext)
-      await pluginMaster.emitSync('protocolInstallProcess', ext)
-      await this.installResourcePack(ext as T.ResourceResourcesPack)
-    }
+    if (!r) return
+    if (!T.isResourcesPack(r)) throw new TypeError('Incorrect resource type!')
+    const jsonPath = join(appDir, 'resources/resource-packs-index.json')
+    let json = await fs.readJson(jsonPath, { throws: false }) || { }
+    if (r.id in json && gte(json[r.id].version, r.id)) return
+    if (r.extends) await install(r.extends, false, true, T.isResourcesPack)
     const p = await makeTempDir()
     const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     try {
@@ -82,9 +102,7 @@ export default class ResourceInstaller extends Plugin {
         const path = join(dir, hashes[i] + '.zip')
         return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.rename(it.file, path))
       }), { concurrency: 8 })
-      const jsonPath = join(appDir, 'resources/resource-pack-index.json')
-      let json = await fs.readJson(jsonPath, { throws: false })
-      if (!json || typeof json !== 'object') json = { }
+      json = await fs.readJson(jsonPath, { throws: false }) || { }
       r.hashes = hashes
       json[r.id] = r
       await fs.outputJson(jsonPath, json)
@@ -93,29 +111,37 @@ export default class ResourceInstaller extends Plugin {
     }
   }
 
-  public async installMod (r: T.ResourceMod, o: T.InstallView, dir?: string) {
-    if (typeof r !== 'object' || r.type !== 'Mod' || !r.id) throw new TypeError('Incorrect resource type!')
-    if (!dir) {
+  public async installMod (r: T.ResourceMod, o: T.InstallView = { }, id?: string, dir?: string) {
+    if (!r) return
+    if (typeof r !== 'object' || r.type !== 'Mod' || !r.id || !valid(r.version)) {
+      throw new TypeError('Incorrect resource type!')
+    }
+    const jsonPath = join(appDir, 'resources/versions', id, 'mods-index.json')
+    let json = await fs.readJson(jsonPath, { throws: false }) || { }
+    if (r.id in json && gte(json[r.id].version, r.id)) return
+    if (!dir && o.resolvedDir) dir = join(o.resolvedDir, 'mods')
+    if (!id && o.resolvedId) id = o.resolvedId
+    if (!dir || !id) {
       const version = profilesStore.profiles[o.selectedVersion]
-      let id = version.lastVersionId
-      switch (version.type) {
-        case 'latest-snapshot':
-          await profilesStore.ensureVersionManifest()
-          id = profilesStore.versionManifest.latest.snapshot
-          break
-        case 'latest-release':
-          await profilesStore.ensureVersionManifest()
-          id = profilesStore.versionManifest.latest.release
+      if (version) {
+        id = version.lastVersionId
+        switch (version.type) {
+          case 'latest-snapshot':
+            await profilesStore.ensureVersionManifest()
+            id = profilesStore.versionManifest.latest.snapshot
+            break
+          case 'latest-release':
+            await profilesStore.ensureVersionManifest()
+            id = profilesStore.versionManifest.latest.release
+        }
+        dir = join(profilesStore.root, 'versions', id, 'mods')
+        await fs.ensureDir(dir)
+        o.resolvedDir = dirname(dir)
+        o.resolvedId = id
       }
-      dir = join(profilesStore.root, 'versions', id, 'mods')
-      await fs.ensureDir(dir)
     }
-    let ext = r.extends
-    if (ext) {
-      if (typeof ext === 'string') ext = await getJson(ext)
-      await pluginMaster.emitSync('protocolInstallProcess', ext)
-      await this.installMod(ext as T.ResourceMod, o, dir)
-    }
+    if (!id) throw new Error('No suck version: ' + o.selectedVersion)
+    if (r.extends) await install(r.extends, false, true, T.isMod, o)
     const p = await makeTempDir()
     const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
     try {
@@ -124,10 +150,46 @@ export default class ResourceInstaller extends Plugin {
         const path = join(dir, hashes[i] + '.jar')
         return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.rename(it.file, path))
       }), { concurrency: 8 })
-      const jsonPath = join(dir, '../mods-index.json')
-      let json = await fs.readJson(jsonPath, { throws: false })
-      if (!json || typeof json !== 'object') json = { }
+      json = await fs.readJson(jsonPath, { throws: false }) || { }
       r.hashes = hashes
+      json[r.id] = r
+      await fs.outputJson(jsonPath, json)
+    } finally {
+      await fs.remove(p).catch(console.error)
+    }
+  }
+
+  public async installPlugin (r: T.ResourcePlugin, showDialog = false, o: T.InstallView = { }) {
+    if (!r) return
+    if (typeof r !== 'object' || r.type !== 'Plugin' || !r.id || !valid(r.version)) {
+      throw new TypeError('Incorrect resource type!')
+    }
+    const jsonPath = join(appDir, 'resources/plugins-index.json')
+    let json = await fs.readJson(jsonPath, { throws: false }) || { }
+    if (r.id in json && gte(json[r.id].version, r.id)) return
+    if (r.extension && !allowExtensions.includes(r.extension)) {
+      throw new Error(`The extension: ${r.extension} is not allowed`)
+    }
+    if (!o.confirmed && showDialog && !await openConfirmDialog({
+      cancelButton: true,
+      text: $('Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}',
+        r.id, r.title || $('Unknown'))
+    })) throw new Error('Canceled install plugin!')
+    o.confirmed = true
+    if (typeof r.dependencies === 'object' && r.dependencies) {
+      await Promise.all(Object.values(r.dependencies).map(it => install(it, false, true, T.isPlugin, o)))
+    }
+    const p = await makeTempDir()
+    try {
+      const file = join(p, genId())
+      await download({ url: r.url, file }, r.title || r.id)
+      const hash = r.hash ? await checkHash(file, r.hash) : await sha1(file)
+      await fs.ensureDir(PLUGINS_ROOT)
+      const path = join(PLUGINS_ROOT, hash + (r.extension || '.asar'))
+      if (await fs.pathExists(path)) await fs.unlink(path)
+      await fs.rename(file, path)
+      json = await fs.readJson(jsonPath, { throws: false }) || { }
+      r.hash = hash
       json[r.id] = r
       await fs.outputJson(jsonPath, json)
     } finally {

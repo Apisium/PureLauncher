@@ -7,9 +7,11 @@ import { Resources, Resource, InstallView } from './protocol/types'
 type Keys = keyof typeof Lang
 interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
 interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean }
+interface TopBar { blocks: Array<HTMLDivElement[]>, colors: Array<string[]>, containers: HTMLDivElement[] }
 declare global {
+  declare const topBar: TopBar
   declare const __DEV__: boolean
-  declare const $: (text: Keys, ...args: string[]) => string
+  declare const $: $
   declare const profilesStore: ProfilesStore
   declare const pluginMaster: Master
   declare const __getStore: GetStore
@@ -19,6 +21,7 @@ declare global {
   declare const openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
   declare interface Window {
     $: $
+    topBar: TopBar
     __DEV__: boolean
     pluginMaster: Master
     profilesStore: ProfilesStore
@@ -31,6 +34,7 @@ declare global {
   declare namespace NodeJS {
     interface Global {
       $: $
+      topBar: TopBar
       __DEV__: boolean
       __getStore: GetStore
       pluginMaster: Master

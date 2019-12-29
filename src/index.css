@@ -56,20 +56,20 @@ a { color: var(--text-color-0) }
   filter: var(--top-filter);
 }
 
-#blocks1 {
+#blocks0 {
   width: 100%;
   margin-top: -1.5px;
   border-top: var(--top-border) solid 1.5px;
 }
 
-#blocks2 {
+#blocks1 {
   opacity: 0.85;
   margin-top: 20px;
   width: calc(100% - 40px);
   margin-left: 20px;
 }
 
-#blocks3 {
+#blocks2 {
   transition: opacity 1s;
   opacity: 0.75;
   margin-top: 40px;

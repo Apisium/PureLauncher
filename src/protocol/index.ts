@@ -1,13 +1,13 @@
 import { ipcRenderer } from 'electron'
 import { protocol } from '../../packages/web-api'
 import * as T from './types'
-import Install from './install'
+import install from './install'
 import P from '../models/index'
 import GameStore from '../models/GameStore'
 
 const gameStore = P.getStore(GameStore)
 const mappings = {
-  Install,
+  Install: (r: T.ProtocolInstall) => install(r.resource),
   Launch (data: T.ProtocolLaunch) {
     gameStore.launch(typeof data.version === 'object' ? data.version.id : data.version)
   }

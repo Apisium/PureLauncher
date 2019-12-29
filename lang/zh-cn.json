@@ -42,6 +42,8 @@
   "Hash is different: {0} -> {1}": "哈希值不相同: {0} -> {1}",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
+  "Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}":
+    "警告! 当前正在安装扩展插件, 请确认插件来源是否安全! 若扩展插件为恶意插件可能会对您的计算机造成破坏!\n\n插件ID: {0}\n插件名字: {1}",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
