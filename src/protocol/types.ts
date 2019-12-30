@@ -12,7 +12,7 @@ export interface Resource <T extends string = string> {
 }
 export interface ResourceVersion extends Resource<'Version'> {
   version: string
-  json: string | object
+  json: string | Record<string | number, any>
   mcVersion: string
   resources?: Record<string, AllResources> | string
   files?: Record<string, string>
@@ -61,7 +61,7 @@ export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer 
 export const isResource = (r: any): r is Resource => !!(typeof r === 'object' && typeof r.id === 'string' &&
   r.i && typeof r.type === 'string' && r.type)
 export const isResourceWithVersion = (r: any): r is Resource & { version: string } =>
-  isResource(r) && !!(valid((r as any).version))
+  isResource(r) && !!valid((r as any).version)
 export const isResourceWithVersionAndUrls = (r: any): r is Resource & { version: string, urls: string[] } =>
   isResourceWithVersion(r) && Array.isArray((r as any).urls)
 export const isResourcesPack = (r: any): r is ResourceResourcesPack => isResourceWithVersionAndUrls(r) &&

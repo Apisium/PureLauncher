@@ -37,7 +37,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
     return () => skinViewer.dispose()
   }, [ref.current])
   useEffect(() => {
-    if (ref2.current) ref2.current.animationPaused = !props.open
+    if (ref2.current) ref2.current.renderPaused = !props.open
   }, [props.open])
   useEffect(() => {
     if (ref2.current) {
@@ -80,12 +80,18 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
         filters: [
           { name: $('Minecraft Skin File (.png)'), extensions: ['png'] }
         ]
-      }, ([file]) => {
+      }).then(arg => {
+        if (arg.canceled || !arg.filePaths[0]) {
+          setSkin('')
+          setLoading(false)
+          pm.addI()
+          return
+        }
         const img = new Image()
         img.onload = () => {
           try {
             ref3.current = isSlimSkin(img)
-            setSkin(file)
+            setSkin(arg.filePaths[0])
           } catch (e) {
             console.error(e)
             notice({ content: $('Incorrect file format!'), error: true })
@@ -97,7 +103,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
           notice({ content: $('Incorrect file format!'), error: true })
           setLoading(false)
         }
-        img.src = file
+        img.src = arg.filePaths[0]
       })
     }
   }

@@ -1,9 +1,9 @@
 import { plugin, Plugin, event } from '../Plugin'
 import { PLUGINS_ROOT } from '../index'
 import { version } from '../../../package.json'
-import { download, makeTempDir, appDir, getJson, DownloadItem, sha1, genId } from '../../utils/index'
-import { join, dirname } from 'path'
-import { gte, valid } from 'semver'
+import { download, makeTempDir, appDir, getJson, DownloadItem, sha1, genId, md5, validPath, replace } from '../../utils/index'
+import { join, dirname, resolve } from 'path'
+import { gte, valid, major } from 'semver'
 import pAll from 'p-all'
 import fs from 'fs-extra'
 import install from '../../protocol/install'
@@ -64,24 +64,46 @@ export default class ResourceInstaller extends Plugin {
 
   public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
     if (!T.isVersion(r)) throw new TypeError('Incorrect resource type!')
-    if (!/^[.\w-]/.test(r.mcVersion)) throw new Error(`The mcVersion (${r.mcVersion}) is illegal!`)
+    const id = (r as any).resolvedId = `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
+    const jsonPath = join(appDir, 'resources/versions-index.json')
+    let sJson = await fs.readJson(jsonPath, { throws: false }) || { }
+    if (id in sJson && gte(sJson[r.id].version, id)) return
+    const obj: any = { confirmed: o.confirmed }
     if (r.extends) {
-      const obj = { confirmed: o.confirmed }
       await install(r.extends, false, true, T.isVersion, obj)
       if (obj.confirmed) o.confirmed = true
     }
     let json = r.json
-    if (typeof json === 'string') json = await getJson<object>(json)
-    ;(json as any).id = r.mcVersion
+    if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
+    if (r.extends) json.extends = obj.resolvedId
+    o.resolvedId = json.id = id
     await pluginMaster.emitSync('processResourceVersionJson', json)
-    o.resolvedId = r.mcVersion
-    const dir = o.resolvedDir = join(profilesStore.root, 'versions', r.mcVersion)
+    const dir = o.resolvedDir = resolve(profilesStore.root, 'versions', id)
     await fs.ensureDir(dir)
-    // TODO: install version
-    await fs.writeJson(join(dir, r.mcVersion + '.json'), json)
-    if (typeof r.resources === 'object') {
-      await pAll(Object.values(r.resources).map(it => () =>
-        install(it, false, true, r => T.isResource(r) && !T.isVersion(r), o)))
+    const p = await makeTempDir()
+    try {
+      const urls: Array<{ url: string, file: string, absolute: string }> =
+        Object.entries(r.files).map(([name, url], i) => ({ url: replace(url, r), file: join(p, i.toString()),
+          absolute: validPath(dir, replace(name, r)) }))
+      await fs.writeJson(join(dir, r.mcVersion + '.json'), json)
+      const hashes = await downloadAndCheckHash(urls, r)
+      await pAll(urls.map(it => () => {
+        const path = it.absolute
+        return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.rename(it.file, path))
+      }), { concurrency: 8 })
+      if (typeof r.resources === 'object') {
+        await pAll(Object.values(r.resources).map(it => () =>
+          install(it, false, true, r => T.isResource(r) && !T.isVersion(r), o)), { concurrency: 5 })
+      }
+      sJson = await fs.readJson(jsonPath, { throws: false }) || { }
+      r.hashes = hashes
+      delete r.json
+      sJson[id] = r
+      await fs.outputJson(jsonPath, json)
+    } catch {
+      await fs.remove(dir)
+    } finally {
+      await fs.remove(p)
     }
   }
 
@@ -93,7 +115,8 @@ export default class ResourceInstaller extends Plugin {
     if (r.id in json && gte(json[r.id].version, r.id)) return
     if (r.extends) await install(r.extends, false, true, T.isResourcesPack)
     const p = await makeTempDir()
-    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
+    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) =>
+      ({ url: replace(url, r), file: join(p, it.toString()) }))
     try {
       const hashes = await downloadAndCheckHash(urls, r)
       const dir = join(profilesStore.root, 'resourcepacks')
@@ -143,7 +166,8 @@ export default class ResourceInstaller extends Plugin {
     if (!id) throw new Error('No suck version: ' + o.selectedVersion)
     if (r.extends) await install(r.extends, false, true, T.isMod, o)
     const p = await makeTempDir()
-    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) => ({ url, file: join(p, it.toString()) }))
+    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) =>
+      ({ url: replace(url, r), file: join(p, it.toString()) }))
     try {
       const hashes = await downloadAndCheckHash(urls, r)
       await pAll(urls.map((it, i) => () => {
@@ -182,7 +206,7 @@ export default class ResourceInstaller extends Plugin {
     const p = await makeTempDir()
     try {
       const file = join(p, genId())
-      await download({ url: r.url, file }, r.title || r.id)
+      await download({ url: replace(r.url, r), file }, r.title || r.id)
       const hash = r.hash ? await checkHash(file, r.hash) : await sha1(file)
       await fs.ensureDir(PLUGINS_ROOT)
       const path = join(PLUGINS_ROOT, hash + (r.extension || '.asar'))

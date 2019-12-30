@@ -1,7 +1,8 @@
 import fs from 'fs-extra'
 import uuid from 'uuid-by-string'
+import * as resolveP from 'resolve-path'
 import { remote, ipcRenderer } from 'electron'
-import { join } from 'path'
+import { join, resolve, extname } from 'path'
 import { platform } from 'os'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
@@ -96,3 +97,14 @@ export const sha1 = (file: string) => new Promise<string>((resolve, e) => {
 })
 
 export const md5 = (d: BinaryLike) => createHash('md5').update(d).digest('hex')
+
+export const DEFAULT_EXT_FILTER = ['exe', 'com']
+export const validPath = (parent: string, path: string, filter = DEFAULT_EXT_FILTER) => {
+  /* eslint-disable no-control-regex */
+  if (/[<>:"|?*\x00-\x1F]/.test(name) || path.length > 255 || filter.includes(extname(name))) {
+    throw new Error(`The file name (${name}) is illegal.`)
+  }
+  return resolveP(resolve(parent), path) as string
+}
+
+export const replace = (text: string, obj: object) => text.replace(/(?<!\\){(.+?)}/g, (_: string, t: string) => obj[t])
