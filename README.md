@@ -11,6 +11,14 @@ An awesome Minecraft Launcher.
 - 🎁 One-click download and install resources.
 - ✨ And more...
 
+## Snapshots
+
+![Home](./snapshots/home.jpg)
+
+![Accounts](./snapshots/accounts.jpg)
+
+![Settings](./snapshots/settings.jpg)
+
 ## Documentation
 
 For plugins developers, resource creators, testers and advanced users:

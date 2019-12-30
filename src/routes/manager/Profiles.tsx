@@ -31,9 +31,22 @@ const Profiles: React.FC = () => {
                 console.error(e)
                 notice({ content: $('Failed!'), error: true })
               })}
-        >{$('Use')}
+        >
+          {$('Use')}
         </button>
-        <button className='btn2 danger'>{$('Log out')}</button>
+        <button
+          className='btn2 danger' onClick={() => {
+            Promise.resolve(pluginMaster.logins[it.type].logout(it.key))
+              .then(() => notice({ content: $('Success!') }))
+              .catch(e => {
+                console.error(e)
+                notice({ content: $('Failed!'), error: true })
+              })
+              .finally(pm.addI)
+          }}
+        >
+          {$('Log out')}
+        </button>
       </div>
     </li>)}
     </ul>

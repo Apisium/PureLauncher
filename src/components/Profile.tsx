@@ -133,9 +133,18 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
             props.onClose()
             pm.setLoginDialogVisible(true)
           }}
-        >{$('Add account')}
-        </button>
-        <button className='btn btn-secondary' disabled={loading} onClick={console.log}>{$('Log out')}</button>
+        >{$('Add account')}</button>
+        <button
+          className='btn btn-secondary' disabled={loading} onClick={() => {
+            Promise.resolve(pluginMaster.logins[u.type].logout(u.key))
+              .then(() => notice({ content: $('Success!') }))
+              .catch(e => {
+                console.error(e)
+                notice({ content: $('Failed!'), error: true })
+              })
+              .finally(pm.addI)
+          }}
+        >{$('Log out')}</button>
       </div>
       <div className='text'>{$('Quick account switching:')}</div>
       <select value={u ? u.key : ''} onChange={e => pm.setSelectedProfile(e.target.value)}>

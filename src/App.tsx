@@ -36,7 +36,7 @@ const App: React.FC = () => {
         <SideBar />
         <section id='main-content' className='scroll-bar'>
           {home}{settings}{manager}
-          <Redirect to='/manager/downloads' />
+          <Redirect to='/home' />
         </section>
       </HashRouter>
       <InstallList />
