@@ -2,6 +2,9 @@
   "plugins": [
     "babel-plugin-dollar",
     "reqwq/babel-plugin.js",
-    ["module-resolver", { "alias": { "reqwq": "reqwq/dist/esnext/index.js" } }]
+    ["module-resolver", { "alias": {
+      "reqwq": "reqwq/dist/esnext/index.js",
+      "skinview3d": "skinview3d/dist/skinview3d.module.js"
+    } }]
   ]
 }

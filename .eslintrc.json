@@ -69,6 +69,7 @@
     "react/prop-types": "off",
     "react/no-children-prop": "off",
     "object-property-newline": "off",
+    "no-void": "off",
     "@typescript-eslint/member-delimiter-style": ["error", { "multiline": { "delimiter": "none", "requireLast": false }, "singleline": { "delimiter": "comma" } }]
   }
 }

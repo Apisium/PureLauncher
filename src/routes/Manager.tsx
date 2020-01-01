@@ -7,27 +7,36 @@ import useRoute from '../useRoute'
 import Versions from './manager/Versions'
 import Downloads from './manager/Downloads'
 import Profiles from './manager/Profiles'
+import Extensions from './manager/Extensions'
 
 export const getPages = () => [
   {
     name: $('Versions'),
-    path: '/manager/versions'
+    path: '/manager/versions',
+    component: Versions
   },
   {
     name: $('Accounts'),
-    path: '/manager/accounts'
+    path: '/manager/accounts',
+    component: Profiles
   },
   {
     name: $('Downloads'),
-    path: '/manager/downloads'
+    path: '/manager/downloads',
+    component: Downloads
   },
   // {
   //   name: $('Resources'),
   //   path: '/manager/resources'
   // },
+  // {
+  //   name: $('Saves'),
+  //   path: '/manager/saves'
+  // },
   {
-    name: $('Saves'),
-    path: '/manager/saves'
+    name: $('Extensions'),
+    path: '/manager/extensions',
+    component: Extensions
   }
 ]
 
@@ -36,12 +45,8 @@ const Manager: React.FC = () => {
   const { location: { pathname }, history } = useRouter()
   const onChange = (i: number) => history.push(pages[i].path)
 
-  const versions = useRoute(Versions, '/manager/versions')
-  const downloads = useRoute(Downloads, '/manager/downloads')
-  const profiles = useRoute(Profiles, '/manager/accounts')
-
   return <div className='manager'>
-    {versions}{downloads}{profiles}
+    {pages.map(it => useRoute(it.component, it.path))}
     <Dots
       count={pages.length}
       onChange={onChange}

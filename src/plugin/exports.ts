@@ -12,7 +12,8 @@ export { default as ShowMore } from '../components/ShowMore'
 export { default as Treebeard } from '../components/treebeard/index'
 export { default as createVersionSelector } from '../components/VersionSelector'
 export { default as installResource } from '../protocol/index'
-export { download, genId, genUUID, getJson, fetchJson, appDir, makeTempDir, DownloadItem } from '../utils/index'
+export { download, genId, genUUID, getJson, fetchJson, appDir, makeTempDir,
+  DownloadItem, validPath, sha1, md5, replace } from '../utils/index'
 export { STATUS as LAUNCH_STATUS }
 
 export const $: Window['$'] = (window as any).__$pli0
