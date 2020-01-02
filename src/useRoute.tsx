@@ -4,10 +4,11 @@ import { withRouter } from 'react-router-dom'
 
 const Route = withRouter<any, any>(LRoute)
 
-export default (component: React.FC, path: string) => {
+export default (component: React.FC, path: string, key?: any) => {
   const ref = useRef<{ routeDom: HTMLDivElement }>()
   return <Route
     alwaysLive
+    key={key}
     wrappedComponentRef={ref}
     component={component}
     path={path}

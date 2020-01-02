@@ -1,5 +1,7 @@
 import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
+import * as skinview3d from 'skinview3d'
+import * as IconButtonExports from '../components/IconButton'
 
 export { Plugin, plugin, event } from './Plugin'
 export { default as Authenticator } from './Authenticator'
@@ -11,10 +13,11 @@ export { default as Switch } from '../components/Switch'
 export { default as ShowMore } from '../components/ShowMore'
 export { default as Treebeard } from '../components/treebeard/index'
 export { default as createVersionSelector } from '../components/VersionSelector'
+export { default as IconButton } from '../components/IconButton'
 export { default as installResource } from '../protocol/index'
 export { download, genId, genUUID, getJson, fetchJson, appDir, makeTempDir,
   DownloadItem, validPath, sha1, md5, replace } from '../utils/index'
-export { STATUS as LAUNCH_STATUS }
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinview3d }
 
 export const $: Window['$'] = (window as any).__$pli0
 export const pluginMaster = window.pluginMaster

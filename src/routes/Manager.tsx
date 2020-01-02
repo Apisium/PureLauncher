@@ -46,7 +46,7 @@ const Manager: React.FC = () => {
   const onChange = (i: number) => history.push(pages[i].path)
 
   return <div className='manager'>
-    {pages.map(it => useRoute(it.component, it.path))}
+    {pages.map(it => useRoute(it.component, it.path, it.path))}
     <Dots
       count={pages.length}
       onChange={onChange}

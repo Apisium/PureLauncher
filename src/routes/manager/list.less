@@ -102,9 +102,18 @@
 }
 
 .manager-extensions {
-  .extensions {
-    section {
-
+  .header {
+    border: none !important;
+    padding-right: 0 !important;
+  }
+  .container {
+    height: calc(100% - 35px);
+    overflow: hidden;
+  }
+  .scroll-bar {
+    height: 100%;
+    & > div {
+      margin: 14px 0 14px 14px;
     }
   }
 }

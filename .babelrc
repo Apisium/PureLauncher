@@ -1,10 +1,22 @@
 {
   "plugins": [
-    "babel-plugin-dollar",
-    "reqwq/babel-plugin.js",
-    ["module-resolver", { "alias": {
-      "reqwq": "reqwq/dist/esnext/index.js",
-      "skinview3d": "skinview3d/dist/skinview3d.module.js"
-    } }]
-  ]
+    "babel-plugin-dollar"
+  ],
+  "env": {
+    "production": {
+      "plugins": [
+        ["module-resolver", { "alias": {
+          "reqwq": "reqwq/dist/esnext/index.js",
+          "skinview3d": "skinview3d/dist/skinview3d.module.js"
+        } }]
+      ]
+    },
+    "development": {
+      "plugins": [
+        ["module-resolver", { "alias": {
+          "reqwq": "reqwq/dist/esnext/index.js"
+        } }]
+      ]
+    }
+  }
 }

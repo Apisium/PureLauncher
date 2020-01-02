@@ -1,0 +1,35 @@
+.icon-button {
+  margin: 9px;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+.icon-button p {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.icon-button img {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  transition: filter .5s;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+.icon-button:hover img {
+  filter: brightness(1.3);
+}
+.icon-button span {
+  position: absolute;
+  left: 4px;
+  right: 0;
+  top: 32px;
+  font-size: 26px;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: minecraft;
+}
