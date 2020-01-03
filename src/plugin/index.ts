@@ -3,7 +3,7 @@ import internal from './internal/index'
 import isDev from '../utils/isDev'
 import fs from 'fs-extra'
 import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
-import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo } from './Plugin'
+import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, EXTENSION_BUTTONS, ExtensionsButton, ROUTES } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { appDir } from '../utils/index'
 import { remote, ipcRenderer } from 'electron'
@@ -13,6 +13,8 @@ export const PLUGINS_ROOT = join(appDir, 'plugins')
 
 const AUTHENTICATORS = Symbol('Authenticators')
 export default class Master extends EventBus {
+  public [ROUTES] = new Set<JSX.Element>()
+  public [EXTENSION_BUTTONS] = new Set<ExtensionsButton>()
   public plugins: Record<string, Plugin> = { }
   public logins: Record<string, Authenticator> = { [YGGDRASIL]: new Yggdrasil(), [OFFLINE]: new Offline() }
 
@@ -76,6 +78,8 @@ export default class Master extends EventBus {
     await plugin.onUnload()
     if (EVENTS in plugin) Object.entries<any>(plugin[EVENTS]).forEach(([name, fn]) => this.off(name, fn))
     if (AUTHENTICATORS in plugin) plugin[AUTHENTICATORS].forEach((it: string) => delete this.logins[it])
+    if (plugin[EXTENSION_BUTTONS]) plugin[EXTENSION_BUTTONS].forEach(i => this[EXTENSION_BUTTONS].delete(i))
+    if (plugin[ROUTES]) plugin[ROUTES].forEach(i => this[ROUTES].delete(i))
     delete this.plugins[info.id]
   }
 
@@ -143,5 +147,19 @@ export default class Master extends EventBus {
       })
       throw new Error('Fail to load plugins: ' + ids.join(', '))
     }
+  }
+
+  public addExtensionsButton (opt: ExtensionsButton) {
+    this[EXTENSION_BUTTONS].add(opt)
+    const u = (window as any).__extensionsUpdater
+    if (u) u[1](!u[0])
+    return this
+  }
+
+  public addRoute (route: JSX.Element) {
+    this[ROUTES].add(route)
+    const u = (window as any).__routerUpdater
+    if (u) u[1](!u[0])
+    return this
   }
 }

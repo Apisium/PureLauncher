@@ -1,7 +1,8 @@
 import React, { createRef, useState } from 'react'
 import Dialog from 'rc-dialog'
 import SideBar from './SideBar'
-import useRoute from './useRoute'
+import LiveRoute from './components/LiveRoute'
+import { ROUTES } from './plugin/Plugin'
 import { render, unmountComponentAtNode } from 'react-dom'
 import { ipcRenderer } from 'electron'
 import { HashRouter, Redirect } from 'react-router-dom'
@@ -22,21 +23,25 @@ Object.defineProperty(window, 'PureLauncherPluginExports', {
 })
 
 ipcRenderer.on('pure-launcher-reload', () => location.reload())
-
 const ref = createRef()
 require('./i18n').setInstance(ref)
 
+const PluginRoutes: React.FC = () => {
+  (window as any).__routerUpdater = useState(false)
+  return React.createElement(React.Fragment, null, ...pluginMaster[ROUTES])
+}
+
 const App: React.FC = () => {
-  const home = useRoute(Home, '/home')
-  const manager = useRoute(Manager, '/manager/:type')
-  const settings = useRoute(Settings, '/settings')
   return (
     <Provider>
       <HashRouter ref={ref as any}>
         <SideBar />
         <section id='main-content' className='scroll-bar'>
-          {home}{settings}{manager}
+          <LiveRoute component={Home} path='/home' />
+          <LiveRoute component={Manager} path='/manager/:type' />
+          <LiveRoute component={Settings} path='/settings' />
           <Redirect to='/manager/extensions' />
+          <PluginRoutes />
         </section>
       </HashRouter>
       <InstallList />

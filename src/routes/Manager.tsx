@@ -2,7 +2,7 @@ import './manager.css'
 import React from 'react'
 import Dots from '../components/Dots'
 import useRouter from 'use-react-router'
-import useRoute from '../useRoute'
+import LiveRoute from '../components/LiveRoute'
 
 import Versions from './manager/Versions'
 import Downloads from './manager/Downloads'
@@ -46,7 +46,7 @@ const Manager: React.FC = () => {
   const onChange = (i: number) => history.push(pages[i].path)
 
   return <div className='manager'>
-    {pages.map(it => useRoute(it.component, it.path, it.path))}
+    {pages.map(it => <LiveRoute component={it.component} path={it.path} key={it.path} />)}
     <Dots
       count={pages.length}
       onChange={onChange}
