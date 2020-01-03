@@ -5,7 +5,13 @@ export const EVENTS = Symbol('Events')
 export const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
 export const ROUTES = Symbol('Pages')
 export const PLUGIN_INFO = Symbol('PluginInfo')
-export interface ExtensionsButton { title: () => string, key: any, onClick?: () => void, icon?: string }
+export interface ExtensionsButton {
+  title: () => string
+  key: any
+  onClick?: () => void
+  icon?: string
+  hideFirst?: boolean
+}
 export type PluginInfo = Pick<ResourcePlugin, Exclude<keyof ResourcePlugin, 'type' | 'url' | 'dependencies' | 'extension'>>
   & { dependencies?: string[] }
 export class Plugin {

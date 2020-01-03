@@ -8,6 +8,7 @@ import Versions from './manager/Versions'
 import Downloads from './manager/Downloads'
 import Profiles from './manager/Profiles'
 import Extensions from './manager/Extensions'
+import Plugins from './manager/Plugins'
 
 export const getPages = () => [
   {
@@ -47,6 +48,7 @@ const Manager: React.FC = () => {
 
   return <div className='manager'>
     {pages.map(it => <LiveRoute component={it.component} path={it.path} key={it.path} />)}
+    <LiveRoute component={Plugins} path='/manager/plugins' />
     <Dots
       count={pages.length}
       onChange={onChange}

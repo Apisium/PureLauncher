@@ -5,6 +5,7 @@ import { GetStore } from 'reqwq'
 import { Resources, Resource, InstallView } from './protocol/types'
 
 type Keys = keyof typeof Lang
+type $ = (name: Keys, ...args: string[]) => string
 interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
 interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean }
 interface TopBar { blocks: Array<HTMLDivElement[]>, colors: Array<string[]>, containers: HTMLDivElement[] }

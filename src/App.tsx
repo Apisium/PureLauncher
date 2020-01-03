@@ -1,22 +1,20 @@
 import React, { createRef, useState } from 'react'
 import Dialog from 'rc-dialog'
-import SideBar from './SideBar'
+import history from './utils/history'
 import LiveRoute from './components/LiveRoute'
 import { ROUTES } from './plugin/Plugin'
 import { render, unmountComponentAtNode } from 'react-dom'
 import { ipcRenderer } from 'electron'
-import { HashRouter, Redirect } from 'react-router-dom'
+import { Router, Redirect } from 'react-router-dom'
 
 import Provider from './models/index'
+import './plugin/index'
+
 import Home from './routes/Home'
 import Settings from './routes/Settings'
 import Manager from './routes/Manager'
-
-import Master from './plugin/index'
-
+import SideBar from './SideBar'
 import InstallList from './components/InstallList'
-
-Object.defineProperty(window, 'pluginMaster', { value: new Master() })
 
 Object.defineProperty(window, 'PureLauncherPluginExports', {
   value: Object.freeze(require('./plugin/exports'))
@@ -34,7 +32,7 @@ const PluginRoutes: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Provider>
-      <HashRouter ref={ref as any}>
+      <Router ref={ref as any} history={history}>
         <SideBar />
         <section id='main-content' className='scroll-bar'>
           <LiveRoute component={Home} path='/home' />
@@ -43,7 +41,7 @@ const App: React.FC = () => {
           <Redirect to='/manager/extensions' />
           <PluginRoutes />
         </section>
-      </HashRouter>
+      </Router>
       <InstallList />
     </Provider>
   )

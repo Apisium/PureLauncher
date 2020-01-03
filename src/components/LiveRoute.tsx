@@ -21,7 +21,7 @@ export default class LiveRoute extends Component<Props> {
     if (this.ref.current) {
       const d = this.ref.current.routeDom
       d.classList.remove('hide')
-      const style = d.routeDom.style
+      const style = d.style
       process.nextTick(() => {
         style.position = ''
         style.opacity = '1'

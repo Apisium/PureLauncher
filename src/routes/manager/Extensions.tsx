@@ -8,7 +8,7 @@ const Extensions: React.FC = () => {
   const arr = new Array(pluginMaster[EXTENSION_BUTTONS].size)
   let i = 0
   pluginMaster[EXTENSION_BUTTONS].forEach(it => (arr[i++] =
-    <IconButton key={it.key} title={it.title()} icon={it.icon} onClick={it.onClick} />))
+    <IconButton key={it.key} title={it.title()} icon={it.icon} onClick={it.onClick} hideFirst={it.hideFirst} />))
   return <div className='manager-list version-switch manager-versions manager-extensions'>
     <div className='list-top'>
       <span className='header'>{$('Extensions')}</span>

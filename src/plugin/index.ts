@@ -163,3 +163,5 @@ export default class Master extends EventBus {
     return this
   }
 }
+
+Object.defineProperty(window, 'pluginMaster', { value: new Master() })

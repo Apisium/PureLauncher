@@ -25,11 +25,14 @@
 }
 .icon-button span {
   position: absolute;
-  left: 4px;
+  left: 0;
   right: 0;
   top: 32px;
   font-size: 26px;
   transform: translateY(-50%);
   text-align: center;
   font-family: minecraft;
+}
+.icon-button span.offset {
+  left: 4px;
 }
