@@ -9,8 +9,6 @@ const OPTIONS = { compress: { ecma: 8 }, output: { beautify: false, comments: fa
 global.JSPackager = module.exports = class JSPackager extends ParcelJSPackager {
   constructor (a, b) {
     super(a, b)
-    this.__size = 0
-    this.__code = ''
     this.v8CacheFile = join(b.options.outDir, 'v8-cache.js')
   }
   async setup () {
@@ -25,18 +23,21 @@ global.JSPackager = module.exports = class JSPackager extends ParcelJSPackager {
       const cFile = relative(dirname(this.bundle.name), this.v8CacheFile).replace(/\\/g, '/')
       this.dest.end(`require('./${cFile}');require('./${basename(file)}')`)
     } else this.dest.end('throw new Error("Compile error!")')
+    let code = ''
     this.dest = {
-      write: (chunk = '') => void (this.__code += chunk),
-      end: (chunk = '') => {
-        this.__code += chunk
-        if (this.__code.includes('Object.defineProperty')) {
-          this.__code = '_ODP=Object.defineProperty,' + this.__code.replace(/Object\.defineProperty/g, '_ODP')
+      get bytesWritten () { return code.length },
+      write (chunk = '') {
+        code += chunk
+        return Promise.resolve()
+      },
+      end (chunk = '') {
+        code += chunk
+        if (code.includes('Object.defineProperty')) {
+          code = '_ODP=Object.defineProperty,' + code.replace(/Object\.defineProperty/g, '_ODP')
         }
-        const { code } = minify(this.__code, OPTIONS)
-        this.__size = code.length
-        fs.writeFile(file, code)
+        code = minify(code, OPTIONS).code
+        return fs.writeFile(file, code)
       }
     }
   }
-  getSize () { return this.__size }
 }

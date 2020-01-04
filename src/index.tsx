@@ -10,8 +10,6 @@ import { remote } from 'electron'
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
 const logo = document.getElementById('top-logo')
-const chicken = document.getElementById('chicken')
-const chickenSound = new Audio(require('./assets/sounds/chicken.ogg'))
 ReactDOM.render(<App />, document.getElementById('root'), () => {
   const content = document.getElementById('main-content')
   let full = true
@@ -28,11 +26,11 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
     }
     instance.notice(ctx)
   }
-  chicken.onclick = () => {
-    try { chickenSound.play().catch(() => {}) } catch (e) { }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onclick = () => {
     if (full) {
       full = false
-      chicken.style.opacity = '0'
+      // chicken.style.opacity = '0'
       content.style.opacity = '0'
       topBar.containers[2].style.opacity = '0'
       logo.style.opacity = '0'
@@ -44,11 +42,11 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
       }, 700)
       setTimeout(() => {
         remote.getCurrentWindow().setSize(240, 586)
-        setTimeout(() => (chicken.style.opacity = '1'), 100)
+        // setTimeout(() => (chicken.style.opacity = '1'), 100)
       }, 4000)
     } else {
       full = true
-      chicken.style.opacity = '0'
+      // chicken.style.opacity = '0'
       setTimeout(() => {
         remote.getCurrentWindow().setSize(816, 586)
         top.style.width = ''
@@ -61,7 +59,7 @@ ReactDOM.render(<App />, document.getElementById('root'), () => {
           content.style.opacity = '1'
           logo.style.opacity = '1'
         }, 3000)
-        setTimeout(() => (chicken.style.opacity = '1'), 4000)
+        // setTimeout(() => (chicken.style.opacity = '1'), 4000)
       }, 1000)
     }
   }
@@ -82,7 +80,7 @@ document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimi
 let timer1: NodeJS.Timeout
 let timer2: NodeJS.Timeout
 function startAnimation () {
-  chicken.style.opacity = '1'
+  // chicken.style.opacity = '1'
   timer1 = setInterval(() => {
     topBar.blocks[0][Math.random() * topBar.blocks[0].length | 0]
       .style.backgroundColor = topBar.colors[0][Math.random() * topBar.colors[0].length | 0]
@@ -91,10 +89,10 @@ function startAnimation () {
     topBar.blocks[2][Math.random() * topBar.blocks[2].length | 0]
       .style.backgroundColor = topBar.colors[2][Math.random() * topBar.colors[2].length | 0]
   }, 100)
-  timer2 = setInterval(() => (chicken.style.marginTop = 10 - (Math.random() * 20 | 0) + 'px'), 1000)
+  // timer2 = setInterval(() => (chicken.style.marginTop = 10 - (Math.random() * 20 | 0) + 'px'), 1000)
 }
 function stopAnimation () {
-  chicken.style.opacity = '2'
+  // chicken.style.opacity = '2'
   clearInterval(timer1)
   clearInterval(timer2)
 }

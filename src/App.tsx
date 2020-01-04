@@ -1,5 +1,6 @@
 import React, { createRef, useState } from 'react'
 import Dialog from 'rc-dialog'
+import isDev from './utils/isDev'
 import history from './utils/history'
 import LiveRoute from './components/LiveRoute'
 import { ROUTES } from './plugin/Plugin'
@@ -30,21 +31,27 @@ const PluginRoutes: React.FC = () => {
 }
 
 const App: React.FC = () => {
-  return (
-    <Provider>
-      <Router ref={ref as any} history={history}>
-        <SideBar />
-        <section id='main-content' className='scroll-bar'>
-          <LiveRoute component={Home} path='/home' />
-          <LiveRoute component={Manager} path='/manager/:type' />
-          <LiveRoute component={Settings} path='/settings' />
-          <Redirect to='/manager/extensions' />
-          <PluginRoutes />
-        </section>
-      </Router>
-      <InstallList />
-    </Provider>
-  )
+  try {
+    return (
+      <Provider>
+        <Router ref={ref as any} history={history}>
+          <SideBar />
+          <section id='main-content' className='scroll-bar'>
+            <LiveRoute component={Home} path='/home' />
+            <LiveRoute component={Manager} path='/manager/:type' />
+            <LiveRoute component={Settings} path='/settings' />
+            <Redirect to='/manager/extensions' />
+            <PluginRoutes />
+          </section>
+        </Router>
+        <InstallList />
+      </Provider>
+    )
+  } catch (e) {
+    if (!isDev) location.reload()
+    console.log(e)
+    return <h1>Error: {e}</h1>
+  }
 }
 
 global.openConfirmDialog = (data: { text: string, title?: string, cancelButton?: boolean }) => new Promise(r => {

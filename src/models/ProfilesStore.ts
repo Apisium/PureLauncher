@@ -17,6 +17,8 @@ const VERSION_MANIFEST = 'version_manifest.json'
 const EXTRA_CONFIG = 'config.json'
 const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
+const defaultLocale = (navigator.languages[0] || 'zh-cn').toLowerCase()
+
 export interface Version {
   name: string
   icon: string
@@ -35,7 +37,7 @@ export default class ProfilesStore extends Store {
   public i = 0
   public settings = {
     enableSnapshots: false,
-    locale: 'zh-cn',
+    locale: defaultLocale,
     showMenu: true,
     showGameLog: false,
     soundOn: true
@@ -367,7 +369,7 @@ export default class ProfilesStore extends Store {
     this.settings = merge(this.settings, json.settings)
     this.profiles = merge(this.profiles, json.profiles)
     if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()
-    applyLocate(this.settings.locale, true)
+    applyLocate(this.settings.locale || defaultLocale, true)
     this.setTasks()
   }
 

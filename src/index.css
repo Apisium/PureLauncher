@@ -124,38 +124,6 @@ img {
   display: block;
 }
 
-#chicken {
-  opacity: 0;
-  top: -105px;
-  position: absolute;
-  animation: move-chicken 30s ease-in-out infinite;
-  transition: margin-top 1s, opacity 1s;
-  cursor: pointer;
-  transform: translateZ(0);
-  will-change: transform, margin-left, margin-top;
-}
-#chicken img {
-  height: 140px;
-}
-#chicken::after {
-  content: '';
-  position: absolute;
-  width: 80px;
-  height: 40px;
-  background-color: #0000006e;
-  bottom: 7px;
-  left: 98px;
-  border-radius: 50%;
-  filter: blur(12px);
-}
-
-@keyframes move-chicken {
-  0% { margin-left: -240px; transform: rotateY(180deg) translateZ(0) }
-  50% { margin-left: 100%; transform: rotateY(180deg) translateZ(0) }
-  51% { margin-left: 100%; transform: translateZ(0) }
-  100% { margin-left: -240px; transform: translateZ(0) }
-}
-
 #close, #hide {
   z-index: 2050;
   background-color: unset;
