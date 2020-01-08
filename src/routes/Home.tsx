@@ -1,8 +1,13 @@
 import './home.less'
 import Slider from 'react-slick'
+import user from '../utils/analytics'
 import React, { useEffect, useState } from 'react'
 import { shell } from 'electron'
 
+const openUrl = (url: string) => {
+  shell.openExternal(url)
+  user.event('external url', 'open').catch(console.error)
+}
 const Home: React.FC = () => {
   const [slides, setSlides] = useState<Array<{ text: string, url: string, img: string }>>([])
   const [news, setNews] = useState<Array<{ title: string, classify: string, link: string, time: string }>>([])
@@ -60,14 +65,14 @@ const Home: React.FC = () => {
     <div className='home'>
       <div className='slider' style={{ opacity: slides.length ? 1 : 0 }}>
         <Slider fade infinite autoplay pauseOnHover autoplaySpeed={5000} slidesToShow={1} slidesToScroll={1}>
-          {slides.map(it => <div className='cover' key={it.url} role='button' onClick={() => shell.openExternal(it.url)}>
+          {slides.map(it => <div className='cover' key={it.url} role='button' onClick={() => openUrl(it.url)}>
             <img src={it.img} alt={it.text} /><span>{it.text}</span>
           </div>)}
         </Slider>
       </div>
       <div className='news' style={{ opacity: news.length ? null : 0 }}>{news.map(it => <p key={it.link}>
         <span className='classify'>{it.classify}</span>
-        <a role='button' onClick={() => shell.openExternal(it.link)}> {it.title} </a>
+        <a role='button' onClick={() => openUrl(it.link)}> {it.title} </a>
       </p>)}
       </div>
     </div>

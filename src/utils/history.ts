@@ -1,3 +1,7 @@
 import { createHashHistory } from 'history'
+import user from './analytics'
 
-export default createHashHistory()
+const history = createHashHistory()
+history.listen(l => user.pageView(l.pathname).catch(console.error))
+
+export default history

@@ -1,4 +1,5 @@
 import * as T from './types'
+import user from '../utils/analytics'
 import { getJson } from '../utils/index'
 
 export default (
@@ -14,7 +15,10 @@ export default (
     obj.request = request
     obj.throws = throws
     await pluginMaster.emitSync('protocolInstallProcess', r, obj)
-    if (request && !await global.__requestInstallResources(r, obj)) return
+    if (request) {
+      if (await global.__requestInstallResources(r, obj)) user.event('resource', 'install').catch(console.error)
+      else return
+    }
     await pluginMaster.emitSync('protocolInstallResource', r, obj)
   })()
   if (!throws) {

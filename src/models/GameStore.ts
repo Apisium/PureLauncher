@@ -7,6 +7,7 @@ import { join } from 'path'
 import fs from 'fs-extra'
 import ProfilesStore from './ProfilesStore'
 import Task from '@xmcl/task'
+import user from '../utils/analytics'
 
 export enum STATUS {
   READY, LAUNCHING, LAUNCHED, DOWNLOADING
@@ -45,6 +46,7 @@ export default class GameStore extends Store {
     })
   }
   public async launch (version?: string) {
+    user.event('game', 'launch').catch(console.error)
     const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest,
       ensureVersionManifest, checkModsDirectory, modsPath } = this.profilesStore
     const { javaArgs, javaPath } = extraJson
