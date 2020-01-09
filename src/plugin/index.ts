@@ -3,7 +3,7 @@ import internal from './internal/index'
 import isDev from '../utils/isDev'
 import fs from 'fs-extra'
 import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
-import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, EXTENSION_BUTTONS, ExtensionsButton, ROUTES } from './Plugin'
+import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, ExtensionsButton } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { appDir } from '../utils/index'
 import { remote, ipcRenderer } from 'electron'
@@ -12,9 +12,12 @@ import { join } from 'path'
 export const PLUGINS_ROOT = join(appDir, 'plugins')
 
 const AUTHENTICATORS = Symbol('Authenticators')
+const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
+const ROUTES = Symbol('Pages')
+
 export default class Master extends EventBus {
-  public [ROUTES] = new Set<JSX.Element>()
-  public [EXTENSION_BUTTONS] = new Set<ExtensionsButton>()
+  public routes = new Set<JSX.Element>()
+  public extensionsButtons = new Set<ExtensionsButton>()
   public plugins: Record<string, Plugin> = { }
   public logins: Record<string, Authenticator> = { [YGGDRASIL]: new Yggdrasil(), [OFFLINE]: new Offline() }
 
@@ -53,6 +56,8 @@ export default class Master extends EventBus {
     if (!(PLUGIN_INFO in c)) throw new Error('Load plugin fail!')
     const info: PluginInfo = c[PLUGIN_INFO]
     if (!info.id || info.id in this.plugins) throw new Error('Load plugin fail!')
+    if (typeof info.title !== 'function') throw new Error('The plugin should have a title!')
+    Object.defineProperty(p, 'pluginInfo', { value: info })
     if (EVENTS in p) {
       Object.entries<Function>(p[EVENTS]).forEach(([name, fn]) => {
         if (typeof fn !== 'function') return
@@ -69,27 +74,24 @@ export default class Master extends EventBus {
     if (name in this.logins) throw new Error(`the Authenticator (${name}) is already exists!`)
     this.checkPlugin(plugin)
     this.logins[name] = a
-    ;(plugin[AUTHENTICATORS] || (plugin[AUTHENTICATORS] = [])).push(name)
+    ;(plugin[AUTHENTICATORS] || (plugin[AUTHENTICATORS] = new Set())).push(name)
   }
 
   public async unloadPlugin (plugin: Plugin) {
     if (internal.has(plugin)) throw new Error('Build-in plugins can not be unloaded!')
-    const info = this.checkPlugin(plugin)
+    this.checkPlugin(plugin)
     await plugin.onUnload()
     if (EVENTS in plugin) Object.entries<any>(plugin[EVENTS]).forEach(([name, fn]) => this.off(name, fn))
     if (AUTHENTICATORS in plugin) plugin[AUTHENTICATORS].forEach((it: string) => delete this.logins[it])
-    if (plugin[EXTENSION_BUTTONS]) plugin[EXTENSION_BUTTONS].forEach(i => this[EXTENSION_BUTTONS].delete(i))
-    if (plugin[ROUTES]) plugin[ROUTES].forEach(i => this[ROUTES].delete(i))
-    delete this.plugins[info.id]
+    if (plugin[EXTENSION_BUTTONS]) plugin[EXTENSION_BUTTONS].forEach((i: any) => this[EXTENSION_BUTTONS].delete(i))
+    if (plugin[ROUTES]) plugin[ROUTES].forEach((i: any) => this[ROUTES].delete(i))
+    delete this.plugins[plugin.pluginInfo.id]
   }
 
   private checkPlugin (plugin: Plugin) {
     if (!(plugin instanceof Plugin)) throw new Error('No such plugin!')
-    const c = plugin.constructor
-    if (!(PLUGIN_INFO in c)) throw new Error('No such plugin!')
-    const info: PluginInfo = c[PLUGIN_INFO]
-    if (!info.id || plugin !== this.plugins[info.id]) throw new Error('No such plugin!')
-    return info
+    const info = plugin.pluginInfo
+    if (!info?.id || plugin !== this.plugins[info.id]) throw new Error('No such plugin!')
   }
 
   private async loadPlugins () {
@@ -149,18 +151,35 @@ export default class Master extends EventBus {
     }
   }
 
-  public addExtensionsButton (opt: ExtensionsButton) {
-    this[EXTENSION_BUTTONS].add(opt)
+  public addExtensionsButton (opt: ExtensionsButton, plugin: Plugin) {
+    (plugin[EXTENSION_BUTTONS] || (plugin[EXTENSION_BUTTONS] = new Set())).add(opt)
+    this.extensionsButtons.add(opt)
     const u = (window as any).__extensionsUpdater
     if (u) u[1](!u[0])
     return this
   }
 
-  public addRoute (route: JSX.Element) {
-    this[ROUTES].add(route)
+  public addRoute (route: JSX.Element, plugin: Plugin) {
+    (plugin[ROUTES] || (plugin[ROUTES] = new Set())).add(route)
+    this.routes.add(route)
     const u = (window as any).__routerUpdater
     if (u) u[1](!u[0])
     return this
+  }
+
+  public isPluginUninstallable (p: Plugin) {
+    try {
+      this.checkPlugin(p)
+      const { id } = p.pluginInfo
+      return !Object.values(this.plugins).some(it => it.pluginInfo.dependencies?.includes(id))
+    } catch {
+      return false
+    }
+  }
+
+  public uninstallPlugin (p: Plugin) {
+    if (!this.isPluginUninstallable(p)) return true
+    // TODO:
   }
 }
 

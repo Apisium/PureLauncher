@@ -35,6 +35,8 @@
   "Incorrect java version!": "Java 版本不正确!",
   "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
   "Have already logged in? Click here!": "已经登陆了? 点击这里切换账户!",
+  "Share": "分享",
+  "ResourcesInstaller": "资源管理安装器.",
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
   "OK": "确认",
@@ -110,5 +112,12 @@
   "Minecraft Version": "我的世界版本",
   "Apis": "前置API",
   "Host": "地址",
-  "Target Version": "目标版本"
+  "Target Version": "目标版本",
+
+  "$readmeEn": "",
+  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: AkkariinMeiko",
+  "Official Website": "官网",
+  "Source Code": "源代码",
+  "Tencent QQ Group": "QQ群",
+  "Telegram Group": "Telegram群组"
 }

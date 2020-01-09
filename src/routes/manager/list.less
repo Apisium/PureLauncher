@@ -2,7 +2,8 @@
   height: 100%;
   color: var(--text-color-0);
   li {
-    padding: 6px;
+    padding: 6px !important;
+    cursor: default !important;
     position: relative;
   }
   ul {
@@ -101,11 +102,12 @@
   }
 }
 
+.header.no-button {
+  border: none !important;
+  padding-right: 0 !important;
+}
+
 .manager-extensions {
-  .header {
-    border: none !important;
-    padding-right: 0 !important;
-  }
   .container {
     height: calc(100% - 35px);
     overflow: hidden;

@@ -21,7 +21,12 @@ const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: s
     .then(() => pAll(urls.map((it, i) => r.hashes ? () => checkHash(it.file, r.hashes[i])
       : () => sha1(it.file)), { concurrency: 6 }))
 
-@plugin({ id: '@pure-launcher/resource-installer', version, description: $("PureLauncher's built-in plugin") })
+@plugin({
+  version,
+  id: '@pure-launcher/resource-installer',
+  description: () => $("PureLauncher's built-in plugin"),
+  title: () => $('ResourcesInstaller')
+})
 export default class ResourceInstaller extends Plugin {
   @event()
   public async protocolInstallProcess (r: T.AllResources | T.ResourceVersion, o?: T.InstallView) {

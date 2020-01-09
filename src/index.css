@@ -27,6 +27,11 @@ body {
 }
 
 a { color: var(--text-color-0) }
+a.link {
+  transition: color .3s;
+  color: var(--link-color);
+}
+a.link:hover { color: var(--link-hover-color) }
 
 .top {
   transition: 3s;

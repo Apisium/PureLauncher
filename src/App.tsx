@@ -3,7 +3,6 @@ import Dialog from 'rc-dialog'
 import isDev from './utils/isDev'
 import history from './utils/history'
 import LiveRoute from './components/LiveRoute'
-import { ROUTES } from './plugin/Plugin'
 import { render, unmountComponentAtNode } from 'react-dom'
 import { ipcRenderer } from 'electron'
 import { Router, Redirect } from 'react-router-dom'
@@ -27,7 +26,7 @@ require('./i18n').setInstance(ref)
 
 const PluginRoutes: React.FC = () => {
   (window as any).__routerUpdater = useState(false)
-  return React.createElement(React.Fragment, null, ...pluginMaster[ROUTES])
+  return React.createElement(React.Fragment, null, ...pluginMaster.routes)
 }
 
 const App: React.FC = () => {

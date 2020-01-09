@@ -5,6 +5,8 @@ import ShowMore from '../components/ShowMore'
 import ProfilesStore from '../models/ProfilesStore'
 import { langs } from '../i18n'
 import { useStore } from 'reqwq'
+import { shell } from 'electron'
+import { version } from '../../package.json'
 
 const Settings: React.FC = () => {
   const pm = useStore(ProfilesStore)
@@ -60,8 +62,37 @@ const Settings: React.FC = () => {
       </div> */}
     </form>
     <ShowMore>
-      <div>
-        <p>PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.</p>
+      <div style={{ textAlign: 'center' }}>
+        <p style={{ whiteSpace: 'pre-line' }}>{$('$readme')}</p>
+        <p>{$('Version')}: {version}</p>
+        <p>{$('Official Website')}:&nbsp;
+          <a
+            onClick={() => shell.openExternal('https://p.apisium.cn')}
+            href='javascript:void 0'
+            className='link'
+          >p.apisium.cn</a>
+        </p>
+        <p>{$('Source Code')}:&nbsp;
+          <a
+            onClick={() => shell.openExternal('https://github.com/Apisium/PureLauncher')}
+            href='javascript:void 0'
+            className='link'
+          >github.com/Apisium/PureLauncher</a>
+        </p>
+        <p>{$('Tencent QQ Group')}:&nbsp;
+          <a
+            onClick={() => shell.openExternal('https://jq.qq.com/?_wv=1027&k=5lSLiII')}
+            href='javascript:void 0'
+            className='link'
+          >7923302</a>
+        </p>
+        <p>{$('Telegram Group')}:&nbsp;
+          <a
+            onClick={() => shell.openExternal('https://t.me/PureLauncher')}
+            href='javascript:void 0'
+            className='link'
+          >t.me/PureLauncher</a>
+        </p>
       </div>
     </ShowMore>
   </div>

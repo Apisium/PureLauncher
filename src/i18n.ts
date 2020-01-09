@@ -20,6 +20,12 @@ export const applyLocate = (name: string, notUpdate = false) => {
   currentName = name
   if (!notUpdate) forceUpdate(instance.current)
 }
-
+export const replaceArgs = (text: string, ...args: string[]) => text.replace(/{(\d)}/g, (_, i) => args[i])
 ;(window as any).__$pli0 = (text: keyof typeof zhCN, ...args: string[]) =>
-  text in current ? current[text].replace(/{(\d)}/g, (_, i) => args[i]) : text
+  text in current
+    ? replaceArgs(current[text], ...args)
+    : text.startsWith('$')
+      ? text === '$readme'
+        ? replaceArgs(zhCN.$readmeEn, ...args)
+        : null
+      : replaceArgs(text, ...args)
