@@ -10,6 +10,7 @@ import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
 
 export const PLUGINS_ROOT = join(appDir, 'plugins')
+export const DELETES_FILE = join(PLUGINS_ROOT, 'deletes.json')
 
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
@@ -96,11 +97,10 @@ export default class Master extends EventBus {
 
   private async loadPlugins () {
     await fs.ensureDir(PLUGINS_ROOT)
-    const deletesFile = join(PLUGINS_ROOT, 'deletes.json')
-    if (await fs.pathExists(deletesFile)) {
-      const deletes: string[] = await fs.readJson(deletesFile)
+    if (await fs.pathExists(DELETES_FILE)) {
+      const deletes: string[] = await fs.readJson(DELETES_FILE)
       await Promise.all(deletes.map(it => fs.unlink(join(PLUGINS_ROOT, it)).catch()))
-      await fs.unlink(deletesFile)
+      await fs.unlink(DELETES_FILE)
     }
     let plugins: Array<typeof Plugin> = []
     await Promise.all((await fs.readdir(PLUGINS_ROOT))
@@ -167,19 +167,23 @@ export default class Master extends EventBus {
     return this
   }
 
-  public isPluginUninstallable (p: Plugin) {
+  public isPluginUninstallable (p: Plugin, deletes?: string[] = fs.readJsonSync(DELETES_FILE, { throws: false })) {
+    if (internal.has(p)) return false
     try {
       this.checkPlugin(p)
       const { id } = p.pluginInfo
-      return !Object.values(this.plugins).some(it => it.pluginInfo.dependencies?.includes(id))
+      return !Object.values(this.plugins).some(it => !deletes.includes(it) && it.pluginInfo.dependencies?.includes(id))
     } catch {
       return false
     }
   }
 
-  public uninstallPlugin (p: Plugin) {
-    if (!this.isPluginUninstallable(p)) return true
-    // TODO:
+  public async uninstallPlugin (p: Plugin) {
+    const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
+    if (!this.isPluginUninstallable(p, deletes)) throw new Error('Plugin cannot be uninstalled!')
+    deletes.push(p.pluginInfo.id)
+    await fs.writeJson(DELETES_FILE, deletes)
+    return deletes
   }
 }
 
