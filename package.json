@@ -105,7 +105,6 @@
     "skinview3d": "^1.2.1",
     "slick-carousel": "^1.8.1",
     "typescript": "^3.7.4",
-    "use-react-router": "^1.0.7",
     "uuid-by-string": "^3.0.2",
     "velocity-react": "^1.4.3"
   },

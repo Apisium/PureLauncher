@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import './settings.less'
 import React from 'react'
 import Switch from '../components/Switch'
@@ -68,29 +69,25 @@ const Settings: React.FC = () => {
         <p>{$('Official Website')}:&nbsp;
           <a
             onClick={() => shell.openExternal('https://p.apisium.cn')}
-            href='javascript:void 0'
-            className='link'
+            role='link'
           >p.apisium.cn</a>
         </p>
         <p>{$('Source Code')}:&nbsp;
           <a
             onClick={() => shell.openExternal('https://github.com/Apisium/PureLauncher')}
-            href='javascript:void 0'
-            className='link'
+            role='link'
           >github.com/Apisium/PureLauncher</a>
         </p>
         <p>{$('Tencent QQ Group')}:&nbsp;
           <a
             onClick={() => shell.openExternal('https://jq.qq.com/?_wv=1027&k=5lSLiII')}
-            href='javascript:void 0'
-            className='link'
+            role='link'
           >7923302</a>
         </p>
         <p>{$('Telegram Group')}:&nbsp;
           <a
             onClick={() => shell.openExternal('https://t.me/PureLauncher')}
-            href='javascript:void 0'
-            className='link'
+            role='link'
           >t.me/PureLauncher</a>
         </p>
       </div>

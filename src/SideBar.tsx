@@ -5,12 +5,11 @@ import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'
 import LoginDialog from './components/LoginDialog'
 import VersionSwitch from './components/VersionSwitch'
-import useRouter from 'use-react-router'
 import Avatar from './components/Avatar'
 import GameStore, { STATUS } from './models/GameStore'
 import ProfilesStore from './models/ProfilesStore'
 import { Textfit } from 'react-textfit'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
 import { join } from 'path'
@@ -25,7 +24,7 @@ const SideBar: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [openProfile, setProfile] = useState(false)
   const [openSwitch, setSwitch] = useState(false)
-  const { location: { pathname } } = useRouter()
+  const { pathname } = useLocation()
   const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')
   const lastRelease = $('last-release')

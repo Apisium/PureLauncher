@@ -39,7 +39,7 @@ const App: React.FC = () => {
             <LiveRoute component={Home} path='/home' />
             <LiveRoute component={Manager} path='/manager/:type' />
             <LiveRoute component={Settings} path='/settings' />
-            <Redirect to='/manager/extensions' />
+            <Redirect to='/manager/mods/1.15-pre1' />
             <PluginRoutes />
           </section>
         </Router>

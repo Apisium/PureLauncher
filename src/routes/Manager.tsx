@@ -1,14 +1,16 @@
 import './manager.css'
 import React from 'react'
 import Dots from '../components/Dots'
-import useRouter from 'use-react-router'
 import LiveRoute from '../components/LiveRoute'
+import history from '../utils/history'
+import { useLocation, Route } from 'react-router-dom'
 
 import Versions from './manager/Versions'
 import Downloads from './manager/Downloads'
 import Profiles from './manager/Profiles'
 import Extensions from './manager/Extensions'
 import Plugins from './manager/Plugins'
+import Mods from './manager/Mods'
 
 export const getPages = () => [
   {
@@ -43,12 +45,13 @@ export const getPages = () => [
 
 const Manager: React.FC = () => {
   const pages = getPages()
-  const { location: { pathname }, history } = useRouter()
+  const pathname = useLocation().pathname
   const onChange = (i: number) => history.push(pages[i].path)
 
   return <div className='manager'>
     {pages.map(it => <LiveRoute component={it.component} path={it.path} key={it.path} />)}
     <LiveRoute component={Plugins} path='/manager/plugins' />
+    <Route component={Mods} path='/manager/mods/:version' />
     <Dots
       count={pages.length}
       onChange={onChange}

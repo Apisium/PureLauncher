@@ -35,7 +35,6 @@
   "Incorrect java version!": "Java 版本不正确!",
   "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
   "Have already logged in? Click here!": "已经登陆了? 点击这里切换账户!",
-  "Share": "分享",
   "ResourcesInstaller": "资源管理安装器.",
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
@@ -100,6 +99,8 @@
   "CANCELED": "已取消",
   "ERROR": "发生错误",
   "CANCEL": "取消",
+  "Export": "导出",
+  "Disable": "禁用",
 
   "Open official website": "打开官网",
   "Recent play": "快速启动",

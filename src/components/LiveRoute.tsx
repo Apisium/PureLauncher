@@ -13,18 +13,18 @@ export default class LiveRoute extends Component<Props> {
       const style = d.style
       style.position = 'absolute'
       style.opacity = '0'
-      setTimeout(() => d.classList.add('hide'), 400)
+      setTimeout(() => d.classList.add('hide'), 500)
     }
     if (this.props.onHide) this.props.onHide()
   }
   private handleReappear = () => {
     if (this.ref.current) {
       const d = this.ref.current.routeDom
-      d.classList.remove('hide')
       const style = d.style
       process.nextTick(() => {
         style.position = ''
         style.opacity = '1'
+        d.classList.remove('hide')
       })
     }
     if (this.props.onReappear) this.props.onReappear()

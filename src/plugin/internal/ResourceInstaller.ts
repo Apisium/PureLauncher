@@ -10,6 +10,8 @@ import install from '../../protocol/install'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
 
+export const getModsIndexPath = (id: string) => join(appDir, 'resources/versions', id, 'mods-index.json')
+
 export const allowExtensions = ['.js', '.mjs', '.asar']
 
 const checkHash = (file: string, hash: string) => sha1(file).then(it => {
@@ -144,9 +146,6 @@ export default class ResourceInstaller extends Plugin {
     if (typeof r !== 'object' || r.type !== 'Mod' || !r.id || !valid(r.version)) {
       throw new TypeError('Incorrect resource type!')
     }
-    const jsonPath = join(appDir, 'resources/versions', id, 'mods-index.json')
-    let json = await fs.readJson(jsonPath, { throws: false }) || { }
-    if (r.id in json && gte(json[r.id].version, r.id)) return
     if (!dir && o.resolvedDir) dir = join(o.resolvedDir, 'mods')
     if (!id && o.resolvedId) id = o.resolvedId
     if (!dir || !id) {
@@ -169,6 +168,9 @@ export default class ResourceInstaller extends Plugin {
       }
     }
     if (!id) throw new Error('No suck version: ' + o.selectedVersion)
+    const jsonPath = getModsIndexPath(id)
+    let json = await fs.readJson(jsonPath, { throws: false }) || { }
+    if (r.id in json && gte(json[r.id].version, r.id)) return
     if (r.extends) await install(r.extends, false, true, T.isMod, o)
     const p = await makeTempDir()
     const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) =>

@@ -1,6 +1,7 @@
 import './list.less'
 import React from 'react'
 import moment from 'moment'
+import history from '../../utils/history'
 import ProfilesStore from '../../models/ProfilesStore'
 import { useStore } from 'reqwq'
 
@@ -29,7 +30,7 @@ const Versions: React.FC = () => {
         <span>({ver.lastVersionId})</span>
         <div className='time'>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div>
         <div className='buttons'>
-          <button className='btn2'>{$('Mods')}</button>
+          <button className='btn2' onClick={() => history.push('/manager/mods/' + ver.key)}>{$('Mods')}</button>
           <button className='btn2 danger'>{$('Delete')}</button>
         </div>
         </li>)}

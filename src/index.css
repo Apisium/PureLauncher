@@ -27,11 +27,13 @@ body {
 }
 
 a { color: var(--text-color-0) }
-a.link {
+a.link, a[role='link'] {
   transition: color .3s;
   color: var(--link-color);
+  cursor: pointer;
+  text-decoration: underline;
 }
-a.link:hover { color: var(--link-hover-color) }
+a.link:hover, a[role='link']:hover { color: var(--link-hover-color); }
 
 .top {
   transition: 3s;

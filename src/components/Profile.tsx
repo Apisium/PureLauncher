@@ -71,7 +71,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
         .finally(() => {
           setSkin('')
           setLoading(false)
-          pm.addI()
+          pm.i++
         })
     } else {
       remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
@@ -84,7 +84,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
         if (arg.canceled || !arg.filePaths[0]) {
           setSkin('')
           setLoading(false)
-          pm.addI()
+          pm.i++
           return
         }
         const img = new Image()
@@ -142,7 +142,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
                 console.error(e)
                 notice({ content: $('Failed!'), error: true })
               })
-              .finally(pm.addI)
+              .finally(() => pm.i++)
           }}
         >{$('Log out')}</button>
       </div>

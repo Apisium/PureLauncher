@@ -62,6 +62,9 @@
 }
 
 .manager-versions {
+  display: flex !important;
+  flex-wrap: wrap;
+  flex-direction: column;
   ul.scroll-bar {
     border: none;
     color: inherit;
@@ -109,7 +112,7 @@
 
 .manager-extensions {
   .container {
-    height: calc(100% - 35px);
+    flex: 1;
     overflow: hidden;
   }
   .scroll-bar {

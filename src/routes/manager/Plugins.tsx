@@ -26,7 +26,7 @@ const Plugins: React.FC = () => {
             <span>({p.pluginInfo.version})</span>
             <div className='time'>{p.pluginInfo?.description()}</div>
             {!internal.has(p) && <div className='buttons'>
-              <button className='btn2'>{$('Share')}</button>
+              <button className='btn2'>{$('Export')}</button>
               <button
                 className='btn2 danger'
                 disabled={!uninstallable}

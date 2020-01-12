@@ -137,8 +137,6 @@ export default class ProfilesStore extends Store {
     }
   }
 
-  public addI () { this.i++ }
-
   public async cacheSkins () {
     const t = localStorage.getItem('skinCacheTime')
     if (t && parseInt(t, 10) + 24 * 60 * 60 * 1000 > Date.now()) return
@@ -146,7 +144,7 @@ export default class ProfilesStore extends Store {
     await pAll(pluginMaster.getAllProfiles().filter(it => it.skinUrl)
       .map(it => () => cacheSkin(it)), { concurrency: 5 })
     localStorage.setItem('skinCacheTime', Date.now().toString())
-    this.addI()
+    this.i++
   }
 
   public async setJavaPath () {

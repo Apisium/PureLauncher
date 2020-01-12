@@ -42,7 +42,7 @@ const Profiles: React.FC = () => {
                 console.error(e)
                 notice({ content: $('Failed!'), error: true })
               })
-              .finally(pm.addI)
+              .finally(() => pm.i++)
           }}
         >
           {$('Log out')}
