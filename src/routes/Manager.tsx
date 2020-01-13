@@ -49,9 +49,11 @@ const Manager: React.FC = () => {
   const onChange = (i: number) => history.push(pages[i].path)
 
   return <div className='manager'>
-    {pages.map(it => <LiveRoute component={it.component} path={it.path} key={it.path} />)}
-    <LiveRoute component={Plugins} path='/manager/plugins' />
-    <Route component={Mods} path='/manager/mods/:version' />
+    <div className='container'>
+      {pages.map(it => <LiveRoute component={it.component} path={it.path} key={it.path} />)}
+      <LiveRoute component={Plugins} path='/manager/plugins' />
+      <Route component={Mods} path='/manager/mods/:version' />
+    </div>
     <Dots
       count={pages.length}
       onChange={onChange}

@@ -37,7 +37,7 @@ const App: React.FC = () => {
           <SideBar />
           <section id='main-content' className='scroll-bar'>
             <LiveRoute component={Home} path='/home' />
-            <LiveRoute component={Manager} path='/manager/:type' />
+            <LiveRoute component={Manager} path='/manager/:type' className='vh100' />
             <LiveRoute component={Settings} path='/settings' />
             <Redirect to='/manager/mods/1.15-pre1' />
             <PluginRoutes />
