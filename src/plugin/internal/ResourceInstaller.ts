@@ -46,7 +46,7 @@ export default class ResourceInstaller extends Plugin {
     }
   }
   @event(null, true)
-  public async protocolInstallResource (r: T.AllResources | T.ResourceVersion, o: T.InstallView) {
+  public async protocolInstallResource (r: T.AllResources | T.ResourceVersion | T.ResourcePlugin, o: T.InstallView) {
     switch (r.type) {
       case 'Server':
         await this.installServer(r)
@@ -100,7 +100,7 @@ export default class ResourceInstaller extends Plugin {
       }), { concurrency: 8 })
       if (typeof r.resources === 'object') {
         await pAll(Object.values(r.resources).map(it => () =>
-          install(it, false, true, r => T.isResource(r) && !T.isVersion(r), o)), { concurrency: 5 })
+          install(it, false, true, r => T.isResource(r) && !T.isVersion(r) && !T.isPlugin(r), o)), { concurrency: 5 })
       }
       sJson = await fs.readJson(jsonPath, { throws: false }) || { }
       r.hashes = hashes

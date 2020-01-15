@@ -7,7 +7,8 @@ export default (
   request = true,
   throws = true,
   checker: (r: any) => boolean = T.isResource,
-  obj: T.InstallView = { }
+  obj: T.InstallView = { },
+  pluginsNotInstalled = false
 ) => {
   const p = (async () => {
     if (typeof r === 'string') r = await getJson(r) as T.Resource
@@ -16,7 +17,9 @@ export default (
     obj.throws = throws
     await pluginMaster.emitSync('protocolInstallProcess', r, obj)
     if (request) {
-      if (await global.__requestInstallResources(r, obj)) user.event('resource', 'install').catch(console.error)
+      const req = await global.__requestInstallResources(r, obj)
+      if (pluginsNotInstalled) return req
+      if (req) user.event('resource', 'install').catch(console.error)
       else return
     }
     await pluginMaster.emitSync('protocolInstallResource', r, obj)

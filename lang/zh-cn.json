@@ -94,6 +94,8 @@
   "Incorrect file format!": "文件格式不正确!",
   "Please select the skin file.": "请选择你的皮肤文件",
   "Unavailable": "不可用",
+  "Plugins installed! Restarting...": "插件安装完成! 正在重启启动器...",
+  "Currently, the game is launching. Please restart the game manually later to install the plugin!": "当前游戏启动中，请稍后手动重启游戏以进行插件安装!",
   "The plugin cannot be uninstalled because it is dependent on other plugins!": "当前插件由于被其他插件依赖而无法卸载!",
 
   "FINISHED": "已完成",

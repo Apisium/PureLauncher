@@ -1,4 +1,5 @@
 export const INTERRUPTIBLE = Symbol('Interruptible')
+const ONCE = Symbol('Once')
 export default class EventBus {
   private map = new Map<string, Array<(...args: any[]) => any>>()
   public on (name: string, fn: (...args: any[]) => any) {
@@ -6,6 +7,10 @@ export default class EventBus {
     let arr = this.map.get(name)
     if (!arr) this.map.set(name, arr = [])
     arr.push(fn)
+  }
+  public once (name: string, fn: (...args: any[]) => any) {
+    fn[ONCE] = true
+    this.on(name, fn)
   }
   public off (name: string, fn: (...args: any[]) => any) {
     if (typeof fn !== 'function') throw new TypeError('fn is not a function!')
@@ -22,6 +27,7 @@ export default class EventBus {
     const arr = this.map.get(name)
     if (arr) {
       for (const fn of arr) {
+        if (fn[ONCE]) this.off(name, fn)
         if (fn[INTERRUPTIBLE]) await fn.apply(null, args)
         else try { await fn.apply(null, args) } catch (e) { console.error(e) }
       }
@@ -31,6 +37,7 @@ export default class EventBus {
     const arr = this.map.get(name)
     if (!arr) return Promise.resolve()
     return Promise.all(arr.map(async fn => {
+      if (fn[ONCE]) this.off(name, fn)
       if (fn[INTERRUPTIBLE]) await fn.apply(null, args)
       else try { await fn.apply(null, args) } catch (e) { console.error(e) }
     }))

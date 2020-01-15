@@ -15,12 +15,14 @@ export const DELETES_FILE = join(PLUGINS_ROOT, 'deletes.json')
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
 const ROUTES = Symbol('Pages')
+const FILE = Symbol('File')
 
 export default class Master extends EventBus {
   public routes = new Set<JSX.Element>()
   public extensionsButtons = new Set<ExtensionsButton>()
   public plugins: Record<string, Plugin> = { }
   public logins: Record<string, Authenticator> = { [YGGDRASIL]: new Yggdrasil(), [OFFLINE]: new Offline() }
+  private pluginFileMap: Record<string, string> = { }
 
   public constructor () {
     super()
@@ -106,7 +108,8 @@ export default class Master extends EventBus {
     await Promise.all((await fs.readdir(PLUGINS_ROOT))
       .filter(it => it.endsWith('.js') || it.endsWith('.asar'))
       .map(async it => {
-        let path = join(PLUGINS_ROOT, it)
+        const file = join(PLUGINS_ROOT, it)
+        let path = file
         if (it.endsWith('.asar')) {
           const pkg = await fs.readJson(join(path, 'package.json'), { throws: false })
           path = join(path, pkg && pkg.main ? pkg.main : 'index.js')
@@ -115,6 +118,7 @@ export default class Master extends EventBus {
           const plugin = require(path)
           const info: PluginInfo = plugin[PLUGIN_INFO]
           if (!info || !info.id) throw new Error('This file is not a plugin!')
+          plugin[FILE] = file
           plugins.push(plugin)
         } catch (e) {
           console.error('Fail to load plugin: ' + path, e)
@@ -123,7 +127,11 @@ export default class Master extends EventBus {
     plugins = plugins.filter(It => {
       const info = It[PLUGIN_INFO]
       if (Array.isArray(info.dependencies) && info.dependencies.length) return true
-      try { this.loadPlugin(new ((It as any).default || It)()) } catch (e) {
+      try {
+        const p = new ((It as any).default || It)()
+        p[FILE] = It[FILE]
+        this.loadPlugin(p)
+      } catch (e) {
         console.error('Fail to load plugin: ' + info.id, e)
       }
     }).sort((a, b) => a[PLUGIN_INFO].dependencies.length - b[PLUGIN_INFO].dependencies.length)
@@ -132,7 +140,11 @@ export default class Master extends EventBus {
       const temp = plugins.filter(It => {
         const info = It[PLUGIN_INFO]
         if (info.dependencies.some(it => !(it in this.plugins))) return true
-        try { this.loadPlugin(new ((It as any).default || It)()) } catch (e) {
+        try {
+          const p = new ((It as any).default || It)()
+          p[FILE] = It[FILE]
+          this.loadPlugin(p)
+        } catch (e) {
           console.error('Fail to load plugin: ' + info.id, e)
           return true
         }
@@ -167,12 +179,13 @@ export default class Master extends EventBus {
     return this
   }
 
-  public isPluginUninstallable (p: Plugin, deletes?: string[] = fs.readJsonSync(DELETES_FILE, { throws: false })) {
+  public isPluginUninstallable (p: Plugin, deletes: string[] = fs.readJsonSync(DELETES_FILE, { throws: false })) {
     if (internal.has(p)) return false
     try {
       this.checkPlugin(p)
       const { id } = p.pluginInfo
-      return !Object.values(this.plugins).some(it => !deletes.includes(it) && it.pluginInfo.dependencies?.includes(id))
+      return !Object.values(this.plugins).some(it => !deletes.includes(this.pluginFileMap[it.pluginInfo.id]) &&
+        it.pluginInfo.dependencies?.includes(id))
     } catch {
       return false
     }
@@ -181,7 +194,8 @@ export default class Master extends EventBus {
   public async uninstallPlugin (p: Plugin) {
     const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
     if (!this.isPluginUninstallable(p, deletes)) throw new Error('Plugin cannot be uninstalled!')
-    deletes.push(p.pluginInfo.id)
+    this.pluginFileMap[p.pluginInfo.id] = p[FILE]
+    deletes.push(p[FILE])
     await fs.writeJson(DELETES_FILE, deletes)
     return deletes
   }

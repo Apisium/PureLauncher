@@ -57,7 +57,7 @@ export interface ResourcePlugin extends Resource<'Plugin'> {
   extension?: string
   dependencies?: Record<string, ResourcePlugin | string>
 }
-export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer | ResourcePlugin
+export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer
 export const isResource = (r: any): r is Resource => !!(typeof r === 'object' && typeof r.id === 'string' &&
   r.i && typeof r.type === 'string' && r.type)
 export const isResourceWithVersion = (r: any): r is Resource & { version: string } =>
@@ -83,7 +83,9 @@ export interface ProtocolLaunch extends Protocol<'Launch'> {
   autoInstall?: boolean
 }
 export interface ProtocolInstall extends Protocol<'Install'> {
-  resource: string | AllResources | ResourceVersion
+  resource: string | AllResources | ResourceVersion | ResourcePlugin
+  plugins?: Record<string, string | ResourcePlugin>
+  notInstallPlugins?: boolean
 }
 export interface InstallView {
   [key: string]: any
