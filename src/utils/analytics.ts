@@ -6,8 +6,8 @@ export const pagesFilter: Array<(path: string | null, source: string) => string 
   (_, path) => path.startsWith('/manager/mods/') ? '/manager/mods' : path
 ]
 
-let token = localStorage.getItem('AnalyticsToken')
-if (!token) localStorage.setItem('AnalyticsToken', (token = genUUIDOrigin()))
+let token = localStorage.getItem('analyticsToken')
+if (!token) localStorage.setItem('analyticsToken', (token = genUUIDOrigin()))
 const ga = new GoogleAnalytics('UA-155613176-1', token)
 Object.assign(ga.defaultValues, {
   av,

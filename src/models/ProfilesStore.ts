@@ -184,6 +184,20 @@ export default class ProfilesStore extends Store {
     }))
   }
 
+  public async resolveVersion (key: string) {
+    const v = this.profiles[key]
+    if (!v) throw new Error('No such version: ' + key)
+    switch (v.type) {
+      case 'latest-release':
+        await this.ensureVersionManifest()
+        return this.versionManifest.latest.release
+      case 'latest-snapshot':
+        await this.ensureVersionManifest()
+        return this.versionManifest.latest.snapshot
+      default: return v.lastVersionId
+    }
+  }
+
   public async saveLaunchProfileJson () {
     // not throw but return a null
     const json = await fs.readJson(this.launchProfilePath, { throws: false }) || {}
@@ -361,7 +375,7 @@ export default class ProfilesStore extends Store {
   }
 
   private loadLaunchProfileJson (json: any) {
-    this.selectedUser = merge(this.selectedUser, json)
+    this.selectedUser = merge(this.selectedUser, json.selectedUser)
     this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
     this.clientToken = json.clientToken
     this.settings = merge(this.settings, json.settings)
@@ -376,7 +390,7 @@ export default class ProfilesStore extends Store {
   }
 
   private onLoadLaunchProfileFailed (e: Error) {
-    if (e.message.includes('no such file or directory')) {
+    if (!e.message.includes('no such file or directory')) {
       console.error('Fail to load launcher profile', e)
     }
     if (fs.pathExistsSync(this.launchProfilePath)) {

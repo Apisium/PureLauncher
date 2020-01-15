@@ -50,8 +50,8 @@ const Manager: React.FC = () => {
 
   return <div className='manager'>
     <div className='container'>
-      {pages.map(it => <LiveRoute component={it.component} path={it.path} key={it.path} />)}
-      <LiveRoute component={Plugins} path='/manager/plugins' />
+      {pages.map(it => <LiveRoute exact component={it.component} path={it.path} key={it.path} />)}
+      <LiveRoute exact component={Plugins} path='/manager/plugins' />
       <Route component={Mods} path='/manager/mods/:version' />
     </div>
     <Dots

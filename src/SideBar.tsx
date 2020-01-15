@@ -14,6 +14,7 @@ import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
 import { join } from 'path'
 import { skinsDir } from './utils/index'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
@@ -52,6 +53,7 @@ const SideBar: React.FC = () => {
       break
     default: btnText = $('Unknown')
   }
+  const name = logged ? u.username : $('NOT LOGGED-IN')
   return (
     <div className='side-bar'>
       <ToolTip
@@ -61,7 +63,6 @@ const SideBar: React.FC = () => {
       >
         <Avatar
           data-sound
-          key={(logged ? u.key : '') + pm.i.toString()}
           src={logged ? [
             u.skinUrl,
             join(skinsDir, u.key + '.png')
@@ -69,10 +70,13 @@ const SideBar: React.FC = () => {
           onClick={() => logged ? setProfile(true) : pm.setLoginDialogVisible()}
         />
       </ToolTip>
-      <p className='name'>{logged ? u.username : $('NOT LOGGED-IN')}</p>
+      <AnimatePresence exitBeforeEnter>
+        <motion.p className='name' key={name} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          {name}</motion.p>
+      </AnimatePresence>
       <ul className='list'>
-        <li className={pathname === '/home' ? 'active' : null}>
-          <Link to='/home'><img src={homeIcon} alt='' /><span data-sound>{$('Home')}</span></Link>
+        <li className={pathname === '/' ? 'active' : null}>
+          <Link to='/'><img src={homeIcon} alt='' /><span data-sound>{$('Home')}</span></Link>
         </li>
         <li
           onMouseEnter={() => setOpen(true)}

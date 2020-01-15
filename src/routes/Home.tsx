@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-first-prop-new-line */
 import './home.less'
 import Slider from 'react-slick'
 import user from '../utils/analytics'
@@ -26,7 +27,7 @@ const Home: React.FC = () => {
           )
             .map(({ childNodes: n }) => ({
               text: (n[1] as HTMLSpanElement).innerText,
-              url: 'http://www.mcbbs.net/' + (n[0] as HTMLAnchorElement).getAttribute('href'),
+              url: (n[0] as HTMLAnchorElement).getAttribute('href'),
               img: (n[0].childNodes[0] as HTMLImageElement).getAttribute('src')
             }))))
           localStorage.setItem('slidesTime', Date.now().toString())
@@ -64,7 +65,8 @@ const Home: React.FC = () => {
   return (
     <div className='home'>
       <div className='slider' style={{ opacity: slides.length ? 1 : 0 }}>
-        <Slider fade infinite autoplay pauseOnHover autoplaySpeed={5000} slidesToShow={1} slidesToScroll={1}>
+        <Slider key={slides} fade infinite autoplay pauseOnHover
+          autoplaySpeed={5000} slidesToShow={1} slidesToScroll={1}>
           {slides.map(it => <div className='cover' key={it.url} role='button' onClick={() => openUrl(it.url)}>
             <img src={it.img} alt={it.text} /><span>{it.text}</span>
           </div>)}

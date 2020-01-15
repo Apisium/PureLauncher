@@ -2,6 +2,7 @@ import './list.less'
 import React from 'react'
 import moment from 'moment'
 import history from '../../utils/history'
+import Empty from '../../components/Empty'
 import ProfilesStore from '../../models/ProfilesStore'
 import { useStore } from 'reqwq'
 
@@ -12,6 +13,9 @@ const Versions: React.FC = () => {
   const lastPlayed = $('Last played')
   const lastRelease = $('last-release')
   const lastSnapshot = $('last-snapshot')
+  const versions = Object
+    .entries(pm.profiles)
+    .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
   return <div className='manager-list version-switch manager-versions'>
     <div className='list-top'>
       <span className='header'>{$('Versions List')}</span>
@@ -19,10 +23,8 @@ const Versions: React.FC = () => {
         <span data-sound>{$('Add new...')}</span>
       </a>
     </div>
-    <ul className='scroll-bar'>
-      {Object
-        .entries(pm.profiles)
-        .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
+    {versions.length ? <ul className='scroll-bar'>
+      {versions
         .map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
         .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
         .map(ver => <li key={ver.key}>{ver.type === 'latest-release' ? lastRelease
@@ -34,7 +36,7 @@ const Versions: React.FC = () => {
           <button className='btn2 danger'>{$('Delete')}</button>
         </div>
         </li>)}
-    </ul>
+    </ul> : <Empty />}
   </div>
 }
 

@@ -49,8 +49,11 @@
   color: #fff;
   font-size: 13px;
   letter-spacing: 1px;
+  border-radius: 2px;
   background-color: #36b030;
   transition: background-color .3s;
+  box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14),
+    0 1px 8px 0 rgba(0, 0, 0, 0.12);
 }
 
 .btn2:hover {
@@ -242,7 +245,6 @@ progress[value='-1']::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   user-select: none;
   cursor: pointer;
   text-transform: uppercase;
