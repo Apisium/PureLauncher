@@ -18,12 +18,14 @@ export default class GameStore extends Store {
 
   @injectStore(ProfilesStore)
   private profilesStore: ProfilesStore
+  private currentVersionId: string
   private worker = Object.assign(new Worker('../workers/launch.ts'), { [NOT_PROXY]: true })
 
   constructor () {
     super()
     this.worker.addEventListener('message', (m) => {
       const { state, error } = m.data
+      pluginMaster.emit('launchMessage', this.currentVersionId, state, error)
       switch (state) {
         case 'error':
           // this.error = error
@@ -46,6 +48,10 @@ export default class GameStore extends Store {
     })
   }
   public async launch (version?: string) {
+    const v = { version }
+    await pluginMaster.emitSync('launchResolveVersion', v)
+    version = v.version
+
     user.event('game', 'launch').catch(console.error)
     const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest,
       ensureVersionManifest, checkModsDirectory, modsPath } = this.profilesStore
@@ -82,13 +88,19 @@ export default class GameStore extends Store {
         break
     }
 
+    v.version = versionId
+    await pluginMaster.emitSync('launchPostResolvedVersion', v)
+    versionId = v.version
+
     await checkModsDirectory()
     if (await fs.pathExists(modsPath)) {
       const s = await fs.stat(modsPath)
       if (s.isSymbolicLink()) await fs.unlink(modsPath)
     }
-    const dest = join(root, 'versions', versionId, 'mods')
+    const versionRoot = join(root, 'versions', versionId)
+    const dest = join(versionRoot, 'mods')
     if (!await fs.pathExists(modsPath) && await fs.pathExists(dest)) await fs.symlink(dest, modsPath, 'dir')
+    await pluginMaster.emit('launchEnsureFiles', versionId, versionRoot)
 
     const option: Launcher.Option = {
       version: versionId,
@@ -104,6 +116,7 @@ export default class GameStore extends Store {
         env: {}
       }
     }
+    await pluginMaster.emitSync('preLaunch', versionId, versionRoot, option)
     this.status = STATUS.LAUNCHING
     this.worker.postMessage(option)
 
@@ -123,6 +136,8 @@ export default class GameStore extends Store {
       }
       this.worker.addEventListener('message', onceLaunch)
     })
+    this.currentVersionId = versionId
+    await pluginMaster.emit('postLaunch', versionId, versionRoot, option)
   }
   private async ensureMinecraftVersion (minecraft: string, version: Installer.VersionMeta) {
     const task = Installer.installTask('client', version, minecraft, {

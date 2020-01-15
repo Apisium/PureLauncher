@@ -54,8 +54,8 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
     : other.headers
 }).then(it => it.json().catch(() => null))
 export const getJson = <T = any> (url: string) => fetch(url, { cache: 'no-cache' }).then(r => r.json()) as Promise<T>
-export const genUUIDOrigin = (t?: string) => uuid(t || Math.random().toString() + Math.random().toString())
-export const genUUID = () => genUUIDOrigin().replace(/-/g, '')
+export const genUUIDOrigin = (t?: string) => uuid(t || (Math.random().toString() + Math.random().toString()))
+export const genUUID = (t?: string) => genUUIDOrigin(t).replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 
 export interface DownloadItem { url: string, file: string }

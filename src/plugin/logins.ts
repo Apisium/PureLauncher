@@ -9,7 +9,7 @@ const saveFile = async () => {
     await profilesStore.saveLaunchProfileJson()
   } catch (e) {
     console.error(e)
-    throw new Error('保存失败!')
+    throw new Error($('Fail to save files!'))
   }
 }
 

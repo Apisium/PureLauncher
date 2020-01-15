@@ -126,11 +126,6 @@ img {
   overflow-x: hidden !important;
 }
 
-#main-content > * {
-  transition: .4s ease-in-out;
-  display: block;
-}
-
 #close, #hide {
   z-index: 2050;
   background-color: unset;
