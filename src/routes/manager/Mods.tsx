@@ -7,10 +7,9 @@ import { getModsIndexPath } from '../../plugin/internal/ResourceInstaller'
 import { ResourceMod } from '../../protocol/types'
 import { join, basename } from 'path'
 import { useParams } from 'react-router-dom'
-import createFetcher from '../../utils/createFetcher'
-import { OneCache } from '../../utils/OneCache'
+import { createResource, OneCache } from 'react-cache-enhance'
 
-const useVersion = createFetcher(async (ver: string) => {
+const useVersion = createResource(async (ver: string) => {
   if (!ver) return
   const path = join(profilesStore.root, 'versions', ver, 'mods')
   try {
@@ -28,6 +27,7 @@ const useVersion = createFetcher(async (ver: string) => {
 
 const Version: React.FC<{ version: string }> = p => {
   const ver = useVersion(p.version)
+  console.log(ver)
   return <ul className='scroll-bar'>
     {ver.mods.map(it => <li key={it}>
       {it}

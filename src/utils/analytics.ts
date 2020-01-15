@@ -1,5 +1,5 @@
-import GA from 'electron-google-analytics'
-import { version } from '../../package.json'
+import GoogleAnalytics from 'google-analytics-lite/dist/esnext/index'
+import { version as av } from '../../package.json'
 import { genUUIDOrigin } from './index'
 
 export const pagesFilter: Array<(path: string | null, source: string) => string | null> = [
@@ -8,21 +8,21 @@ export const pagesFilter: Array<(path: string | null, source: string) => string 
 
 let token = localStorage.getItem('AnalyticsToken')
 if (!token) localStorage.setItem('AnalyticsToken', (token = genUUIDOrigin()))
-const user: {
-  set (key: string, value: string): void
-  pageview (url: string | null, path: string, title?: string): Promise<any>
-  pageView (path: string): Promise<any>
-  event (name: string, action: string): Promise<any>
-} = new GA('UA-155613176-1')
-user.set('cid', token)
-user.set('ds', 'app')
-user.set('ul', navigator.languages[0])
-user.set('an', 'PureLauncher')
-user.set('aid', 'cn.apisium.purelauncher')
-user.set('av', version)
-user.pageView = (path: string, title?: string) => {
-  const d = pagesFilter.reduce((p, fn) => fn(p, path), path)
-  return d ? user.pageview(null, d, title) : Promise.resolve()
+const ga = new GoogleAnalytics('UA-155613176-1', token)
+Object.assign(ga.defaultValues, {
+  av,
+  ds: 'app',
+  ul: navigator.languages[0],
+  an: 'PureLauncher',
+  aid: 'cn.apisium.purelauncher'
+})
+const f = ga.pageView
+ga.pageView = (dl: string, dh?: string, dt?: string, other?: any) => {
+  if (dh) {
+    dh = pagesFilter.reduce((p, fn) => fn(p, dh), dh)
+    return dh ? f.call(ga, dl, dh, dt, other) : Promise.resolve(true)
+  }
+  return f.call(ga, dl, dh, dt, other)
 }
 
-export default user
+export default ga

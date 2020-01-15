@@ -1,6 +1,7 @@
 import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
-import * as skinview3d from 'skinview3d'
+import * as skinView3d from 'skinview3d'
+import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
 
 export { Plugin, plugin, event } from './Plugin'
@@ -18,9 +19,6 @@ export { default as LiveRoute } from '../components/LiveRoute'
 export { default as installResource } from '../protocol/index'
 export { default as isDev } from '../utils/isDev'
 export { default as history } from '../utils/history'
-export { default as Lru } from '../utils/Lru'
-export { default as OneCache } from '../utils/OneCache'
-export { default as createFetcher } from '../utils/createFetcher'
 export { default as React } from 'react'
 export { default as ReactDOM } from 'react-dom'
 export { default as Dialog } from 'rc-dialog'
@@ -31,7 +29,7 @@ export { default as TextFit } from 'react-textfit'
 export { default as ReactRouter } from 'react-router-dom'
 export { download, genId, genUUID, getJson, fetchJson, appDir, makeTempDir,
   DownloadItem, validPath, sha1, md5, replace } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinview3d }
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache }
 
 export const $: Window['$'] = (window as any).__$pli0
 export const pluginMaster = window.pluginMaster

@@ -3,7 +3,8 @@
     "babel-plugin-dollar",
     "@babel/plugin-proposal-optional-chaining",
     ["module-resolver", { "alias": {
-      "reqwq": "reqwq/dist/esnext/index.js"
+      "reqwq": "reqwq/dist/esnext/index.js",
+      "react-cache-enhance": "react-cache-enhance/dist/esnext/index.js"
     } }]
   ]
 }
