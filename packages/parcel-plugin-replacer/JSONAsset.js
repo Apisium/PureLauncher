@@ -10,6 +10,7 @@ global.JSONAsset = module.exports = class JSONAsset extends ParcelJSONAsset {
         }
       } catch (e) { console.error(e) }
     }
-    return super.generate()
+    const code = this.ast ? JSON.stringify(this.ast) : this.contents
+    return `module.exports=JSON.parse(${JSON.stringify(code)})`
   }
 }

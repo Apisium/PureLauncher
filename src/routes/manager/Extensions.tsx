@@ -13,7 +13,7 @@ const Extensions: React.FC = () => {
       <span className='header no-button'>{$('Extensions')}</span>
     </div>
     <div className='container'>
-      <div className='scroll-bar'>
+      <div className='scrollable'>
         <div>{arr}</div>
       </div>
     </div>

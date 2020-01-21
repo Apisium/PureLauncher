@@ -32,7 +32,7 @@ const useVersion = createResource(async (ver: string) => {
 
 const Version: React.FC<{ version: string }> = p => {
   const ver = useVersion(p.version)
-  return ver.mods.length + ver.installed.length ? <ul className='scroll-bar'>
+  return ver.mods.length + ver.installed.length ? <ul className='scrollable'>
     {ver.mods.map(it => <li key={it}>
       {it}
       <div className='time'>233</div>

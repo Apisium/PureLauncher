@@ -28,6 +28,7 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as TextFit } from 'react-textfit'
 export { default as ReactRouter } from 'react-router-dom'
+export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { download, genId, genUUID, getJson, fetchJson, appDir, makeTempDir,
   DownloadItem, validPath, sha1, md5, replace } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache }

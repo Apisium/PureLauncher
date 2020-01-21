@@ -18,7 +18,7 @@ const Profiles: React.FC = () => {
         <span data-sound>{$('Add account')}</span>
       </a>
     </div>
-    <ul className='scroll-bar'>{pluginMaster.getAllProfiles().map(it => <li key={it.key}>
+    <ul className='scrollable'>{pluginMaster.getAllProfiles().map(it => <li key={it.key}>
       <Avatar src={[it.skinUrl, join(skinsDir, it.key + '.png'), steve]} />
       {it.displayName ? <>{it.username} <span>{it.displayName}</span></> : it.username}
       <div className='time'>{pluginMaster.logins[it.type][Auth.TITLE]()}</div>

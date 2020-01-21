@@ -14,6 +14,7 @@ let current = zhCN
 export let currentName = 'zh-cn'
 
 export const applyLocate = (name: string, notUpdate = false) => {
+  name = name.toLowerCase()
   if (!(name in langs)) throw new Error('No such lang: ' + name)
   current = langs[name]
   moment.locale(name)

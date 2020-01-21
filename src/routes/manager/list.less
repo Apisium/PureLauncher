@@ -3,7 +3,6 @@
   color: var(--text-color-0);
   li {
     padding: 10px 6px !important;
-    cursor: default !important;
     position: relative;
   }
   ul {
@@ -65,7 +64,7 @@
   display: flex !important;
   flex-wrap: wrap;
   flex-direction: column;
-  ul.scroll-bar {
+  ul.scrollable {
     border: none;
     color: inherit;
     width: 100%;
@@ -86,8 +85,7 @@
     }
   }
   .time {
-    margin-top: 1px;
-    color: var(--text-color-2);
+    color: var(--text-color-2) !important;
   }
 }
 
@@ -115,10 +113,26 @@
     flex: 1;
     overflow: hidden;
   }
-  .scroll-bar {
+  .scrollable {
     height: 100%;
     & > div {
       margin: 14px 0 14px 14px;
     }
+  }
+}
+
+.version-edit {
+  .rc-dialog-body { width: 360px }
+  .pl-form > div { width: 100% }
+  .pl-form a {
+    width: 100%;
+    margin: 2px 0 0;
+    font-size: 12px;
+    text-align: right;
+  }
+  .version-icon {
+    width: 60px;
+    height: 60px;
+    margin: auto;
   }
 }

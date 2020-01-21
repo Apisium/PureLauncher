@@ -35,11 +35,11 @@ const App: React.FC = () => {
       <Provider>
         <Router ref={ref as any} history={history}>
           <SideBar />
-          <section id='main-content' className='scroll-bar'>
+          <section id='main-content' className='scrollable'>
             <LiveRoute exact component={Home} path='/' />
             <LiveRoute component={Manager} path='/manager/:type' className='vh100' />
             <LiveRoute exact component={Settings} path='/settings' />
-            <Redirect to='/manager/mods/1.15-pre1' />
+            <Redirect to='/manager/versions' />
             <PluginRoutes />
           </section>
         </Router>
@@ -70,10 +70,11 @@ global.openConfirmDialog = (data: { text: string, title?: string, cancelButton?:
       onClose={() => fn(false)}
       title={data.title || $('News:')}
       children={data.text}
-      footer={<>
-        <button className='btn btn-primary' onClick={() => fn(true)}>{$('OK')}</button>
-        {data.cancelButton && <button className='btn btn-secondary' onClick={() => fn(false)}>{$('CANCEL')}</button>}
-      </>}
+      footer={[
+        <button key='ok' className='btn btn-primary' onClick={() => fn(true)}>{$('OK')}</button>,
+        data.cancelButton && <button key='cancel' className='btn btn-secondary' onClick={() => fn(false)}>
+          {$('CANCEL')}</button>
+      ]}
     />
   }
   render(<E />, elm)

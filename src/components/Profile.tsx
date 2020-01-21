@@ -13,7 +13,7 @@ import ProfilesStore from '../models/ProfilesStore'
 
 const skinUrl = require('../assets/images/steve.png')
 
-const Profile: React.FC<{ open: boolean, onClose: () => void }> = (props) => {
+const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const ref = useRef<HTMLDivElement>()
   const ref2 = useRef<SkinViewer>()
   const ref3 = useRef<boolean>(false)

@@ -42,6 +42,7 @@
   "Successfully installed resources!": "资源安装成功!",
   "Failed to install resources!": "资源安装失败!",
   "Hash is different: {0} -> {1}": "哈希值不相同: {0} -> {1}",
+  "Please select an icon you like:": "请选择一个你喜欢的图标:",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
   "Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}":
@@ -56,10 +57,16 @@
   "ENABLE SOUND": "开启启动器音效",
   "ENABLE BMCLAPI": "使用 BMCLAPI 加速下载",
   "SHOW OUTPUT LOGS": "显示游戏日志",
+  "NAME": "名字",
+  "Unnamed": "未命名",
   "Locate Java": "选择 Java",
   "Locate the path of Java 8": "请选择你的 Java 8 路径",
   "Executable File (Javaw)": "可执行文件 (Javaw)",
   "Debugging plugin": "正在调试插件",
+  "Click to edit": "点击以进行编辑",
+  "Add Version": "添加版本",
+  "VERSION": "版本目录",
+  "Install the vanilla game / Forge / Fabric?": "安装 原版游戏/Forge/Fabric?",
 
   "Online Login": "正版登录",
   "Offline Login": "离线登录",
@@ -103,6 +110,9 @@
   "CANCELED": "已取消",
   "ERROR": "发生错误",
   "CANCEL": "取消",
+  "Cancel": "取消",
+  "SAVE": "保存",
+  "ADD": "添加",
   "Export": "导出",
   "Disable": "禁用",
 

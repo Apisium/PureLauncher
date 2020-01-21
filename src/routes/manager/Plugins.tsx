@@ -18,7 +18,7 @@ const Plugins: React.FC = () => {
     <div className='list-top'>
       <span className='header no-button'>{$('Plugins')}</span>
     </div>
-    <ul className='scroll-bar'>
+    <ul className='scrollable'>
       {Object.values(pluginMaster.plugins)
         .map(p => {
           const uninstallable = pluginMaster.isPluginUninstallable(p, deletes)

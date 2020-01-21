@@ -229,3 +229,25 @@ img {
   from { opacity: 0 }
   to { opacity: 1 }
 }
+
+.pl-form {
+  display: flex;
+  flex-wrap: wrap;
+}
+.pl-form .group {
+  margin: auto;
+  padding-top: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 45%;
+  display: flex;
+}
+.pl-form .group.switch {
+  justify-content: center;
+}
+.pl-form label {
+  font-size: 12px;
+}
+.pl-form input, .pl-form select {
+  width: 100%;
+}

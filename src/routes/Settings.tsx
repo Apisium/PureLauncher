@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import './settings.less'
+import './settings.css'
 import React from 'react'
 import Switch from '../components/Switch'
 import ShowMore from '../components/ShowMore'
@@ -12,7 +12,7 @@ import { version } from '../../package.json'
 const Settings: React.FC = () => {
   const pm = useStore(ProfilesStore)
   return <div className='settings'>
-    <form>
+    <form className='pl-form'>
       <div className='group'>
         <label>{$('JAVA EXECUTABLE')}</label>
         <input
