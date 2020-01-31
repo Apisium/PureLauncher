@@ -2,18 +2,20 @@
 import './list.less'
 import React, { useState, useMemo, useRef } from 'react'
 import IconPicker, { resolveIcon } from '../../components/IconPicker'
+import ProfilesStore, { Version } from '../../models/ProfilesStore'
 import fs from 'fs-extra'
 import moment from 'moment'
 import Dialog from 'rc-dialog'
 import ToolTip from 'rc-tooltip'
 import history from '../../utils/history'
 import Empty from '../../components/Empty'
-import ProfilesStore, { Version } from '../../models/ProfilesStore'
+import analytics from '../../utils/analytics'
+import Loading from '../../components/Loading'
 import { join } from 'path'
 import { useStore } from 'reqwq'
-import Loading from '../../components/Loading'
 
 const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
+  const ref = useRef<HTMLFormElement>()
   const [open, setOpen] = useState(false)
   const [icon, setIcon] = useState('')
   const ps = useStore(ProfilesStore)
@@ -27,12 +29,24 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
     visible={!!p.version}
     title={ver.lastVersionId}
     footer={[
-      <button key='save' className='btn btn-primary' onClick={p.onClose}>{$('SAVE')}</button>,
+      <button
+        key='save'
+        className='btn btn-primary'
+        onClick={() => {
+          p.onClose()
+          if (!ref.current) return
+          const data = new FormData(ref.current)
+          analytics.event('profile', 'edit')
+          profilesStore.editProfile(p.version, data.get('name') as string, data.get('icon') as string)
+            .then(() => notice({ content: $('Success!') }))
+            .catch(e => (console.error(e), notice({ content: $('Failed!'), error: true })))
+        }}
+      >{$('SAVE')}</button>,
       <button key='cancel' className='btn btn-secondary' onClick={p.onClose}>{$('CANCEL')}</button>,
       <button key='delete' className='btn btn-danger'>{$('Delete')}</button>
     ]}
   >
-    <form className='pl-form'>
+    <form className='pl-form' ref={ref}>
       <ToolTip placement='right' overlay={$('Click to edit')} overlayStyle={{ zIndex: 1100 }}>
         <img alt={ver.icon} src={resolveIcon(ver.icon)} className='version-icon' onClick={() => setOpen(true)} />
       </ToolTip>
@@ -58,7 +72,9 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
     setIcon('Furnace')
     ;(async () => {
       setLoading(true)
-      const ret = await fs.readdir(VERSIONS).catch(() => [] as string[])
+      const set = new Set()
+      Object.values(profilesStore.profiles).forEach(it => set.add(it.lastVersionId))
+      const ret = (await fs.readdir(VERSIONS).catch(() => [] as string[])).filter(it => !set.has(it))
       const exists = await Promise.all(ret.map(it => fs.pathExists(join(VERSIONS, it, it + '.json'))))
       setVersions(ret.filter((_, i) => exists[i]))
       setLoading(false)
@@ -76,7 +92,18 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
         key='save'
         disabled={loading}
         className='btn btn-primary'
-        onClick={() => (p.onClose(), ref.current && new FormData(ref.current))}>{$('ADD')}</button>,
+        onClick={() => {
+          p.onClose()
+          if (!ref.current) return
+          const data = new FormData(ref.current)
+          analytics.event('profile', 'add')
+          profilesStore.addProfile(
+            data.get('version') as string,
+            data.get('name') as string,
+            data.get('icon') as string
+          ).then(() => notice({ content: $('Success!') }))
+            .catch(e => (console.error(e), notice({ content: $('Failed!'), error: true })))
+        }}>{$('ADD')}</button>,
       <button key='cancel' className='btn btn-secondary' onClick={p.onClose}>{$('CANCEL')}</button>
     ]}
   >
@@ -135,8 +162,14 @@ const Versions: React.FC = () => {
               <div className='time'>{lastPlayed}: {ver.lastUsed.valueOf() ? ver.lastUsed.fromNow() : unknown}</div>
             </div>
             <div className='buttons'>
-              <button className='btn2' onClick={() => history.push('/manager/mods/' + ver.key)}>{$('Mods')}</button>
-              <button className='btn2 danger'>{$('Delete')}</button>
+              <button
+                className='btn2'
+                onClick={e => {
+                  e.stopPropagation()
+                  history.push('/manager/mods/' + ver.key)
+                }}
+              >{$('Mods')}</button>
+              <button className='btn2 default' onClick={e => e.stopPropagation()}>{$('Export')}</button>
             </div>
           </li>
         </ToolTip>)}

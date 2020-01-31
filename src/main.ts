@@ -1,4 +1,4 @@
-import { basename } from 'path'
+import { join, basename } from 'path'
 import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
@@ -6,7 +6,27 @@ import createServer from './createServer'
 
 let window: BrowserWindow = null
 let downloadWindow: BrowserWindow = null
+let launchingWindow: BrowserWindow = null
+const webp = join(app.getPath('userData'), 'launching.webp')
 ;(process.env as any)['D' + 'EV'] = process.env.NODE_ENV !== 'production'
+
+const showLaunchingDialog = () => {
+  if (!launchingWindow) return
+  launchingWindow.show()
+  launchingWindow.webContents.executeJavaScript(`
+    if (!window.img) window.img = document.getElementsByTagName("img")[0]
+    window.img.src = '${webp.replace(/\\/g, '\\\\')}'
+    window.img.style.opacity = '1'
+  `)
+
+  setTimeout(() => {
+    launchingWindow.webContents.executeJavaScript('window.img.style.opacity = "0"')
+    setTimeout(() => {
+      launchingWindow.hide()
+      launchingWindow.webContents.executeJavaScript('window.img.src = ""')
+    }, 1000)
+  }, 28000)
+}
 
 interface Item { file: string, url: string, instance?: any, length?: number }
 interface DownloadItem {
@@ -48,6 +68,7 @@ const create = () => {
   const downloadItems: Record<string, DownloadItem> = { }
   let downloadViewer
   ipcMain
+    .on('show-launching-dialog', showLaunchingDialog)
     .on('download-window-loaded', (e, id) => {
       downloadViewer = webContents.fromId(id).once('did-navigate', () => (downloadViewer = null))
       if (process.env.DOWNLOAD_DEV) downloadViewer.openDevTools()
@@ -160,11 +181,28 @@ const create = () => {
     transparent: true,
     frame: false,
     show: false,
+    skipTaskbar: true,
     webPreferences: { webviewTag: true, nodeIntegration: true, nodeIntegrationInWorker: true }
   })
-
   window.loadFile('./dist/index.html')
-  window.webContents.executeJavaScript('window.aaaa=23333')
+
+  launchingWindow = new BrowserWindow({
+    width: 500,
+    height: 441,
+    resizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    transparent: true,
+    frame: false,
+    title: 'Launching...',
+    show: false,
+    alwaysOnTop: true,
+    webPreferences: { webSecurity: false }
+  })
+  launchingWindow.webContents.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="preload" href="' + webp +
+    '"></head><body style="margin:0;overflow:hidden"><img style="pointer-events:none;transition:1s;filter:drop-shadow(0 4px 8px #0000008a);opacity:0"></body></html>'))
+
   const timer = setInterval(() => {
     if (items.size) {
       let total = 0

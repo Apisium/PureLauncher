@@ -16,6 +16,7 @@ const Settings: React.FC = () => {
       <div className='group'>
         <label>{$('JAVA EXECUTABLE')}</label>
         <input
+          style={{ cursor: 'pointer' }}
           placeholder={$('<auto>')}
           value={pm.extraJson.javaPath}
           onClick={pm.setJavaPath}

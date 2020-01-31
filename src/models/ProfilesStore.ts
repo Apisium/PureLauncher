@@ -234,6 +234,31 @@ export default class ProfilesStore extends Store {
     this.saveExtraConfigJsonSync()
   }
 
+  public async addProfile (version: string, name = '', icon = 'Furnace') {
+    const path = join(this.root, 'versions', version, version + '.json')
+    if (!await fs.pathExists(path)) throw new Error('Json is not exists!')
+    const key = genUUID()
+    const created = new Date().toISOString()
+    this.profiles[key] = {
+      name,
+      icon,
+      created,
+      lastUsed: created,
+      lastVersionId: version,
+      type: 'custom'
+    }
+    await this.saveLaunchProfileJson()
+    return key
+  }
+
+  public async editProfile (key: string, name?: string, icon?: string) {
+    const p = this.profiles[key]
+    if (!p) throw new Error(`The profile (${key}) is not exists!`)
+    if (name) p.name = name
+    if (icon) p.icon = icon
+    await this.saveLaunchProfileJson()
+  }
+
   public async setMemory (mem: string) {
     const m = parseInt(mem, 10)
     this.extraJson.memory = Number.isNaN(m) || Object.is(m, Infinity) || m < 0 ? 0 : m

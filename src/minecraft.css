@@ -68,6 +68,16 @@
   background-color: #e7643c;
 }
 
+.btn2.default {
+  background-color: #f7f7f7;
+  color: #131313;
+}
+
+.btn2.default:hover {
+  background-color: #c5c5c5;
+  color: #131313;
+}
+
 .btn .grow::after {
   box-shadow: 0 0 0 0 rgba(0,0,0,.15)
 }
