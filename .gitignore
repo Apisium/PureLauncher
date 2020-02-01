@@ -2,7 +2,7 @@ node_modules
 dist
 .cache
 *.log
-build
+release
 .idea
 cmake-build-debug
 native/target

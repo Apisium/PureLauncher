@@ -3,17 +3,18 @@
   "private": true,
   "version": "0.0.0",
   "description": "An awesome Minecraft Launcher.",
-  "main": "index.js",
+  "main": "dist/src/main.js",
   "scripts": {
     "lint": "eslint src/ packages/ --ext .js,.ts,.tsx",
     "fix": "eslint src/ packages/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --no-autoinstall --target electron --public-url .",
     "run": "electron .",
     "watch": "parcel watch index.html src/main.ts --target electron --public-url . --no-autoinstall",
-    "build": "npm run clean && parcel build index.html src/main.ts --target electron --public-url . --bundle-node-modules --no-source-maps --no-cache",
+    "pack": "electron-builder",
+    "build": "npm run clean && parcel build index.html src/main.ts --target electron --public-url . -d app/dist --bundle-node-modules --no-source-maps --no-cache",
     "test": "npm run lint",
     "postinstall": "npm run build:web-api",
-    "clean": "del-cli dist",
+    "clean": "del-cli app/dist",
     "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules",
     "compile": "npm run compile:cpp && npm run compile:rust",
     "compile:cpp": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- cmake-js compile",
@@ -67,6 +68,7 @@
     "babel-plugin-module-resolver": "^4.0.0",
     "del-cli": "^3.0.0",
     "electron": "^7.1.10",
+    "electron-builder": "^22.3.2",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-config-standard-react": "^9.2.0",
@@ -129,5 +131,86 @@
   "replacer": {
     "@['\"]lodash.debounce['\"]": "'lodash/debounce'",
     "from 'three'": "from '/packages/minimize-three/index.js'"
+  },
+  "build": {
+    "productName": "purelauncher",
+    "appId": "cn.apisium.purelauncher",
+    "directories": {
+      "output": "release"
+    },
+    "extraFiles": "unpacked",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Apisium",
+        "repo": "PureLauncher"
+      }
+    ],
+    "files": [
+      "dist/**/*",
+      "main.js"
+    ],
+    "protocols": [
+      {
+        "name": "pure-launcher",
+        "schemes": [
+          "pure-launcher"
+        ]
+      }
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "mac": {
+      "icon": "build/icons/icon.icns",
+      "target": [
+        {
+          "target": "dmg"
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icons/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh"
+    },
+    "linux": {
+      "icon": "build/icons",
+      "target": [
+        {
+          "target": "deb"
+        },
+        {
+          "target": "rpm"
+        },
+        {
+          "target": "AppImage"
+        }
+      ]
+    }
   }
 }
