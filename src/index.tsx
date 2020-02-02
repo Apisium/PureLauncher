@@ -1,4 +1,5 @@
 import './index.css'
+import './utils/hacks'
 import './utils/isDev'
 import React from 'react'
 import ReactDOM from 'react-dom'

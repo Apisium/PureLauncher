@@ -13,6 +13,8 @@ import analytics from '../../utils/analytics'
 import Loading from '../../components/Loading'
 import { join } from 'path'
 import { useStore } from 'reqwq'
+import { VERSIONS_PATH } from '../../constants'
+import { uninstallVersion } from '../../protocol/uninstaller'
 
 const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
   const ref = useRef<HTMLFormElement>()
@@ -43,7 +45,25 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
         }}
       >{$('SAVE')}</button>,
       <button key='cancel' className='btn btn-secondary' onClick={p.onClose}>{$('CANCEL')}</button>,
-      <button key='delete' className='btn btn-danger'>{$('Delete')}</button>
+      <button
+        key='delete'
+        className='btn btn-danger'
+        onClick={() => {
+          openConfirmDialog({
+            cancelButton: true,
+            title: $('Warning!'),
+            text: $('Are you sure to delete this version? This is a dangerous operation and cannot be recovered after deletion!')
+          }).then(ok => {
+            if (ok) {
+              p.onClose()
+              notice({ content: $('Deleting...') })
+              uninstallVersion(p.version).then(() => notice({ content: $('Success!') })).catch(e => {
+                console.error(e)
+                notice({ content: $('Failed!'), error: true })
+              })
+            }
+          })
+        }}>{$('Delete')}</button>
     ]}
   >
     <form className='pl-form' ref={ref}>
@@ -60,7 +80,6 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
   </Dialog>
 }
 
-const VERSIONS = join(profilesStore.root, 'versions')
 const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
   const ref = useRef<HTMLFormElement>()
   const [open, setOpen] = useState(false)
@@ -74,8 +93,8 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
       setLoading(true)
       const set = new Set()
       Object.values(profilesStore.profiles).forEach(it => set.add(it.lastVersionId))
-      const ret = (await fs.readdir(VERSIONS).catch(() => [] as string[])).filter(it => !set.has(it))
-      const exists = await Promise.all(ret.map(it => fs.pathExists(join(VERSIONS, it, it + '.json'))))
+      const ret = (await fs.readdir(VERSIONS_PATH).catch(() => [] as string[])).filter(it => !set.has(it))
+      const exists = await Promise.all(ret.map(it => fs.pathExists(join(VERSIONS_PATH, it, it + '.json'))))
       setVersions(ret.filter((_, i) => exists[i]))
       setLoading(false)
     })()

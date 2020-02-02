@@ -5,7 +5,7 @@ import ProfilesStore from '../../models/ProfilesStore'
 import * as Auth from '../../plugin/Authenticator'
 import { useStore } from 'reqwq'
 import { join } from 'path'
-import { skinsDir } from '../../utils/index'
+import { SKINS_PATH } from '../../constants'
 
 const steve = require('../../assets/images/steve.png')
 const Profiles: React.FC = () => {
@@ -19,7 +19,7 @@ const Profiles: React.FC = () => {
       </a>
     </div>
     <ul className='scrollable'>{pluginMaster.getAllProfiles().map(it => <li key={it.key}>
-      <Avatar src={[it.skinUrl, join(skinsDir, it.key + '.png'), steve]} />
+      <Avatar src={[it.skinUrl, join(SKINS_PATH, it.key + '.png'), steve]} />
       {it.displayName ? <>{it.username} <span>{it.displayName}</span></> : it.username}
       <div className='time'>{pluginMaster.logins[it.type][Auth.TITLE]()}</div>
       <div className='buttons'>

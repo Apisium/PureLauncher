@@ -13,8 +13,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
 import { join } from 'path'
-import { skinsDir } from './utils/index'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SKINS_PATH } from './constants'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
@@ -65,7 +65,7 @@ const SideBar: React.FC = () => {
           data-sound
           src={logged ? [
             u.skinUrl,
-            join(skinsDir, u.key + '.png')
+            join(SKINS_PATH, u.key + '.png')
           ] : null}
           onClick={() => logged ? setProfile(true) : pm.setLoginDialogVisible()}
         />

@@ -22,6 +22,8 @@ export interface ResourceVersion extends Resource<'Version'> {
   hashes?: string[]
   extends?: string | ResourceVersion
   updateUrl?: string
+  isolation?: boolean
+  useIdAsName?: boolean
 }
 export interface ResourceMod extends Resource<'Mod'> {
   version: string

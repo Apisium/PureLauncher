@@ -43,10 +43,17 @@
   "Failed to install resources!": "资源安装失败!",
   "Hash is different: {0} -> {1}": "哈希值不相同: {0} -> {1}",
   "Please select an icon you like:": "请选择一个你喜欢的图标:",
+  "Warning!": "警告!",
+  "Deleting...": "文件删除中...",
+  "Save failed!": "保存失败!",
+  "Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!":
+  "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
   "Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}":
     "警告! 当前正在安装扩展插件, 请确认插件来源是否安全! 若扩展插件为恶意插件可能会对您的计算机造成破坏!\n\n插件ID: {0}\n插件名字: {1}",
+  "Are you sure to delete this version? This is a dangerous operation and cannot be recovered after deletion!":
+    "是否确认删除该版本? 这是一个危险的操作且删除后无法恢复!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
@@ -132,7 +139,7 @@
   "Target Version": "目标版本",
 
   "$readmeEn": "",
-  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: AkkariinMeiko",
+  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: baleine2000 AkkariinMeiko Fleey",
   "Official Website": "官网",
   "Source Code": "源代码",
   "Tencent QQ Group": "QQ群",

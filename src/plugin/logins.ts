@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import Authenticator, { RegisterAuthenticator, Profile, SkinChangeable } from './Authenticator'
-import { genUUID, fetchJson, appDir } from '../utils/index'
-import { join } from 'path'
+import { genUUID, fetchJson } from '../utils/index'
+import { OFFLINE_ACCOUNTS_FILE } from '../constants'
 
 const BASE_URL = 'https://authserver.mojang.com/'
 const saveFile = async () => {
@@ -180,7 +180,7 @@ export const OFFLINE = 'Offline'
   }
 ])
 export class Offline extends Authenticator {
-  private db: { [key: string]: string } = fs.readJsonSync(join(appDir, 'offline.json'), { throws: false }) || { }
+  private db: { [key: string]: string } = fs.readJsonSync(OFFLINE_ACCOUNTS_FILE, { throws: false }) || { }
   public async login (options: { username: string }) {
     const id = genUUID('OfflinePlayer:' + options.username.toLowerCase())
     if (id in this.db) throw new Error($('Account already exists!'))
@@ -225,9 +225,9 @@ export class Offline extends Authenticator {
     }))
   }
   private save () {
-    return fs.writeJson(join(appDir, 'offline.json'), this.db).catch(e => {
+    return fs.writeJson(OFFLINE_ACCOUNTS_FILE, this.db).catch(e => {
       console.error(e)
-      throw new Error('保存失败!')
+      throw new Error($('Save failed!'))
     })
   }
   private check (key: string) {

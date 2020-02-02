@@ -5,12 +5,9 @@ import fs from 'fs-extra'
 import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, ExtensionsButton } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
-import { appDir } from '../utils/index'
 import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
-
-export const PLUGINS_ROOT = join(appDir, 'plugins')
-export const DELETES_FILE = join(PLUGINS_ROOT, 'deletes.json')
+import { DELETES_FILE, PLUGINS_ROOT } from '../constants'
 
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
@@ -100,7 +97,7 @@ export default class Master extends EventBus {
   private async loadPlugins () {
     await fs.ensureDir(PLUGINS_ROOT)
     if (await fs.pathExists(DELETES_FILE)) {
-      const deletes: string[] = await fs.readJson(DELETES_FILE)
+      const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
       await Promise.all(deletes.map(it => fs.unlink(join(PLUGINS_ROOT, it)).catch()))
       await fs.unlink(DELETES_FILE)
     }

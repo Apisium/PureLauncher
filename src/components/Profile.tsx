@@ -3,13 +3,14 @@ import React, { useRef, useEffect, useState } from 'react'
 import { join } from 'path'
 import { useStore } from 'reqwq'
 import { TITLE, SkinChangeable } from '../plugin/Authenticator'
-import { skinsDir, cacheSkin } from '../utils/index'
+import { cacheSkin } from '../utils/index'
 import { promises as fs } from 'fs'
 import { remote } from 'electron'
 import { SkinViewer, createOrbitControls, CompositeAnimation, WalkingAnimation,
   RotatingAnimation, isSlimSkin } from 'skinview3d'
 import Dialog from 'rc-dialog'
 import ProfilesStore from '../models/ProfilesStore'
+import { SKINS_PATH } from '../constants'
 
 const skinUrl = require('../assets/images/steve.png')
 
@@ -43,7 +44,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
     if (ref2.current) {
       if (skin) ref2.current.skinUrl = skin + '?' + pm.i
       else if (u) {
-        const path = join(skinsDir, u.key + '.png')
+        const path = join(SKINS_PATH, u.key + '.png')
         fs.stat(path)
           .then(it => {
             if (it.isFile()) ref2.current.skinUrl = path + '?' + pm.i

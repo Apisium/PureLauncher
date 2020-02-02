@@ -181,7 +181,6 @@ const create = () => {
     transparent: true,
     frame: false,
     show: false,
-    skipTaskbar: true,
     webPreferences: { webviewTag: true, nodeIntegration: true, nodeIntegrationInWorker: true }
   })
   window.loadFile('./dist/index.html')
@@ -197,6 +196,7 @@ const create = () => {
     title: 'Launching...',
     show: false,
     alwaysOnTop: true,
+    skipTaskbar: true,
     webPreferences: { webSecurity: false }
   })
   launchingWindow.webContents.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(

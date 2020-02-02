@@ -1,22 +1,12 @@
 import fs from 'fs-extra'
 import uuid from 'uuid-by-string'
+import * as resolveP from 'resolve-path'
 import { remote, ipcRenderer } from 'electron'
-import { join } from 'path'
-import { platform } from 'os'
+import { join, resolve, extname } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
-
-export { default as validPath, DEFAULT_EXT_FILTER } from './vaild-path'
-
-export function getMinecraftRoot () {
-  const current = platform()
-  return join(current === 'linux' ? remote.app.getPath('home') : remote.app.getPath('appData'),
-    current === 'darwin' ? 'minecraft' : '.minecraft')
-}
-export const appDir = remote.app.getPath('userData')
-export const skinsDir = join(appDir, 'skins')
-fs.ensureDirSync(skinsDir, 1)
+import { DEFAULT_EXT_FILTER, SKINS_PATH } from '../constants'
 
 export function getJavaVersion (path: string) {
   const parseVersion = (str: string) => {
@@ -42,7 +32,7 @@ export function getJavaVersion (path: string) {
 
 export const cacheSkin = (p: Profile) => fetch(p.skinUrl)
   .then(it => it.arrayBuffer())
-  .then(it => fs.writeFile(join(skinsDir, p.key + '.png'), Buffer.from(it)))
+  .then(it => fs.writeFile(join(SKINS_PATH, p.key + '.png'), Buffer.from(it)))
   .catch(console.error)
 
 export const fetchJson = (url: string, post = false, body?: any, other?: RequestInit) => fetch(url, {
@@ -100,3 +90,11 @@ export const sha1 = (file: string) => new Promise<string>((resolve, e) => {
 export const md5 = (d: BinaryLike) => createHash('md5').update(d).digest('hex')
 
 export const replace = (text: string, obj: object) => text.replace(/(?<!\\){(.+?)}/g, (_: string, t: string) => obj[t])
+
+export const validPath = (parent: string, path: string, filter = DEFAULT_EXT_FILTER) => {
+  /* eslint-disable no-control-regex */
+  if (/[<>:"|?*\x00-\x1F]/.test(name) || path.length > 255 || filter.includes(extname(name))) {
+    throw new Error(`The file name (${name}) is illegal.`)
+  }
+  return resolveP(resolve(parent), path) as string
+}

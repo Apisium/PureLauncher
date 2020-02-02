@@ -8,6 +8,8 @@ import fs from 'fs-extra'
 import ProfilesStore from './ProfilesStore'
 import Task from '@xmcl/task'
 import user from '../utils/analytics'
+import updateResources from '../protocol/check-update'
+import { GAME_ROOT, MODS_PATH, VERSIONS_PATH } from '../constants'
 
 export enum STATUS {
   READY, LAUNCHING, LAUNCHED, DOWNLOADING
@@ -53,8 +55,8 @@ export default class GameStore extends Store {
     version = v.version
 
     user.event('game', 'launch').catch(console.error)
-    const { extraJson, root, getCurrentProfile, selectedVersion, versionManifest,
-      ensureVersionManifest, checkModsDirectory, modsPath } = this.profilesStore
+    const { extraJson, getCurrentProfile, selectedVersion, versionManifest,
+      ensureVersionManifest, checkModsDirectory } = this.profilesStore
     const { javaArgs, javaPath } = extraJson
 
     const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
@@ -75,16 +77,16 @@ export default class GameStore extends Store {
       case 'latest-release':
         await ensureVersionManifest()
         versionId = versionManifest.latest.release
-        await this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
+        await this.ensureMinecraftVersion(GAME_ROOT, versionManifest.versions.find(v => v.id === versionId))
         break
       case 'latest-snapshot':
         await ensureVersionManifest()
         versionId = versionManifest.latest.snapshot
-        await this.ensureMinecraftVersion(root, versionManifest.versions.find(v => v.id === versionId))
+        await this.ensureMinecraftVersion(GAME_ROOT, versionManifest.versions.find(v => v.id === versionId))
         break
       default:
         versionId = version
-        await this.ensureLocalVersion(root, versionId)
+        await this.ensureLocalVersion(GAME_ROOT, versionId)
         break
     }
 
@@ -92,14 +94,20 @@ export default class GameStore extends Store {
     await pluginMaster.emitSync('launchPostResolvedVersion', v)
     versionId = v.version
 
-    await checkModsDirectory()
-    if (await fs.pathExists(modsPath)) {
-      const s = await fs.stat(modsPath)
-      if (s.isSymbolicLink()) await fs.unlink(modsPath)
+    await pluginMaster.emit('launchPreUpdate', v.version)
+    const ret = await updateResources(versionId)
+    await pluginMaster.emit('launchPostUpdate', v.version)
+
+    const versionRoot = join(VERSIONS_PATH, versionId)
+    if (!ret || !ret.isolation) {
+      await checkModsDirectory()
+      if (await fs.pathExists(MODS_PATH)) {
+        const s = await fs.stat(MODS_PATH)
+        if (s.isSymbolicLink()) await fs.unlink(MODS_PATH)
+      }
+      const dest = join(versionRoot, 'mods')
+      if (!await fs.pathExists(MODS_PATH) && await fs.pathExists(dest)) await fs.symlink(dest, MODS_PATH, 'dir')
     }
-    const versionRoot = join(root, 'versions', versionId)
-    const dest = join(versionRoot, 'mods')
-    if (!await fs.pathExists(modsPath) && await fs.pathExists(dest)) await fs.symlink(dest, modsPath, 'dir')
     await pluginMaster.emit('launchEnsureFiles', versionId, versionRoot)
 
     const option: Launcher.Option = {
@@ -110,7 +118,7 @@ export default class GameStore extends Store {
       gameProfile: { id: uuid, name: displayName || username },
       properties: {},
       userType: type || 'mojang' as any,
-      gamePath: root,
+      gamePath: GAME_ROOT,
       extraExecOption: {
         detached: true,
         env: {}

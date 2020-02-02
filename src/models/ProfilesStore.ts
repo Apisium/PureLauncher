@@ -1,21 +1,18 @@
 import { Store, NOT_PROXY } from 'reqwq'
-import { join, dirname } from 'path'
-import { getJavaVersion, getMinecraftRoot, appDir, cacheSkin, genUUID } from '../utils/index'
+import { join } from 'path'
+import { getJavaVersion, cacheSkin, genUUID } from '../utils/index'
 import { remote } from 'electron'
 import { platform } from 'os'
 import { Installer } from '@xmcl/installer'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
+import { LAUNCH_PROFILE_PATH, VERSION_MANIFEST_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH,
+  LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH } from '../constants'
 import fs from 'fs-extra'
 import merge from 'lodash/merge'
 import pAll from 'p-all'
 import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
-
-const LAUNCH_PROFILE = 'launcher_profiles.json'
-const VERSION_MANIFEST = 'version_manifest.json'
-const EXTRA_CONFIG = 'config.json'
-const icon = join(process.cwd(), 'unpacked/mc-logo.ico')
 
 const defaultLocale = (navigator.languages[0] || 'zh-cn').toLowerCase()
 
@@ -72,10 +69,6 @@ export default class ProfilesStore extends Store {
 
   public loginDialogVisible = false
 
-  public readonly launchProfilePath: string
-  public readonly extraConfigPath: string
-  public readonly modsPath: string
-
   public get selectedVersion () {
     let version: Version
     let time = -Infinity
@@ -99,19 +92,16 @@ export default class ProfilesStore extends Store {
       .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
   }
 
-  constructor (readonly root = getMinecraftRoot()) {
+  constructor () {
     super()
-    this.launchProfilePath = join(this.root, LAUNCH_PROFILE)
-    this.extraConfigPath = join(appDir, EXTRA_CONFIG)
-    this.modsPath = join(this.root, 'mods')
     try {
-      this.loadLaunchProfileJson(fs.readJsonSync(this.launchProfilePath))
+      this.loadLaunchProfileJson(fs.readJsonSync(LAUNCH_PROFILE_PATH))
     } catch (e) {
       this.onLoadLaunchProfileFailed(e)
     }
 
     try {
-      this.loadExtraConfigJson(fs.readJsonSync(this.extraConfigPath))
+      this.loadExtraConfigJson(fs.readJsonSync(EXTRA_CONFIG_PATH))
     } catch (e) {
       this.onLoadExtraConfigFailed(e)
     }
@@ -119,6 +109,7 @@ export default class ProfilesStore extends Store {
     this.loadVersionManifest().catch(console.error)
     this.cacheSkins().catch(console.error)
     this.checkModsDirectory().catch(console.error)
+    this.syncVersions().catch(console.error)
   }
 
   public setLoginDialogVisible (state = true) { this.loginDialogVisible = state }
@@ -165,17 +156,17 @@ export default class ProfilesStore extends Store {
   }
 
   public async loadAllConfigs () {
-    await fs.readJson(this.launchProfilePath).then(j => this.loadLaunchProfileJson(j),
+    await fs.readJson(LAUNCH_PROFILE_PATH).then(j => this.loadLaunchProfileJson(j),
       e => this.onLoadLaunchProfileFailed(e))
-    await fs.readJson(this.extraConfigPath).then(j => this.loadExtraConfigJson(j),
+    await fs.readJson(EXTRA_CONFIG_PATH).then(j => this.loadExtraConfigJson(j),
       e => this.onLoadExtraConfigFailed(e))
   }
 
   public saveLaunchProfileJsonSync () {
     // not throw but return a null
-    const json = fs.readJsonSync(this.launchProfilePath, { throws: false }) || {}
+    const json = fs.readJsonSync(LAUNCH_PROFILE_PATH, { throws: false }) || {}
 
-    fs.writeJsonSync(this.launchProfilePath, merge(json, {
+    fs.writeJsonSync(LAUNCH_PROFILE_PATH, merge(json, {
       settings: this.selectedUser,
       selectedUser: this.selectedUser,
       profiles: this.profiles,
@@ -200,7 +191,7 @@ export default class ProfilesStore extends Store {
 
   public async saveLaunchProfileJson () {
     // not throw but return a null
-    const json = await fs.readJson(this.launchProfilePath, { throws: false }) || {}
+    const json = await fs.readJson(LAUNCH_PROFILE_PATH, { throws: false }) || {}
 
     const data: Pick<this, 'settings' | 'selectedUser' | 'profiles' | 'authenticationDatabase' | 'clientToken'> = {
       settings: this.settings,
@@ -209,15 +200,15 @@ export default class ProfilesStore extends Store {
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
     }
-    await fs.writeJson(this.launchProfilePath, merge(json, data))
+    await fs.writeJson(LAUNCH_PROFILE_PATH, merge(json, data))
   }
 
   public async saveExtraConfigJson () {
-    await fs.writeJson(this.extraConfigPath, this.extraJson)
+    await fs.writeJson(EXTRA_CONFIG_PATH, this.extraJson)
   }
 
   public saveExtraConfigJsonSync () {
-    fs.writeJsonSync(this.extraConfigPath, this.extraJson)
+    fs.writeJsonSync(EXTRA_CONFIG_PATH, this.extraJson)
   }
 
   public async setSelectedProfile (key: string, type?: Auth.default | string) {
@@ -234,8 +225,12 @@ export default class ProfilesStore extends Store {
     this.saveExtraConfigJsonSync()
   }
 
-  public async addProfile (version: string, name = '', icon = 'Furnace') {
-    const path = join(this.root, 'versions', version, version + '.json')
+  public async addProfile (version: string, name = '', icon = 'Furnace', avoidExists = false, save = true) {
+    if (avoidExists) {
+      const ver = Object.entries(this.profiles).find(([_, v]) => v.lastVersionId === version)
+      if (ver) return ver[0]
+    }
+    const path = join(VERSIONS_PATH, version, version + '.json')
     if (!await fs.pathExists(path)) throw new Error('Json is not exists!')
     const key = genUUID()
     const created = new Date().toISOString()
@@ -247,7 +242,7 @@ export default class ProfilesStore extends Store {
       lastVersionId: version,
       type: 'custom'
     }
-    await this.saveLaunchProfileJson()
+    if (save) await this.saveLaunchProfileJson()
     return key
   }
 
@@ -310,17 +305,16 @@ export default class ProfilesStore extends Store {
   public async checkModsDirectory () {
     const v = this.selectedVersion
     if (!v) return
-    const dir = this.modsPath
     try {
-      const s = await fs.stat(dir)
+      const s = await fs.stat(MODS_PATH)
       if (!s.isDirectory() || s.isSymbolicLink()) return
     } catch (e) { return }
-    const dest = join(this.root, 'versions', v.lastVersionId, 'mods')
+    const dest = join(VERSIONS_PATH, v.lastVersionId, 'mods')
     if (await fs.pathExists(dest)) {
-      await fs.copy(dir, dest, { overwrite: false })
-      await fs.remove(dir)
-    } else await fs.rename(dir, dest)
-    await fs.symlink(dir, dest, 'dir')
+      await fs.copy(MODS_PATH, dest, { overwrite: false })
+      await fs.remove(MODS_PATH)
+    } else await fs.rename(MODS_PATH, dest)
+    await fs.symlink(MODS_PATH, dest, 'dir')
     openConfirmDialog({
       text: $('Mods folder detected, which has been moved to the game version {0}\'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.', v.lastVersionId)
     })
@@ -343,7 +337,7 @@ export default class ProfilesStore extends Store {
             type: 'tasks',
             name: $('Recent play'),
             items: versions.map(([id, v]) => ({
-              icon,
+              icon: MC_LOGO,
               type: 'task',
               iconIndex: 0,
               program: process.execPath,
@@ -388,12 +382,12 @@ export default class ProfilesStore extends Store {
   }
 
   private async saveVersionManifest () {
-    await fs.writeFile(join(this.root, VERSION_MANIFEST), JSON.stringify(this.versionManifest))
+    await fs.writeFile(VERSION_MANIFEST_PATH, JSON.stringify(this.versionManifest))
   }
 
   private async loadVersionManifest () {
     try {
-      this.versionManifest = await fs.readFile(join(this.root, VERSION_MANIFEST)).then(b => JSON.parse(b.toString()))
+      this.versionManifest = await fs.readFile(VERSION_MANIFEST_PATH).then(b => JSON.parse(b.toString()))
     } catch {
       this.refreshVersionManifest()
     }
@@ -418,10 +412,10 @@ export default class ProfilesStore extends Store {
     if (!e.message.includes('no such file or directory')) {
       console.error('Fail to load launcher profile', e)
     }
-    if (fs.pathExistsSync(this.launchProfilePath)) {
-      fs.renameSync(this.launchProfilePath, `${this.launchProfilePath}.${Date.now()}.bak`)
+    if (fs.pathExistsSync(LAUNCH_PROFILE_PATH)) {
+      fs.renameSync(LAUNCH_PROFILE_PATH, `${LAUNCH_PROFILE_FILE_NAME}.${Date.now()}.bak`)
     }
-    fs.mkdirsSync(dirname(this.launchProfilePath))
+    fs.ensureDirSync(GAME_ROOT)
     this.setDefaultVersions()
     this.saveLaunchProfileJsonSync()
   }
@@ -449,10 +443,18 @@ export default class ProfilesStore extends Store {
     if (!e.message.includes('no such file or directory')) {
       console.error('Fail to load extra launcher profile', e)
     }
-    if (await fs.pathExists(this.extraConfigPath)) {
-      await fs.rename(this.extraConfigPath, `${this.extraConfigPath}.${Date.now()}.bak`)
+    if (await fs.pathExists(EXTRA_CONFIG_PATH)) {
+      await fs.rename(EXTRA_CONFIG_PATH, `${EXTRA_CONFIG_FILE_NAME}.${Date.now()}.bak`)
     }
-    await fs.mkdirs(dirname(this.extraConfigPath))
     await this.saveExtraConfigJson()
+  }
+
+  private async syncVersions () {
+    const versions: any = { }
+    Object.values(this.profiles).forEach(it => (versions[it.lastVersionId] = null))
+    await Promise.all(Object.values(await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || {})
+      .filter((it: any) => typeof versions[it.resolvedId] === 'undefined')
+      .map((it: any) => this.addProfile(it.resolvedId, it.title, null, false, false).catch(console.error)))
+    await this.saveLaunchProfileJson()
   }
 }
