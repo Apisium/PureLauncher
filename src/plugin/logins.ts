@@ -4,14 +4,10 @@ import { genUUID, fetchJson } from '../utils/index'
 import { OFFLINE_ACCOUNTS_FILE } from '../constants'
 
 const BASE_URL = 'https://authserver.mojang.com/'
-const saveFile = async () => {
-  try {
-    await profilesStore.saveLaunchProfileJson()
-  } catch (e) {
-    console.error(e)
-    throw new Error($('Fail to save files!'))
-  }
-}
+const saveFile = () => profilesStore.saveLaunchProfileJson().catch(e => {
+  console.error(e)
+  throw new Error($('Fail to save files!'))
+})
 
 export const YGGDRASIL = 'yggdrasil'
 @RegisterAuthenticator(YGGDRASIL, () => $('Online Login'), require('../assets/images/steve-head.png'), [
@@ -63,6 +59,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     return data.user.id as string
   }
   public async logout (key: string) {
+    console.log(key)
     const m = profilesStore
     const p = m.authenticationDatabase[key]
     if (!p) return
@@ -71,11 +68,11 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
         console.error(e)
         throw new Error($('Network connection failed!'))
       })
-    if (!d && d.error) {
+    if (d && d.error) {
       console.error(d)
       throw new Error($('Network connection failed!'))
     }
-    delete m.authenticationDatabase[key]
+    console.log(delete m.authenticationDatabase[key], m.authenticationDatabase[key])
     await saveFile()
   }
   public async refresh (key: string) {

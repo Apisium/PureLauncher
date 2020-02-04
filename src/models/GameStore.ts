@@ -3,13 +3,13 @@ import { Launcher } from '@xmcl/launch'
 import { Installer } from '@xmcl/installer'
 import { Version } from '@xmcl/version'
 import { download } from '../utils/index'
-import { join } from 'path'
-import fs from 'fs-extra'
+import { GAME_ROOT } from '../constants'
+import { version as launcherBrand } from '../../package.json'
+import { remote, ipcRenderer } from 'electron'
 import ProfilesStore from './ProfilesStore'
 import Task from '@xmcl/task'
 import user from '../utils/analytics'
 import updateResources from '../protocol/check-update'
-import { GAME_ROOT, MODS_PATH, VERSIONS_PATH } from '../constants'
 
 export enum STATUS {
   READY, LAUNCHING, LAUNCHED, DOWNLOADING
@@ -34,6 +34,8 @@ export default class GameStore extends Store {
           console.error(error)
           notice({ content: $('Fail to launch!'), error: true })
           this.status = STATUS.READY
+          remote.getCurrentWindow().unmaximize()
+          ipcRenderer.send('close-launching-dialog')
           break
         case 'launched':
           console.log('launched!')
@@ -44,6 +46,8 @@ export default class GameStore extends Store {
             // this.error = ({ code: m.data.code, signal: m.data.signal })
           }
           this.status = STATUS.READY
+          remote.getCurrentWindow().unmaximize()
+          ipcRenderer.send('close-launching-dialog')
           console.log('exit')
           break
       }
@@ -56,10 +60,14 @@ export default class GameStore extends Store {
 
     user.event('game', 'launch').catch(console.error)
     const { extraJson, getCurrentProfile, selectedVersion, versionManifest,
-      ensureVersionManifest, checkModsDirectory } = this.profilesStore
+      ensureVersionManifest, checkModsDirectoryOfVersion } = this.profilesStore
     const { javaArgs, javaPath } = extraJson
 
-    const { accessToken = '', uuid, username, displayName, type } = getCurrentProfile()
+    let profile = getCurrentProfile()
+    if (!profile) throw new Error('No selected profile!')
+    const authenticator = pluginMaster.logins[profile.type]
+    if (!await authenticator.validate(profile.key)) await authenticator.refresh(profile.key)
+    profile = getCurrentProfile()
 
     if (!version) {
       version = selectedVersion.lastVersionId
@@ -98,34 +106,29 @@ export default class GameStore extends Store {
     const ret = await updateResources(versionId)
     await pluginMaster.emit('launchPostUpdate', v.version)
 
-    const versionRoot = join(VERSIONS_PATH, versionId)
-    if (!ret || !ret.isolation) {
-      await checkModsDirectory()
-      if (await fs.pathExists(MODS_PATH)) {
-        const s = await fs.stat(MODS_PATH)
-        if (s.isSymbolicLink()) await fs.unlink(MODS_PATH)
-      }
-      const dest = join(versionRoot, 'mods')
-      if (!await fs.pathExists(MODS_PATH) && await fs.pathExists(dest)) await fs.symlink(dest, MODS_PATH, 'dir')
-    }
-    await pluginMaster.emit('launchEnsureFiles', versionId, versionRoot)
+    await checkModsDirectoryOfVersion(versionId, ret)
+    await pluginMaster.emit('launchEnsureFiles', versionId)
 
     const option: Launcher.Option = {
+      launcherBrand,
       version: versionId,
       javaPath: javaPath || 'java',
+      launcherName: 'pure-launcher',
       extraJVMArgs: javaArgs.split(' '),
-      accessToken: accessToken || '',
-      gameProfile: { id: uuid, name: displayName || username },
+      accessToken: profile.accessToken || '',
+      gameProfile: { id: profile.uuid, name: profile.username },
       properties: {},
-      userType: type || 'mojang' as any,
+      userType: 'mojang' as any,
       gamePath: GAME_ROOT,
       extraExecOption: {
         detached: true,
         env: {}
       }
     }
-    await pluginMaster.emitSync('preLaunch', versionId, versionRoot, option)
+    await pluginMaster.emitSync('preLaunch', versionId, option)
     this.status = STATUS.LAUNCHING
+    remote.getCurrentWindow().minimize()
+    setTimeout(() => ipcRenderer.send('open-launching-dialog'), 3000)
     this.worker.postMessage(option)
 
     await new Promise((res, rej) => {
@@ -145,7 +148,7 @@ export default class GameStore extends Store {
       this.worker.addEventListener('message', onceLaunch)
     })
     this.currentVersionId = versionId
-    await pluginMaster.emit('postLaunch', versionId, versionRoot, option)
+    await pluginMaster.emit('postLaunch', versionId, option)
   }
   private async ensureMinecraftVersion (minecraft: string, version: Installer.VersionMeta) {
     const task = Installer.installTask('client', version, minecraft, {

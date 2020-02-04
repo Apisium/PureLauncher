@@ -6,8 +6,8 @@ import { TITLE, SkinChangeable } from '../plugin/Authenticator'
 import { cacheSkin } from '../utils/index'
 import { promises as fs } from 'fs'
 import { remote } from 'electron'
-import { SkinViewer, createOrbitControls, CompositeAnimation, WalkingAnimation,
-  RotatingAnimation, isSlimSkin } from 'skinview3d'
+import { isSlimSkin, loadSkinToCanvas } from 'skinview-utils'
+import { SkinViewer, createOrbitControls, WalkingAnimation, RotatingAnimation } from 'skinview3d'
 import Dialog from 'rc-dialog'
 import ProfilesStore from '../models/ProfilesStore'
 import { SKINS_PATH } from '../constants'
@@ -30,10 +30,8 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
       skinUrl
     })
     createOrbitControls(skinViewer).enableRotate = true
-    const animation = new CompositeAnimation()
-    animation.add(WalkingAnimation)
-    animation.add(RotatingAnimation)
-    skinViewer.animation = animation as any
+    skinViewer.animations.add(WalkingAnimation)
+    skinViewer.animations.add(RotatingAnimation)
     ref2.current = skinViewer
     return () => skinViewer.dispose()
   }, [ref.current])
@@ -90,8 +88,10 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
         }
         const img = new Image()
         img.onload = () => {
+          const canvas = new OffscreenCanvas(0, 0)
+          loadSkinToCanvas(canvas, img)
           try {
-            ref3.current = isSlimSkin(img)
+            ref3.current = isSlimSkin(canvas)
             setSkin(arg.filePaths[0])
           } catch (e) {
             console.error(e)

@@ -158,6 +158,7 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 .rc-dialog-content {
   border-radius: 3px;

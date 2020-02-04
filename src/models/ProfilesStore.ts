@@ -9,10 +9,10 @@ import { langs, applyLocate } from '../i18n'
 import { LAUNCH_PROFILE_PATH, VERSION_MANIFEST_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH,
   LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH } from '../constants'
 import fs from 'fs-extra'
-import merge from 'lodash/merge'
 import pAll from 'p-all'
 import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
+import { ResourceVersion } from '../protocol/types'
 
 const defaultLocale = (navigator.languages[0] || 'zh-cn').toLowerCase()
 
@@ -55,7 +55,7 @@ export default class ProfilesStore extends Store {
     selectedUser: '',
     loginType: '',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
-      '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M'
+      '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow'
   }
   public versionManifest: Installer.VersionMetaList & { [NOT_PROXY]: true } = {
     [NOT_PROXY]: true,
@@ -118,7 +118,7 @@ export default class ProfilesStore extends Store {
     if (!this.extraJson.loginType) return null
     try {
       if (this.extraJson.loginType === YGGDRASIL) {
-        return this.selectedUser.account ? null : pluginMaster.logins[YGGDRASIL].getData(this.selectedUser.account)
+        return this.selectedUser.account ? pluginMaster.logins[YGGDRASIL].getData(this.selectedUser.account) : null
       } else return pluginMaster.getCurrentLogin().getData(this.extraJson.selectedUser)
     } catch (e) {
       this.extraJson.loginType = ''
@@ -166,13 +166,14 @@ export default class ProfilesStore extends Store {
     // not throw but return a null
     const json = fs.readJsonSync(LAUNCH_PROFILE_PATH, { throws: false }) || {}
 
-    fs.writeJsonSync(LAUNCH_PROFILE_PATH, merge(json, {
-      settings: this.selectedUser,
+    fs.writeJsonSync(LAUNCH_PROFILE_PATH, {
+      ...json,
+      settings: { ...json.settings, ...this.settings },
       selectedUser: this.selectedUser,
       profiles: this.profiles,
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
-    }))
+    })
   }
 
   public async resolveVersion (key: string) {
@@ -194,13 +195,14 @@ export default class ProfilesStore extends Store {
     const json = await fs.readJson(LAUNCH_PROFILE_PATH, { throws: false }) || {}
 
     const data: Pick<this, 'settings' | 'selectedUser' | 'profiles' | 'authenticationDatabase' | 'clientToken'> = {
-      settings: this.settings,
+      ...json,
+      settings: { ...json.settings, ...this.settings },
       selectedUser: this.selectedUser,
       profiles: this.profiles,
       authenticationDatabase: this.authenticationDatabase,
       clientToken: this.clientToken
     }
-    await fs.writeJson(LAUNCH_PROFILE_PATH, merge(json, data))
+    await fs.writeJson(LAUNCH_PROFILE_PATH, data)
   }
 
   public async saveExtraConfigJson () {
@@ -306,19 +308,33 @@ export default class ProfilesStore extends Store {
     const v = this.selectedVersion
     if (!v) return
     try {
-      const s = await fs.stat(MODS_PATH)
+      const s = await fs.lstat(MODS_PATH)
       if (!s.isDirectory() || s.isSymbolicLink()) return
     } catch (e) { return }
-    const dest = join(VERSIONS_PATH, v.lastVersionId, 'mods')
+    const dest = join(VERSIONS_PATH, await this.resolveVersion(v.key), 'mods')
     if (await fs.pathExists(dest)) {
       await fs.copy(MODS_PATH, dest, { overwrite: false })
       await fs.remove(MODS_PATH)
     } else await fs.rename(MODS_PATH, dest)
-    await fs.symlink(MODS_PATH, dest, 'dir')
+    await fs.symlink(dest, MODS_PATH, 'junction')
     openConfirmDialog({
       text: $('Mods folder detected, which has been moved to the game version {0}\'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.', v.lastVersionId)
     })
     return v
+  }
+
+  public async checkModsDirectoryOfVersion (id: string, info?: ResourceVersion) {
+    if (!info) info = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[id]
+    const versionRoot = join(VERSIONS_PATH, id)
+    if (!info || !info.isolation) {
+      await this.checkModsDirectory()
+      if (await fs.pathExists(MODS_PATH)) {
+        const s = await fs.lstat(MODS_PATH)
+        if (s.isSymbolicLink()) await fs.unlink(MODS_PATH)
+      }
+      const dest = join(versionRoot, 'mods')
+      if (!await fs.pathExists(MODS_PATH) && await fs.pathExists(dest)) await fs.symlink(dest, MODS_PATH, 'junction')
+    }
   }
 
   public setTasks () {
@@ -394,11 +410,11 @@ export default class ProfilesStore extends Store {
   }
 
   private loadLaunchProfileJson (json: any) {
-    this.selectedUser = merge(this.selectedUser, json.selectedUser)
-    this.authenticationDatabase = merge(this.authenticationDatabase, json.authenticationDatabase)
+    this.selectedUser = json.selectedUser
+    this.authenticationDatabase = json.authenticationDatabase
     this.clientToken = json.clientToken
-    this.settings = merge(this.settings, json.settings)
-    this.profiles = merge(this.profiles, json.profiles)
+    this.settings = json.settings
+    this.profiles = json.profiles
     if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()
     applyLocate(this.settings.locale || defaultLocale, true)
     this.setTasks()
@@ -406,6 +422,7 @@ export default class ProfilesStore extends Store {
 
   private loadExtraConfigJson (extra: this['extraJson']) {
     this.extraJson = extra
+    if (!extra.loginType && this.selectedUser.account && this.selectedUser.profile) extra.loginType = YGGDRASIL
   }
 
   private onLoadLaunchProfileFailed (e: Error) {

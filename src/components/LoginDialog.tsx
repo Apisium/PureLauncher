@@ -23,17 +23,21 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
     const len = getObjectLength(pluginMaster.logins)
     width = len > 3 ? 570 / len - 30 : 130
   }
+  const close = () => {
+    props.onClose()
+    setType('')
+  }
   return <Dialog
     animation='zoom'
     maskAnimation='fade'
     className='login-dialog'
     visible={props.open}
-    onClose={() => !loading && props.onClose()}
+    onClose={() => !loading && close()}
   >
     {type === ''
       ? <>
         <p className='title'>{$('Choose your account login mode. If you don\'t have the online version, please choose the "Offline Login" on the right')}</p>
-        <Link to='/manager/accounts' className='title title2' onClick={props.onClose}>
+        <Link to='/manager/accounts' className='title title2' onClick={close}>
           {$('Have already logged in? Click here!')}
         </Link>
         <div className='heads'>
@@ -67,7 +71,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
             .then(key => profilesStore.setSelectedProfile(key, currentLogin))
             .then(() => {
               notice({ content: $('Login succeeded!') })
-              props.onClose()
+              close()
             })
             .catch(err => notice({ content: err.message, error: true })) // TODO:
             .finally(() => setLoading(false))

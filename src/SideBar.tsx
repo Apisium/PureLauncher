@@ -1,14 +1,14 @@
 import './side-bar.less'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
+import GameStore, { STATUS } from './models/GameStore'
 import ToolTip from 'rc-tooltip'
 import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'
 import LoginDialog from './components/LoginDialog'
 import VersionSwitch from './components/VersionSwitch'
 import Avatar from './components/Avatar'
-import GameStore, { STATUS } from './models/GameStore'
 import ProfilesStore from './models/ProfilesStore'
-import { Textfit } from 'react-textfit'
+import fitText from './utils/fit-text'
 import { Link, useLocation } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
@@ -38,22 +38,26 @@ const SideBar: React.FC = () => {
   const versionName = `${ver.type === 'latest-release' ? lastRelease
     : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.lastVersionId})`
   let btnText: string
-  switch (gs.status) {
-    case STATUS.READY:
-      btnText = $('Play')
-      break
-    case STATUS.LAUNCHING:
-      btnText = $('Launching...')
-      break
-    case STATUS.LAUNCHED:
-      btnText = $('Launched')
-      break
-    case STATUS.DOWNLOADING:
-      btnText = $('Downloading...')
-      break
-    default: btnText = $('Unknown')
-  }
-  const name = logged ? u.username : $('NOT LOGGED-IN')
+  let name: string
+  if (logged) {
+    name = u.username
+    switch (gs.status) {
+      case STATUS.READY:
+        btnText = $('Play')
+        break
+      case STATUS.LAUNCHING:
+        btnText = $('Launching...')
+        break
+      case STATUS.LAUNCHED:
+        btnText = $('Launched')
+        break
+      case STATUS.DOWNLOADING:
+        btnText = $('Downloading...')
+        break
+      default: btnText = $('Unknown')
+    }
+  } else btnText = name = $('NOT LOGGED-IN')
+  const fontSize = useMemo(() => fitText(btnText.toUpperCase(), 104, 20), [btnText]) + 'px'
   return (
     <div className='side-bar'>
       <ToolTip
@@ -97,8 +101,13 @@ const SideBar: React.FC = () => {
         </li>)}
         </ul>
       </Dropdown>
-      <button className='btn btn-primary launch' onClick={() => gs.launch()} disabled={gs.status !== STATUS.READY}>
-        <i className='iconfont icon-icons-minecraft_pic' /><Textfit mode='single'>{btnText}</Textfit>
+      <button
+        className='btn btn-primary launch'
+        onClick={() => logged && gs.launch()}
+        disabled={!logged || gs.status !== STATUS.READY}
+      >
+        <i className='iconfont icon-icons-minecraft_pic' />
+        <span style={{ fontSize }}>{btnText}</span>
       </button>
       <a className='version' role='button' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span>

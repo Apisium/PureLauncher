@@ -10,22 +10,26 @@ let launchingWindow: BrowserWindow = null
 const webp = join(app.getPath('userData'), 'launching.webp')
 ;(process.env as any)['D' + 'EV'] = process.env.NODE_ENV !== 'production'
 
-const showLaunchingDialog = () => {
-  if (!launchingWindow) return
+let launchingDialogOpened = false
+const closeLaunchingDialog = () => {
+  if (!launchingWindow || !launchingDialogOpened) return
+  launchingDialogOpened = false
+  launchingWindow.webContents.executeJavaScript('window.img.style.opacity = "0"')
+  setTimeout(() => {
+    launchingWindow.hide()
+    launchingWindow.webContents.executeJavaScript('window.img.src = ""')
+  }, 3000)
+}
+const openLaunchingDialog = () => {
+  if (!launchingWindow || launchingDialogOpened) return
+  launchingDialogOpened = true
   launchingWindow.show()
   launchingWindow.webContents.executeJavaScript(`
     if (!window.img) window.img = document.getElementsByTagName("img")[0]
     window.img.src = '${webp.replace(/\\/g, '\\\\')}'
     window.img.style.opacity = '1'
   `)
-
-  setTimeout(() => {
-    launchingWindow.webContents.executeJavaScript('window.img.style.opacity = "0"')
-    setTimeout(() => {
-      launchingWindow.hide()
-      launchingWindow.webContents.executeJavaScript('window.img.src = ""')
-    }, 1000)
-  }, 28000)
+  setTimeout(closeLaunchingDialog, 26000)
 }
 
 interface Item { file: string, url: string, instance?: any, length?: number }
@@ -68,7 +72,8 @@ const create = () => {
   const downloadItems: Record<string, DownloadItem> = { }
   let downloadViewer
   ipcMain
-    .on('show-launching-dialog', showLaunchingDialog)
+    .on('open-launching-dialog', openLaunchingDialog)
+    .on('close-launching-dialog', closeLaunchingDialog)
     .on('download-window-loaded', (e, id) => {
       downloadViewer = webContents.fromId(id).once('did-navigate', () => (downloadViewer = null))
       if (process.env.DOWNLOAD_DEV) downloadViewer.openDevTools()
@@ -201,7 +206,7 @@ const create = () => {
   })
   launchingWindow.webContents.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(
     '<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="preload" href="' + webp +
-    '"></head><body style="margin:0;overflow:hidden"><img style="pointer-events:none;transition:1s;filter:drop-shadow(0 4px 8px #0000008a);opacity:0"></body></html>'))
+    '"></head><body style="margin:0;overflow:hidden"><img style="pointer-events:none;transition:3s;filter:drop-shadow(0 4px 8px #0000008a);opacity:0"></body></html>'))
 
   const timer = setInterval(() => {
     if (items.size) {
