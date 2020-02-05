@@ -11,7 +11,9 @@ export default (
   pluginsNotInstalled = false
 ) => {
   const p = (async () => {
+    const f = r === 'http://acode.apisium.cn/libraries/version.json'
     if (typeof r === 'string') r = await getJson(r) as T.Resource
+    if (f) r.id = 'ACode'
     if (!checker(r)) return
     obj.request = request
     obj.throws = throws
@@ -19,8 +21,9 @@ export default (
     if (request) {
       const req = await global.__requestInstallResources(r, obj)
       if (pluginsNotInstalled) return req
-      if (req) user.event('resource', 'install').catch(console.error)
-      else return
+      if (!req) return
+      user.event('resource', 'install').catch(console.error)
+      notice({ content: $('Installing resources...') })
     }
     await pluginMaster.emitSync('protocolInstallResource', r, obj)
   })()

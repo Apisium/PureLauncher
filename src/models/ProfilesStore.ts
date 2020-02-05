@@ -7,7 +7,7 @@ import { Installer } from '@xmcl/installer'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import { LAUNCH_PROFILE_PATH, VERSION_MANIFEST_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH,
-  LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH } from '../constants'
+  LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH } from '../constants'
 import fs from 'fs-extra'
 import pAll from 'p-all'
 import moment from 'moment'
@@ -294,8 +294,9 @@ export default class ProfilesStore extends Store {
   }
 
   public async toggleAnimation () {
-    console.log(this.extraJson)
     this.extraJson.animation = !this.extraJson.animation
+    if (this.extraJson.animation) startAnimation()
+    else stopAnimation()
     await this.saveExtraConfigJson()
   }
 
@@ -409,7 +410,7 @@ export default class ProfilesStore extends Store {
     }
   }
 
-  private loadLaunchProfileJson (json: any) {
+  private loadLaunchProfileJson (json: this) {
     this.selectedUser = json.selectedUser
     this.authenticationDatabase = json.authenticationDatabase
     this.clientToken = json.clientToken
@@ -423,16 +424,17 @@ export default class ProfilesStore extends Store {
   private loadExtraConfigJson (extra: this['extraJson']) {
     this.extraJson = extra
     if (!extra.loginType && this.selectedUser.account && this.selectedUser.profile) extra.loginType = YGGDRASIL
+    if (extra.animation) startAnimation()
   }
 
   private onLoadLaunchProfileFailed (e: Error) {
     if (!e.message.includes('no such file or directory')) {
       console.error('Fail to load launcher profile', e)
     }
-    if (fs.pathExistsSync(LAUNCH_PROFILE_PATH)) {
-      fs.renameSync(LAUNCH_PROFILE_PATH, `${LAUNCH_PROFILE_FILE_NAME}.${Date.now()}.bak`)
-    }
     fs.ensureDirSync(GAME_ROOT)
+    if (fs.pathExistsSync(LAUNCH_PROFILE_PATH)) {
+      fs.renameSync(LAUNCH_PROFILE_PATH, join(GAME_ROOT, `${LAUNCH_PROFILE_FILE_NAME}.${Date.now()}.bak`))
+    }
     this.setDefaultVersions()
     this.saveLaunchProfileJsonSync()
   }
@@ -461,17 +463,24 @@ export default class ProfilesStore extends Store {
       console.error('Fail to load extra launcher profile', e)
     }
     if (await fs.pathExists(EXTRA_CONFIG_PATH)) {
-      await fs.rename(EXTRA_CONFIG_PATH, `${EXTRA_CONFIG_FILE_NAME}.${Date.now()}.bak`)
+      await fs.rename(EXTRA_CONFIG_PATH, join(APP_PATH, `${EXTRA_CONFIG_FILE_NAME}.${Date.now()}.bak`))
     }
     await this.saveExtraConfigJson()
   }
 
   private async syncVersions () {
     const versions: any = { }
-    Object.values(this.profiles).forEach(it => (versions[it.lastVersionId] = null))
-    await Promise.all(Object.values(await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || {})
+    let modified = false
+    const json = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || {}
+    Object.values(this.profiles).forEach(it => it.type !== 'latest-release' && it.type !== 'latest-snapshot' &&
+      (versions[it.lastVersionId] = null))
+    await Promise.all(Object.values(json)
       .filter((it: any) => typeof versions[it.resolvedId] === 'undefined')
-      .map((it: any) => this.addProfile(it.resolvedId, it.title, null, false, false).catch(console.error)))
+      .map((it: any) => this.addProfile(it.resolvedId, it.title, null, false, false).catch(e => {
+        console.error(e)
+        if (e && e.message === 'Json is not exists!' && delete json[it.id]) modified = true
+      })))
+    if (modified) await fs.writeJson(RESOURCES_VERSIONS_INDEX_PATH, versions)
     await this.saveLaunchProfileJson()
   }
 }

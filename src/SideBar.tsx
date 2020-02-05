@@ -45,19 +45,22 @@ const SideBar: React.FC = () => {
       case STATUS.READY:
         btnText = $('Play')
         break
+      case STATUS.PREPARING:
+        btnText = $('Preparing...')
+        break
+      case STATUS.DOWNLOADING:
+        btnText = $('Downloading...')
+        break
       case STATUS.LAUNCHING:
         btnText = $('Launching...')
         break
       case STATUS.LAUNCHED:
         btnText = $('Launched')
         break
-      case STATUS.DOWNLOADING:
-        btnText = $('Downloading...')
-        break
       default: btnText = $('Unknown')
     }
   } else btnText = name = $('NOT LOGGED-IN')
-  const fontSize = useMemo(() => fitText(btnText.toUpperCase(), 104, 20), [btnText]) + 'px'
+  const fontSize = useMemo(() => fitText(btnText.toUpperCase(), 98, 20), [btnText]) + 'px'
   return (
     <div className='side-bar'>
       <ToolTip

@@ -94,6 +94,26 @@
         blocks: [fn(0, colors0, blocks0), fn(2, colors1, blocks1), fn(16, colors2, blocks2)]
       }
       document.addEventListener('DOMContentLoaded', () => (document.getElementsByTagName('html')[0].style.opacity = '1'))
+
+      let timer1
+      window.animationStopped = true
+      window.startAnimation = () => {
+        if (!animationStopped) return
+        animationStopped = false
+        timer1 = setInterval(() => {
+          topBar.blocks[0][Math.random() * topBar.blocks[0].length | 0]
+            .style.backgroundColor = topBar.colors[0][Math.random() * topBar.colors[0].length | 0]
+          topBar.blocks[1][Math.random() * topBar.blocks[1].length | 0]
+            .style.backgroundColor = topBar.colors[1][Math.random() * topBar.colors[1].length | 0]
+          topBar.blocks[2][Math.random() * topBar.blocks[2].length | 0]
+            .style.backgroundColor = topBar.colors[2][Math.random() * topBar.colors[2].length | 0]
+        }, 100)
+      }
+      window.stopAnimation = () => {
+        if (animationStopped) return
+        animationStopped = true
+        clearInterval(timer1)
+      }
     })()
   </script>
   <script src="src/index.tsx"></script>

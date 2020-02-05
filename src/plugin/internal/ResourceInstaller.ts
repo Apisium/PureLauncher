@@ -2,7 +2,9 @@ import { plugin, Plugin, event } from '../Plugin'
 import { version } from '../../../package.json'
 import { download, makeTempDir, getJson, DownloadItem, sha1, genId, md5, validPath, replace } from '../../utils/index'
 import { join, dirname, resolve } from 'path'
-import { gte, valid, major } from 'semver'
+import valid from 'semver/functions/valid'
+import gte from 'semver/functions/gte'
+import major from 'semver/functions/major'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, PLUGINS_ROOT,
   RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, RESOURCES_MODS_INDEX_FILE_NAME } from '../../constants'
 import pAll from 'p-all'
@@ -14,7 +16,7 @@ import * as T from '../../protocol/types'
 export const allowExtensions = ['.js', '.mjs', '.asar']
 
 const checkHash = (file: string, hash: string) => sha1(file).then(it => {
-  if (hash !== it) return it
+  if (hash.trim() === it) return it
   else throw new Error($('Hash is different: {0} -> {1}', it, hash))
 })
 const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: string[] }) =>
@@ -73,12 +75,21 @@ export default class ResourceInstaller extends Plugin {
     const id = (r as any).resolvedId = r.useIdAsName ? r.id : `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
     const dir = resolve(VERSIONS_PATH, id)
     const old: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[r.id]
-    if (old) {
-      if (gte(old.version, r.version)) return
-      o.oldResourceVersion = old
-      if (typeof old.files === 'object') {
-        await Promise.all(Object.keys(old.files)
-          .map(name => fs.unlink(validPath(dir, replace(name, r))).catch(() => {})))
+    const jsonPath = join(dir, id + '.json')
+    if (await fs.pathExists(jsonPath)) {
+      if (old) {
+        if (gte(old.version, r.version)) return
+        o.oldResourceVersion = old
+        if (typeof old.files === 'object') {
+          await Promise.all(Object.keys(old.files)
+            .map(name => fs.unlink(validPath(dir, replace(name, r))).catch(() => {})))
+        }
+      } else {
+        if (!await openConfirmDialog({
+          cancelButton: true,
+          text: $('This version ({0}) already exists! Delete this version? Warning: cannot recover after deletion!', id)
+        })) throw new Error('User refuses to delete existing version: ' + id)
+        await fs.remove(dir)
       }
     }
     const obj: any = { confirmed: o.confirmed }
@@ -87,7 +98,8 @@ export default class ResourceInstaller extends Plugin {
       if (obj.confirmed) o.confirmed = true
     }
     let json = r.json
-    if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
+    if (!json) json = { }
+    else if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
     if (r.extends) json.extends = obj.resolvedId
     o.resolvedId = json.id = id
     await pluginMaster.emitSync('processResourceVersionJson', json)
@@ -95,28 +107,37 @@ export default class ResourceInstaller extends Plugin {
     await fs.ensureDir(dir)
     const p = await makeTempDir()
     try {
-      const urls: Array<{ url: string, file: string, absolute: string }> = typeof r.files === 'object'
-        ? Object.entries(r.files).map(([name, url], i) => ({ url: replace(url, r), file: join(p, i.toString()),
-          absolute: validPath(dir, replace(name, r)) })) : []
-      await fs.writeJson(join(dir, id + '.json'), json)
-      const hashes = await downloadAndCheckHash(urls, r)
-      await pAll(urls.map(it => () => {
-        const path = it.absolute
-        return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.rename(it.file, path))
-      }), { concurrency: 8 })
+      const arr = typeof r.files === 'object' && Object.entries(r.files)
+      if (arr && arr.length) {
+        const urls: Array<{ url: string, file: string, absolute: string }> = arr.map(([name, url], i) =>
+          ({ url: replace(url, r), file: join(p, i.toString()), absolute: validPath(dir, replace(name, r)) }))
+        const hashes = await downloadAndCheckHash(urls, r)
+        await pAll(urls.map(it => () => {
+          const path = it.absolute
+          return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.file, path))
+        }), { concurrency: 8 })
+        r.hashes = hashes
+      } else {
+        delete r.files
+        delete r.hashes
+      }
+      await fs.writeJson(jsonPath, json)
       if (r.isolation) o.isolation = true
       if (typeof r.resources === 'object') {
         await pAll(Object.values(r.resources).map(it => () =>
           install(it, false, true, r => T.isResource(r) && !T.isVersion(r) && !T.isPlugin(r), o)), { concurrency: 5 })
       }
       const sJson = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }
-      r.hashes = hashes
       delete r.json
       sJson[id] = r
-      await fs.outputJson(RESOURCES_VERSIONS_INDEX_PATH, json)
-      profilesStore.addProfile(id, r.title, null, true)
-    } catch {
+      await fs.outputJson(RESOURCES_VERSIONS_INDEX_PATH, sJson)
+      await profilesStore.addProfile(id, r.title, r.icon, true)
+    } catch (e) {
       await fs.remove(dir)
+      const sJson = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }
+      delete sJson[id]
+      await fs.outputJson(RESOURCES_VERSIONS_INDEX_PATH, sJson)
+      throw e
     } finally {
       await fs.remove(p)
     }
@@ -141,7 +162,7 @@ export default class ResourceInstaller extends Plugin {
       await fs.ensureDir(dir)
       await pAll(urls.map((it, i) => () => {
         const path = join(dir, hashes[i] + '.zip')
-        return fs.pathExists(path).then(t => t && fs.unlink(path)).then(() => fs.rename(it.file, path))
+        return fs.pathExists(path).then(t => t && fs.unlink(path)).then(() => fs.move(it.file, path))
       }), { concurrency: 8 })
       if (!o.isolation) {
         const json = await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || { }
@@ -175,12 +196,12 @@ export default class ResourceInstaller extends Plugin {
             id = profilesStore.versionManifest.latest.release
         }
         dir = join(VERSIONS_PATH, id, 'mods')
-        await fs.ensureDir(dir)
         o.resolvedDir = dirname(dir)
         o.resolvedId = id
       }
     }
     if (!id) throw new Error('No suck version: ' + o.selectedVersion)
+    await fs.ensureDir(dir)
     const jsonPath = join(RESOURCES_VERSIONS_PATH, id, RESOURCES_MODS_INDEX_FILE_NAME)
     const old = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
       : (await fs.readJson(jsonPath, { throws: false }) || { })[r.id]
@@ -196,7 +217,7 @@ export default class ResourceInstaller extends Plugin {
       const hashes = await downloadAndCheckHash(urls, r)
       await pAll(urls.map((it, i) => () => {
         const path = join(dir, hashes[i] + '.jar')
-        return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.rename(it.file, path))
+        return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.file, path))
       }), { concurrency: 8 })
       if (!o.isolation) {
         const json = await fs.readJson(jsonPath, { throws: false }) || { }
@@ -236,7 +257,7 @@ export default class ResourceInstaller extends Plugin {
       await fs.ensureDir(PLUGINS_ROOT)
       const path = join(PLUGINS_ROOT, hash + (r.extension || '.asar'))
       if (await fs.pathExists(path)) await fs.unlink(path)
-      await fs.rename(file, path)
+      await fs.move(file, path)
       json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
       r.hash = hash
       json[r.id] = r

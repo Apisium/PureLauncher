@@ -54,5 +54,5 @@ ipcRenderer.on('pure-launcher-protocol', (_, args: any) => {
     console.error(e)
   }
 })
-const data: T.ProtocolInstall = { type: 'Install', resource: 'http://acode.apisium.cn/libraries/mod.json' }
+const data: T.ProtocolInstall = { type: 'Install', resource: 'http://acode.apisium.cn/libraries/version.json' }
 ;(window as any).h = () => protocol(data).then(console.log, console.error)

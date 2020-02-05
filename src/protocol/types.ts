@@ -1,5 +1,5 @@
 import { ReactElement } from 'react'
-import { valid } from 'semver'
+import valid from 'semver/functions/valid'
 
 export type MinecraftApis = Record<string, string>
 export interface Resource <T extends string = string> {
@@ -23,6 +23,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   extends?: string | ResourceVersion
   updateUrl?: string
   isolation?: boolean
+  icon?: string
   useIdAsName?: boolean
 }
 export interface ResourceMod extends Resource<'Mod'> {
@@ -61,7 +62,7 @@ export interface ResourcePlugin extends Resource<'Plugin'> {
 }
 export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer
 export const isResource = (r: any): r is Resource => !!(typeof r === 'object' && typeof r.id === 'string' &&
-  r.i && typeof r.type === 'string' && r.type)
+  r.id && typeof r.type === 'string' && r.type)
 export const isResourceWithVersion = (r: any): r is Resource & { version: string } =>
   isResource(r) && !!valid((r as any).version)
 export const isResourceWithVersionAndUrls = (r: any): r is Resource & { version: string, urls: string[] } =>

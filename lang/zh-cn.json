@@ -29,6 +29,7 @@
   "Loading...": "加载中...",
   "Launching...": "启动中...",
   "Downloading...": "下载中...",
+  "Preparing...": "准备中...",
   "Launched": "游戏运行中",
   "Fail to launch!": "启动失败!",
   "No such version:": "没有这个版本:",
@@ -46,6 +47,7 @@
   "Warning!": "警告!",
   "Deleting...": "文件删除中...",
   "Save failed!": "保存失败!",
+  "Installing resources...": "正在安装资源...",
   "Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!":
   "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
@@ -54,6 +56,8 @@
     "警告! 当前正在安装扩展插件, 请确认插件来源是否安全! 若扩展插件为恶意插件可能会对您的计算机造成破坏!\n\n插件ID: {0}\n插件名字: {1}",
   "Are you sure to delete this version? This is a dangerous operation and cannot be recovered after deletion!":
     "是否确认删除该版本? 这是一个危险的操作且删除后无法恢复!",
+  "This version ({0}) already exists! Delete this version? Warning: cannot recover after deletion!":
+    "该版本（{0}）已经存在！是否删除该版本？警告：删除后将无法复原!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",

@@ -20,6 +20,9 @@ declare global {
   declare const installResources: (data: Resources) => Promise<void>
   declare const __requestInstallResources: (data: Resources, views?: InstallView) => Promise<boolean>
   declare const openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
+  declare const startAnimation: () => void
+  declare const stopAnimation: () => void
+  declare const animationStopped: boolean
   declare interface Window {
     $: $
     topBar: TopBar
@@ -27,10 +30,13 @@ declare global {
     pluginMaster: Master
     profilesStore: ProfilesStore
     __getStore: GetStore
+    animationStopped: boolean
     notice: (ctx: Ctx) => void
     installResources: (data: Resources) => Promise<void>
     __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
     openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
+    startAnimation: () => void
+    stopAnimation: () => void
   }
   declare namespace NodeJS {
     interface Global {
@@ -40,10 +46,13 @@ declare global {
       __getStore: GetStore
       pluginMaster: Master
       profilesStore: ProfilesStore
+      animationStopped: boolean
       notice: (ctx: Ctx) => void
       installResources: (data: Resources) => Promise<void>
       __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
       openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
+      startAnimation: () => void
+      stopAnimation: () => void
     }
   }
 }

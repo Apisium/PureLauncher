@@ -1,15 +1,16 @@
 .version-switch {
+  width: unset;
+  max-width: 450px;
+  min-width: 300px;
   ul {
     margin: 0;
     list-style-type: none;
     padding: 0;
-    width: 100%;
     font-weight: bold;
     border: 1px solid #bbb;
     font-size: 15px;
     color: #000000be;
     border-radius: 3px;
-    width: 300px;
     max-height: 350px;
     overflow-y: auto;
     -webkit-app-region: no-drag;
@@ -64,6 +65,11 @@
   }
   .rc-dialog-body {
     padding: 0;
+  }
+
+  .version-text {
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .version-icon {

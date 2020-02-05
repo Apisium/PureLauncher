@@ -1,5 +1,5 @@
 import { join, basename } from 'path'
-import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem } from 'electron'
+import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem, WebContents } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
 import createServer from './createServer'
@@ -7,6 +7,7 @@ import createServer from './createServer'
 let window: BrowserWindow = null
 let downloadWindow: BrowserWindow = null
 let launchingWindow: BrowserWindow = null
+let downloadViewer: WebContents = null
 const webp = join(app.getPath('userData'), 'launching.webp')
 ;(process.env as any)['D' + 'EV'] = process.env.NODE_ENV !== 'production'
 
@@ -55,7 +56,10 @@ const parseArgs = (args: string[]) => {
 if (app.requestSingleInstanceLock()) {
   app.on('second-instance', (_, argv) => {
     if (window) {
-      if (window.isMinimized()) window.restore()
+      if (window.isMinimized()) {
+        window.restore()
+        window.setBounds({ height: 586, width: 816 })
+      }
       window.focus()
     }
     parseArgs(argv)
@@ -70,14 +74,14 @@ const create = () => {
   downloadWindow = new BrowserWindow({ width: 1, height: 1, show: false })
   const ctx = downloadWindow.webContents
   const downloadItems: Record<string, DownloadItem> = { }
-  let downloadViewer
   ipcMain
     .on('open-launching-dialog', openLaunchingDialog)
     .on('close-launching-dialog', closeLaunchingDialog)
     .on('download-window-loaded', (e, id) => {
-      downloadViewer = webContents.fromId(id).once('did-navigate', () => (downloadViewer = null))
+      downloadViewer = webContents.fromId(id).once('destroyed', () => (downloadViewer = null))
       if (process.env.DOWNLOAD_DEV) downloadViewer.openDevTools()
-      e.reply('download-items', Object.entries(downloadItems).map(([id, { name, file }]) => ({ id, name, file })))
+      e.reply('download-items', Object.entries(downloadItems)
+        .map(([id, { name, file, stopped }]) => ({ id, name, file, stopped })))
     })
     .on('cancel-download', (_, id) => {
       const obj = downloadItems[id]
@@ -157,7 +161,11 @@ const create = () => {
                   obj.next()
                 }
               }
-            } else sendToAll('download-end', id, 0)
+            } else {
+              obj.stopped = true
+              obj.finished = 1
+              sendToAll('download-end', id, 0)
+            }
             break
           case 'cancelled':
             if (!obj.stopped) {
@@ -205,8 +213,8 @@ const create = () => {
     webPreferences: { webSecurity: false }
   })
   launchingWindow.webContents.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(
-    '<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="preload" href="' + webp +
-    '"></head><body style="margin:0;overflow:hidden"><img style="pointer-events:none;transition:3s;filter:drop-shadow(0 4px 8px #0000008a);opacity:0"></body></html>'))
+    '<!DOCTYPE html><html style="pointer-events:none"><head><meta charset="UTF-8"><link rel="preload" href="' + webp +
+    '"></head><body style="margin:0;overflow:hidden"><img style="transition:3s;filter:drop-shadow(0 4px 8px #0000008a);opacity:0"></body></html>'))
 
   const timer = setInterval(() => {
     if (items.size) {

@@ -60,7 +60,7 @@ ipcRenderer
       finished.push(id)
     }
   })
-  .on('download-items', (_, items) => items.forEach((it: any) => addItem(null, it.id, it.file, it.name, true)))
+  .on('download-items', (_, items) => items.forEach((it: any) => addItem(null, it.id, it.file, it.name, !!it.stopped)))
   .send('download-window-loaded', remote.getCurrentWebContents().id)
 
 ;(window as any).clearItems = () => {
