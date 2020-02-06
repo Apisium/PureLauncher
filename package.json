@@ -58,6 +58,7 @@
     "@types/react-dom": "^16.9.5",
     "@types/react-router-dom": "^5.1.3",
     "@types/semver": "^7.1.0",
+    "@types/yazl": "^2.4.2",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "@xmcl/installer": "^1.0.5",
@@ -110,7 +111,8 @@
     "slick-carousel": "^1.8.1",
     "typescript": "^3.7.5",
     "uuid-by-string": "^3.0.2",
-    "velocity-react": "^1.4.3"
+    "velocity-react": "^1.4.3",
+    "yazl": "^2.5.1"
   },
   "bin": {
     "pl-plugin-dev": "packages/plugin/cli.js"

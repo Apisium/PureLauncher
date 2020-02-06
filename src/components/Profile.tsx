@@ -5,7 +5,7 @@ import { useStore } from 'reqwq'
 import { remote } from 'electron'
 import { promises as fs } from 'fs'
 import { SKINS_PATH } from '../constants'
-import { cacheSkin } from '../utils/index'
+import { cacheSkin, autoNotices } from '../utils/index'
 import { isSlimSkin, loadSkinToCanvas } from 'skinview-utils'
 import { TITLE, SkinChangeable } from '../plugin/Authenticator'
 import { SkinViewer, createOrbitControls, WalkingAnimation, RotatingAnimation } from 'skinview3d'
@@ -137,13 +137,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
         >{$('Add account')}</button>
         <button
           className='btn btn-secondary' disabled={loading} onClick={() => {
-            Promise.resolve(pluginMaster.logins[u.type].logout(u.key))
-              .then(() => notice({ content: $('Success!') }))
-              .catch(e => {
-                console.error(e)
-                notice({ content: $('Failed!'), error: true })
-              })
-              .finally(() => pm.i++)
+            autoNotices(Promise.resolve(pluginMaster.logins[u.type].logout(u.key))).finally(() => pm.i++)
           }}
         >{$('Log out')}</button>
       </div>

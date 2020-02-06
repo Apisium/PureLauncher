@@ -1,7 +1,7 @@
 import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
 import PluginMaster from './index'
-import ProfileStore from '../models/ProfilesStore'
+import ProfilesStore from '../models/ProfilesStore'
 import * as skinView3d from 'skinview3d'
 import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
@@ -25,6 +25,7 @@ export { default as Switch } from '../components/Switch'
 export { default as ShowMore } from '../components/ShowMore'
 export { default as Empty } from '../components/Empty'
 export { default as Treebeard } from '../components/treebeard/index'
+export { default as DownloadProviders, DownloadProvider } from './DownloadProviders'
 export { default as createVersionSelector } from '../components/VersionSelector'
 export { default as IconButton } from '../components/IconButton'
 export { default as LiveRoute } from '../components/LiveRoute'
@@ -40,12 +41,12 @@ export { default as ReactImage } from 'react-image'
 export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion,
-  DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfileStore }
+  DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes, autoNotices } from '../utils/index'
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfilesStore }
 
 export const $: Window['$'] = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
-export const profilesStore: ProfileStore = window.profilesStore
+export const profilesStore: ProfilesStore = window.profilesStore
 export const notice: (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => void = null
 export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
   Promise<boolean> = null

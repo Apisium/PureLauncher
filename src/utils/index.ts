@@ -103,3 +103,11 @@ export const validPath = (parent: string, path: string, filter = DEFAULT_EXT_FIL
 export const removeFormatCodes = (text: string) => text.replace(/([\u00A7§]|\\u00A7)[\da-fklmnor]?/g, '')
 
 export const getVersionTypeText = () => $('§7Powered by §e§lPureLauncher §r§o({0})', version)
+
+export const autoNotices = <T> (p: Promise<T>) => p.then(r => {
+  notice({ content: $('Success!') })
+  return r
+}, e => {
+  console.error(e)
+  notice({ content: $('Failed!'), error: true })
+}) as any as Promise<T>

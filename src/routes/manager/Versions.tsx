@@ -14,7 +14,10 @@ import Loading from '../../components/Loading'
 import { join } from 'path'
 import { useStore } from 'reqwq'
 import { VERSIONS_PATH } from '../../constants'
+import { exportVersion } from '../../utils/exporter'
 import { uninstallVersion } from '../../protocol/uninstaller'
+import { autoNotices } from '../../utils'
+import { clipboard } from 'electron'
 
 const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
   const ref = useRef<HTMLFormElement>()
@@ -39,9 +42,7 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
           if (!ref.current) return
           const data = new FormData(ref.current)
           analytics.event('profile', 'edit')
-          profilesStore.editProfile(p.version, data.get('name') as string, data.get('icon') as string)
-            .then(() => notice({ content: $('Success!') }))
-            .catch(e => (console.error(e), notice({ content: $('Failed!'), error: true })))
+          autoNotices(profilesStore.editProfile(p.version, data.get('name') as string, data.get('icon') as string))
         }}
       >{$('SAVE')}</button>,
       <button key='cancel' className='btn btn-secondary' onClick={p.onClose}>{$('CANCEL')}</button>,
@@ -57,10 +58,7 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
             if (ok) {
               p.onClose()
               notice({ content: $('Deleting...') })
-              uninstallVersion(p.version).then(() => notice({ content: $('Success!') })).catch(e => {
-                console.error(e)
-                notice({ content: $('Failed!'), error: true })
-              })
+              autoNotices(uninstallVersion(p.version))
             }
           })
         }}>{$('Delete')}</button>
@@ -116,12 +114,11 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
           if (!ref.current) return
           const data = new FormData(ref.current)
           analytics.event('profile', 'add')
-          profilesStore.addProfile(
+          autoNotices(profilesStore.addProfile(
             data.get('version') as string,
             data.get('name') as string,
             data.get('icon') as string
-          ).then(() => notice({ content: $('Success!') }))
-            .catch(e => (console.error(e), notice({ content: $('Failed!'), error: true })))
+          ))
         }}>{$('ADD')}</button>,
       <button key='cancel' className='btn btn-secondary' onClick={p.onClose}>{$('CANCEL')}</button>
     ]}
@@ -188,7 +185,17 @@ const Versions: React.FC = () => {
                   history.push('/manager/mods/' + ver.key)
                 }}
               >{$('Mods')}</button>
-              <button className='btn2 default' onClick={e => e.stopPropagation()}>{$('Export')}</button>
+              {(!pm.extraJson.copyMode || typeof ver.source === 'string') &&
+                <button
+                  className='btn2 default'
+                  onClick={e => {
+                    e.stopPropagation()
+                    if (pm.extraJson.copyMode) {
+                      clipboard.writeText(ver.source)
+                      notice({ content: $('Success!') })
+                    } else exportVersion(ver.key)
+                  }}
+                >{$('Export')}</button>}
             </div>
           </li>
         </ToolTip>)}

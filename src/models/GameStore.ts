@@ -137,7 +137,7 @@ export default class GameStore extends Store {
       await pluginMaster.emitSync('preLaunch', versionId, option)
       this.status = STATUS.LAUNCHING
       remote.getCurrentWindow().minimize()
-      setTimeout(() => ipcRenderer.send('open-launching-dialog'), 3000)
+      if (extraJson.animation) setTimeout(() => ipcRenderer.send('open-launching-dialog'), 3000)
       this.worker.postMessage(option)
 
       await new Promise((res, rej) => {

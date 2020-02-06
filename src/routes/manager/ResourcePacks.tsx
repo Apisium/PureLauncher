@@ -3,15 +3,19 @@ import fs from 'fs-extra'
 import history from '../../utils/history'
 import Empty from '../../components/Empty'
 import Loading from '../../components/Loading'
+import ProfilesStore from '../../models/ProfilesStore'
 import React, { Suspense, useState } from 'react'
 import { join, basename } from 'path'
 import { plugins } from '../../plugin/internal/index'
-import { removeFormatCodes } from '../../utils/index'
+import { removeFormatCodes, autoNotices } from '../../utils/index'
 import { ResourcePack as RPP } from '@xmcl/resourcepack'
 import { ResourceResourcesPack } from '../../protocol/types'
 import { createResource, OneCache } from 'react-cache-enhance'
 import { uninstallResourcePack } from '../../protocol/uninstaller'
 import { RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH } from '../../constants'
+import { exportResource } from '../../utils/exporter'
+import { useStore } from 'reqwq'
+import { clipboard } from 'electron'
 
 pluginMaster.addExtensionsButton({
   title: () => $('ResourcePacks'),
@@ -60,25 +64,28 @@ const ResourcePack: React.FC = () => {
     if (ok) {
       setLoading(true)
       notice({ content: $('Deleting...') })
-      uninstallResourcePack(id, d).then(() => notice({ content: $('Success!') })).catch(e => {
-        console.error(e)
-        notice({ content: $('Failed!'), error: true })
-      }).finally(() => {
+      autoNotices(uninstallResourcePack(id, d)).finally(() => {
         cache.delete(cache.key)
         setLoading(false)
       })
     }
   })
+  const ps = useStore(ProfilesStore)
   return pack.installed.length + pack.unidentified.length ? <ul className='scrollable'>
     {pack.installed.map(it => <li key={it.id}>
       {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
       <div className='time'>{it.description}</div>
       <div className='buttons'>
-        <button
-          className='btn2' onClick={() => 0}
-        >
-          {$('Export')}
-        </button>
+        {(!ps.extraJson.copyMode || typeof it.source === 'string') &&
+          <button
+            className='btn2'
+            onClick={() => {
+              if (ps.extraJson.copyMode) {
+                clipboard.writeText(it.source)
+                notice({ content: $('Success!') })
+              } else autoNotices(exportResource(it))
+            }}
+          >{$('Export')}</button>}
         <button className='btn2 danger' onClick={() => requestUninstall(it.id)}>{$('Delete')}</button>
       </div>
     </li>)}
@@ -86,11 +93,6 @@ const ResourcePack: React.FC = () => {
       {it[1] && <img src={it[1]} alt={it[0]} />}
       {it[2] ? <>{it[0]} <span>({it[2]})</span></> : it[0]}
       <div className='buttons'>
-        <button
-          className='btn2' onClick={() => 0}
-        >
-          {$('Export')}
-        </button>
         <button className='btn2 danger' onClick={() => requestUninstall(it[0], true)}>{$('Delete')}</button>
       </div>
     </li>)}

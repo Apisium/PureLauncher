@@ -6,6 +6,7 @@ import * as Auth from '../../plugin/Authenticator'
 import { useStore } from 'reqwq'
 import { join } from 'path'
 import { SKINS_PATH } from '../../constants'
+import { autoNotices } from '../../utils'
 
 const steve = require('../../assets/images/steve.png')
 const Profiles: React.FC = () => {
@@ -23,26 +24,12 @@ const Profiles: React.FC = () => {
       {it.displayName ? <>{it.username} <span>{it.displayName}</span></> : it.username}
       <div className='time'>{pluginMaster.logins[it.type][Auth.TITLE]()}</div>
       <div className='buttons'>
-        <button
-          className='btn2' onClick={() =>
-            pm.setSelectedProfile(it.key, it.type)
-              .then(() => notice({ content: $('Success!') }))
-              .catch(e => {
-                console.error(e)
-                notice({ content: $('Failed!'), error: true })
-              })}
-        >
+        <button className='btn2' onClick={() => autoNotices(pm.setSelectedProfile(it.key, it.type))}>
           {$('Use')}
         </button>
         <button
           className='btn2 danger' onClick={() => {
-            Promise.resolve(pluginMaster.logins[it.type].logout(it.key))
-              .then(() => notice({ content: $('Success!') }))
-              .catch(e => {
-                console.error(e)
-                notice({ content: $('Failed!'), error: true })
-              })
-              .finally(() => pm.i++)
+            autoNotices(Promise.resolve(pluginMaster.logins[it.type].logout(it.key))).finally(() => pm.i++)
           }}
         >
           {$('Log out')}

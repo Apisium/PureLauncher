@@ -22,6 +22,7 @@
   "Delete": "删除",
   "Downloads": "下载",
   "ResourcePacks": "材质包",
+  "OFFICIAL": "官方源",
   "Plugins": "插件",
   "Servers": "服务器",
   "Saves": "地图",
@@ -67,12 +68,15 @@
   "JVM ARGUMENTS": "JVM 参数",
   "MAXIMUM MEMORY": "最大内存",
   "LANGUAGE": "启动器语言",
+  "COPY URL MODE": "复制链接模式",
   "ENABLE ANIMATION": "开启启动器动画",
   "ENABLE SOUND": "开启启动器音效",
-  "ENABLE BMCLAPI": "使用 BMCLAPI 加速下载",
+  "DOWNLOAD PROVIDER": "下载源",
   "SHOW OUTPUT LOGS": "显示游戏日志",
+  "ENABLE SNAPSHOTS": "启用快照版本",
   "NAME": "名字",
   "Unnamed": "未命名",
+  "Recommend": "推荐",
   "Locate Java": "选择 Java",
   "Locate the path of Java 8": "请选择你的 Java 8 路径",
   "Executable File (Javaw)": "可执行文件 (Javaw)",
@@ -150,5 +154,8 @@
   "Official Website": "官网",
   "Source Code": "源代码",
   "Tencent QQ Group": "QQ群",
-  "Telegram Group": "Telegram群组"
+  "Telegram Group": "Telegram群组",
+
+  "Zip file": "压缩文件 (zip)",
+  "Exporting...": "导出中..."
 }

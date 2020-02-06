@@ -6,15 +6,14 @@ import { platform } from 'os'
 import { Installer } from '@xmcl/installer'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
+import { ResourceVersion } from '../protocol/types'
 import { LAUNCH_PROFILE_PATH, VERSION_MANIFEST_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH,
-  LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH } from '../constants'
+  LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
 import fs from 'fs-extra'
 import pAll from 'p-all'
 import moment from 'moment'
 import * as Auth from '../plugin/Authenticator'
-import { ResourceVersion } from '../protocol/types'
-
-const defaultLocale = (navigator.languages[0] || 'zh-cn').toLowerCase()
+import DownloadProviders from '../plugin/DownloadProviders'
 
 export interface Version {
   name: string
@@ -34,7 +33,7 @@ export default class ProfilesStore extends Store {
   public i = 0
   public settings = {
     enableSnapshots: false,
-    locale: defaultLocale,
+    locale: DEFAULT_LOCATE,
     showMenu: true,
     showGameLog: false,
     soundOn: true
@@ -48,12 +47,13 @@ export default class ProfilesStore extends Store {
   public clientToken = genUUID()
   public extraJson = {
     javaPath: '',
-    bmclAPI: true,
     memory: 0,
     animation: true,
-    sandbox: true,
     selectedUser: '',
     loginType: '',
+    copyMode: false,
+    downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
+      .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICAL',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow'
   }
@@ -262,8 +262,9 @@ export default class ProfilesStore extends Store {
     await this.saveExtraConfigJson()
   }
 
-  public async toggleBmclAPI () {
-    this.extraJson.bmclAPI = !this.extraJson.bmclAPI
+  public async setDownloadProvider (key: string) {
+    if (!(key in DownloadProviders)) return
+    this.extraJson.downloadProvider = key
     await this.saveExtraConfigJson()
   }
 
@@ -300,9 +301,14 @@ export default class ProfilesStore extends Store {
     await this.saveExtraConfigJson()
   }
 
-  public async toggleSandbox () {
-    this.extraJson.sandbox = !this.extraJson.sandbox
+  public async toggleCopyMode () {
+    this.extraJson.copyMode = !this.extraJson.copyMode
     await this.saveExtraConfigJson()
+  }
+
+  public async toggleSnapshots () {
+    this.settings.enableSnapshots = !this.settings.enableSnapshots
+    await this.saveLaunchProfileJson()
   }
 
   public async checkModsDirectory () {
@@ -417,7 +423,7 @@ export default class ProfilesStore extends Store {
     this.settings = json.settings
     this.profiles = json.profiles
     if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()
-    applyLocate(this.settings.locale || defaultLocale, true)
+    applyLocate(this.settings.locale || DEFAULT_LOCATE, true)
     this.setTasks()
   }
 
