@@ -15,9 +15,7 @@
     "postinstall": "npm run build:web-api",
     "clean": "del-cli app/dist",
     "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules",
-    "compile": "npm run compile:cpp && npm run compile:rust",
-    "compile:cpp": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- cmake-js compile",
-    "compile:rust": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
+    "compile": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
   },
   "repository": {
     "type": "git",
@@ -133,7 +131,7 @@
     "from 'three'": "from '/packages/minimize-three/index.js'"
   },
   "build": {
-    "productName": "purelauncher",
+    "productName": "PureLauncher",
     "appId": "cn.apisium.purelauncher",
     "directories": {
       "output": "release"
@@ -148,6 +146,7 @@
     ],
     "files": [
       "dist/**/*",
+      "!dist/report.html",
       "main.js"
     ],
     "protocols": [
