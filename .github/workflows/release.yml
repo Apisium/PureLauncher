@@ -1,0 +1,49 @@
+name: release
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build app
+        run: npm run build
+      
+      - name: Pack app
+        run: npm run pack
+      
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: release/*.[exe,dmg,deb,rpm,AppImage]
+          tag: ${{ github.ref }}
+          file_glob: true
+
+      - name: Upload report.html
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/report.html
+          tag: ${{ github.ref }}
+          file_glob: true
+          overwrite: true
