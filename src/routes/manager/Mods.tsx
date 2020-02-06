@@ -1,6 +1,5 @@
 import './list.less'
 import fs from 'fs-extra'
-import pAll from 'p-all'
 import Empty from '../../components/Empty'
 import Loading from '../../components/Loading'
 import ProfilesStore, { Version } from '../../models/ProfilesStore'
@@ -25,7 +24,7 @@ const useVersion = createResource(async (ver: string): Promise<Ret> => {
     ver = await profilesStore.resolveVersion(ver)
     const path = join(VERSIONS_PATH, ver, 'mods')
     let files = (await fs.readdir(path)).filter(it => it.endsWith('.jar'))
-    const stats = await pAll(files.map(it => () => fs.stat(it)), { concurrency: 10 })
+    const stats = await Promise.all(files.map(it => fs.stat(it)))
     files = files.filter((_, i) => stats[i].isFile())
     const json: Record<string, ResourceMod> = await fs.readJson(join(RESOURCES_VERSIONS_PATH, ver,
       RESOURCES_MODS_INDEX_FILE_NAME), { throws: false }) || { }
@@ -63,7 +62,7 @@ const Version: React.FC<{ version: string }> = p => {
     }
   })
   const ver = useVersion(p.version)
-  return ver.mods.length + ver.installed.length ? <ul className='scrollable'>
+  return ver.mods.length + ver.installed.length + ver.unUninstallable.length ? <ul className='scrollable'>
     {ver.installed.map(it => <li key={it.id}>
       {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
       <div className='time'>{it.description}</div>

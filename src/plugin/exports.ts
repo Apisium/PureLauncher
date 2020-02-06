@@ -9,8 +9,10 @@ import * as Launcher from '@xmcl/launch'
 import * as Installer from '@xmcl/installer'
 import * as Version from '@xmcl/version'
 import * as Task from '@xmcl/task'
+import * as ResourcePack from '@xmcl/resourcepack'
 
 export { Plugin, plugin, event } from './Plugin'
+export { default as ProfileStore } from '../models/ProfilesStore'
 export { default as Authenticator } from './Authenticator'
 export { default as types } from '../protocol/types'
 export { default as fitText } from '../utils/fit-text'
@@ -48,7 +50,8 @@ export const xmcl = {
   Launcher,
   Installer,
   Version,
-  Task
+  Task,
+  ResourcePack
 }
 
 const gs = P.getStore(GameStore)

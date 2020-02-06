@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import { join } from 'path'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_VERSIONS_PATH, VERSIONS_PATH,
-  RESOURCES_MODS_INDEX_FILE_NAME } from '../constants'
+  RESOURCES_MODS_INDEX_FILE_NAME, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH } from '../constants'
 
 export const uninstallVersion = async (id: string) => {
   const json = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }
@@ -28,5 +28,17 @@ export const uninstallMod = async (version: string, id: string, directly = false
     await Promise.all(json[id].hashes.map((it: string) => fs.unlink(join(dir, it + '.jar')).catch(() => {})))
     delete json[id]
     await fs.writeJson(jsonPath, json)
+  }
+}
+
+export const uninstallResourcePack = async (id: string, directly = false) => {
+  if (directly) await fs.unlink(join(RESOURCE_PACKS_PATH, id)).catch(() => {})
+  else {
+    const json = await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || {}
+    if (!Array.isArray(json[id]?.hashes)) return
+    await Promise.all(json[id].hashes.map((it: string) => fs.unlink(join(RESOURCE_PACKS_PATH, it + '.zip'))
+      .catch(() => {})))
+    delete json[id]
+    await fs.writeJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, json)
   }
 }

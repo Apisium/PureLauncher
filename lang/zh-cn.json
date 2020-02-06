@@ -20,7 +20,7 @@
   "Add new...": "添加新的版本",
   "Delete": "删除",
   "Downloads": "下载",
-  "Resources": "材质",
+  "ResourcePacks": "材质包",
   "Plugins": "插件",
   "Servers": "服务器",
   "Saves": "地图",
@@ -56,6 +56,8 @@
     "警告! 当前正在安装扩展插件, 请确认插件来源是否安全! 若扩展插件为恶意插件可能会对您的计算机造成破坏!\n\n插件ID: {0}\n插件名字: {1}",
   "Are you sure to delete this version? This is a dangerous operation and cannot be recovered after deletion!":
     "是否确认删除该版本? 这是一个危险的操作且删除后无法恢复!",
+  "Are you sure to delete this resource pack? This is a dangerous operation and cannot be recovered after deletion!":
+    "是否确认删除该资源包? 这是一个危险的操作且删除后无法恢复!",
   "This version ({0}) already exists! Delete this version? Warning: cannot recover after deletion!":
     "该版本（{0}）已经存在！是否删除该版本？警告：删除后将无法复原!",
 

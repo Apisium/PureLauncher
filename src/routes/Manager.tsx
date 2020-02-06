@@ -11,6 +11,7 @@ import Profiles from './manager/Profiles'
 import Extensions from './manager/Extensions'
 import Plugins from './manager/Plugins'
 import Mods from './manager/Mods'
+import ResourcePacks from './manager/ResourcePacks'
 
 export const getPages = () => [
   {
@@ -28,14 +29,6 @@ export const getPages = () => [
     path: '/manager/downloads',
     component: Downloads
   },
-  // {
-  //   name: $('Resources'),
-  //   path: '/manager/resources'
-  // },
-  // {
-  //   name: $('Saves'),
-  //   path: '/manager/saves'
-  // },
   {
     name: $('Extensions'),
     path: '/manager/extensions',
@@ -53,6 +46,7 @@ const Manager: React.FC = () => {
       {pages.map(it => <LiveRoute exact component={it.component} path={it.path} key={it.path} />)}
       <LiveRoute exact component={Plugins} path='/manager/plugins' />
       <Route component={Mods} path='/manager/mods/:version' />
+      <Route component={ResourcePacks} path='/manager/resourcePacks' />
     </div>
     <Dots
       count={pages.length}

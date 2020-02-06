@@ -2,18 +2,15 @@ import './profile.less'
 import React, { useRef, useEffect, useState } from 'react'
 import { join } from 'path'
 import { useStore } from 'reqwq'
-import { TITLE, SkinChangeable } from '../plugin/Authenticator'
-import { cacheSkin } from '../utils/index'
-import { promises as fs } from 'fs'
 import { remote } from 'electron'
+import { promises as fs } from 'fs'
+import { SKINS_PATH } from '../constants'
+import { cacheSkin } from '../utils/index'
+import { isSlimSkin, loadSkinToCanvas } from 'skinview-utils'
+import { TITLE, SkinChangeable } from '../plugin/Authenticator'
+import { SkinViewer, createOrbitControls, WalkingAnimation, RotatingAnimation } from 'skinview3d'
 import Dialog from 'rc-dialog'
 import ProfilesStore from '../models/ProfilesStore'
-import { SKINS_PATH } from '../constants'
-
-const { SkinViewer, createOrbitControls, WalkingAnimation, RotatingAnimation }: typeof import('skinview3d') = __DEV__
-  ? require('esm')(window.module)('skinview3d') : require('skinview3d')
-const { isSlimSkin, loadSkinToCanvas }: typeof import('skinview-utils') = __DEV__
-  ? require('esm')(window.module)('skinview-utils') : require('skinview-utils')
 
 const skinUrl = require('../assets/images/steve.png')
 
