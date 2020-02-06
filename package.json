@@ -35,7 +35,11 @@
       "pre-commit": "npm run lint"
     }
   },
-  "author": "Shirasawa",
+  "author": {
+    "name": "Shirasawa",
+    "email": "764798966@qq.com",
+    "url": "https://shirasawa.apisium.cn/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Apisium/PureLauncher/issues"
