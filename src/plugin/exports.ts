@@ -1,5 +1,7 @@
 import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
+import PluginMaster from './index'
+import ProfileStore from '../models/ProfilesStore'
 import * as skinView3d from 'skinview3d'
 import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
@@ -11,8 +13,8 @@ import * as Version from '@xmcl/version'
 import * as Task from '@xmcl/task'
 import * as ResourcePack from '@xmcl/resourcepack'
 
+export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
-export { default as ProfileStore } from '../models/ProfilesStore'
 export { default as Authenticator } from './Authenticator'
 export { default as types } from '../protocol/types'
 export { default as fitText } from '../utils/fit-text'
@@ -37,15 +39,16 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
-export { download, genId, genUUID, getJson, fetchJson, makeTempDir,
-  DownloadItem, validPath, sha1, md5, replace } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq }
+export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion,
+  DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes } from '../utils/index'
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfileStore }
 
 export const $: Window['$'] = (window as any).__$pli0
-export const pluginMaster = window.pluginMaster
-export const profilesStore = window.profilesStore
-export const notice = window.notice
-export const openConfirmDialog = window.openConfirmDialog
+export const pluginMaster: PluginMaster = window.pluginMaster
+export const profilesStore: ProfileStore = window.profilesStore
+export const notice: (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => void = null
+export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
+  Promise<boolean> = null
 export const xmcl = {
   Launcher,
   Installer,
@@ -57,3 +60,5 @@ export const xmcl = {
 const gs = P.getStore(GameStore)
 export const launch = gs.launch
 export const getLaunchStatus = () => gs.status
+Object.defineProperty(module.exports, 'notice', { get: () => window.notice })
+Object.defineProperty(module.exports, 'openConfirmDialog', { get: () => window.openConfirmDialog })

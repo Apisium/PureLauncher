@@ -6,6 +6,7 @@ import Loading from '../../components/Loading'
 import React, { Suspense, useState } from 'react'
 import { join, basename } from 'path'
 import { plugins } from '../../plugin/internal/index'
+import { removeFormatCodes } from '../../utils/index'
 import { ResourcePack as RPP } from '@xmcl/resourcepack'
 import { ResourceResourcesPack } from '../../protocol/types'
 import { createResource, OneCache } from 'react-cache-enhance'
@@ -39,7 +40,7 @@ const useResourcePack = createResource(async (): Promise<Ret> => {
         .then(([icon, info]) => [
           it,
           icon ? URL.createObjectURL(new Blob([icon], { type: 'image/png' })) : null,
-          typeof info.description === 'string' ? info.description.replace(/\u00A7[\da-fml]/g, '') : null
+          typeof info.description === 'string' ? removeFormatCodes(info.description) : null
         ]).catch(e => {
           console.error(e)
           return [it]

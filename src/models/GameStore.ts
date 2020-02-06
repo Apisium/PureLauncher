@@ -63,21 +63,10 @@ export default class GameStore extends Store {
     if (this.status !== STATUS.READY) return
     try {
       this.status = STATUS.PREPARING
-      const v = { version }
-      await pluginMaster.emitSync('launchResolveVersion', v)
-      version = v.version
-
-      user.event('game', 'launch').catch(console.error)
-      const { extraJson, getCurrentProfile, selectedVersion, versionManifest,
+      const { extraJson, getCurrentProfile, selectedVersion, versionManifest, profiles,
         ensureVersionManifest, checkModsDirectoryOfVersion } = this.profilesStore
-      const { javaArgs, javaPath } = extraJson
 
-      let profile = getCurrentProfile()
-      if (!profile) throw new Error('No selected profile!')
-      const authenticator = pluginMaster.logins[profile.type]
-      if (!await authenticator.validate(profile.key)) await authenticator.refresh(profile.key)
-      profile = getCurrentProfile()
-
+      if (version in profiles) version = profiles[version].lastVersionId
       if (!version) {
         version = selectedVersion.lastVersionId
         switch (selectedVersion.type) {
@@ -86,6 +75,18 @@ export default class GameStore extends Store {
             version = selectedVersion.type
         }
       }
+      const v = { version }
+      await pluginMaster.emitSync('launchResolveVersion', v)
+      version = v.version
+
+      user.event('game', 'launch').catch(console.error)
+      const { javaArgs, javaPath } = extraJson
+
+      let profile = getCurrentProfile()
+      if (!profile) throw new Error('No selected profile!')
+      const authenticator = pluginMaster.logins[profile.type]
+      if (!await authenticator.validate(profile.key)) await authenticator.refresh(profile.key)
+      profile = getCurrentProfile()
 
       let versionId: string
 

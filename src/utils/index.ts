@@ -1,6 +1,7 @@
 import fs from 'fs-extra'
 import uuid from 'uuid-by-string'
 import * as resolveP from 'resolve-path'
+import { version } from '../../package.json'
 import { remote, ipcRenderer } from 'electron'
 import { join, resolve, extname } from 'path'
 import { createHash, BinaryLike } from 'crypto'
@@ -98,3 +99,7 @@ export const validPath = (parent: string, path: string, filter = DEFAULT_EXT_FIL
   }
   return resolveP(resolve(parent), path) as string
 }
+
+export const removeFormatCodes = (text: string) => text.replace(/([\u00A7§]|\\u00A7)[\da-fklmnor]?/g, '')
+
+export const getVersionTypeText = () => $('§7Powered by §e§lPureLauncher §r§o({0})', version)
