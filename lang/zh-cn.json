@@ -50,6 +50,8 @@
   "Deleting...": "文件删除中...",
   "Save failed!": "保存失败!",
   "Installing resources...": "正在安装资源...",
+  "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
+    "发生未知错误，请点击上方苦力怕图标以刷新页面!",
   "Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!":
   "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":

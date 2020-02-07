@@ -59,7 +59,7 @@ const SideBar: React.FC = () => {
         break
       default: btnText = $('Unknown')
     }
-  } else btnText = name = $('NOT LOGGED-IN')
+  } else btnText = name = $('Log in')
   const fontSize = useMemo(() => fitText(btnText.toUpperCase(), 98, 20), [btnText]) + 'px'
   return (
     <div className='side-bar'>
@@ -106,8 +106,8 @@ const SideBar: React.FC = () => {
       </Dropdown>
       <button
         className='btn btn-primary launch'
-        onClick={() => logged && gs.launch()}
-        disabled={!logged || gs.status !== STATUS.READY}
+        onClick={() => logged ? gs.launch() : pm.setLoginDialogVisible()}
+        disabled={gs.status !== STATUS.READY}
       >
         <i className='iconfont icon-icons-minecraft_pic' />
         <span style={{ fontSize }}>{btnText}</span>

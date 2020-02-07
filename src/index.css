@@ -99,9 +99,10 @@ main {
   overflow: hidden;
   display: flex;
   width: calc(100% - 40px);
-  position: absolute;
-  top: 50px;
+  position: relative;
+  top: 20px;
   left: 20px;
+  overflow: hidden;
   height: calc(100% - 88px);
   background-color: #ae7a47;
   background: var(--background);

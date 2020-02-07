@@ -1,0 +1,17 @@
+.error {
+  display: flex;
+}
+.error .container {
+  margin: auto;
+}
+.error i {
+  cursor: pointer;
+  color: #f5222d;
+  transition: color .6s;
+}
+.error i:hover {
+  color: #f86d74;
+}
+.error p {
+  white-space: pre-wrap;
+}

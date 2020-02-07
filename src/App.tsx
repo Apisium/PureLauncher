@@ -13,6 +13,7 @@ import './plugin/index'
 import Home from './routes/Home'
 import Settings from './routes/Settings'
 import Manager from './routes/Manager'
+import ErrorPage from './routes/Error'
 import SideBar from './SideBar'
 import InstallList from './components/InstallList'
 
@@ -39,6 +40,7 @@ const App: React.FC = () => {
             <LiveRoute exact component={Home} path='/' />
             <LiveRoute component={Manager} path='/manager/:type' className='vh100' />
             <LiveRoute exact component={Settings} path='/settings' />
+            <LiveRoute exact component={ErrorPage} path='/error' className='vh100' />
             <Redirect to='/manager/versions' />
             <PluginRoutes />
           </section>

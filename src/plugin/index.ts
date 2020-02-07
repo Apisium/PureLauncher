@@ -2,12 +2,14 @@ import Authenticator from './Authenticator'
 import internal from './internal/index'
 import isDev from '../utils/isDev'
 import fs from 'fs-extra'
+import React from 'react'
 import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, ExtensionsButton } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { DELETES_FILE, PLUGINS_ROOT } from '../constants'
+import ErrorHandler from '../components/ErrorHandler'
 
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
@@ -169,8 +171,9 @@ export default class Master extends EventBus {
   }
 
   public addRoute (route: JSX.Element, plugin: Plugin) {
-    (plugin[ROUTES] || (plugin[ROUTES] = new Set())).add(route)
-    this.routes.add(route)
+    const r = React.createElement(ErrorHandler, null, route)
+    ;(plugin[ROUTES] || (plugin[ROUTES] = new Set())).add(r)
+    this.routes.add(r)
     const u = (window as any).__routerUpdater
     if (u) u[1](!u[0])
     return this
