@@ -13,7 +13,14 @@ export const setPort = port => {
   PORT = port
 }
 export const getPort = () => PORT
+export const isRunning = () => f(`http://127.0.0.1:${PORT}/info`).then(() => true, () => false)
 export const reload = () => f(`http://127.0.0.1:${PORT}/reload`).then(it => it.json()).then(it => it.success)
 export const info = () => f(`http://127.0.0.1:${PORT}/info`).then(it => it.json())
 export const protocol = data => post('protocol', data)
 export const setDevPlugin = path => post('setDevPlugin', { path }).then(it => it.success)
+export const ensureRunning = time => isRunning().then(r => r ? undefined : new Promise((resolve, reject) => {
+  location.assign('pure-launcher://')
+  const timer = setTimeout(reject, time || 15000, new Error('Timeout!'))
+  const f = () => void isRunning().then(r => r ? (clearTimeout(timer), resolve()) : f())
+  f()
+}))

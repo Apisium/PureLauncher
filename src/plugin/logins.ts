@@ -41,6 +41,9 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     })
     if (!data || data.error) {
       console.error(data)
+      if (typeof data.error === 'string') {
+        throw new Error(data.error.includes('Invalid credentials') ? $('Invalid username or password!') : data.error)
+      }
       throw new Error($('Network connection failed!'))
     }
     if (!data.selectedProfile || !data.selectedProfile.id) throw new Error($('You don\'t have an online profile yet!'))
