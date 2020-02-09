@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import './list.less'
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, Suspense } from 'react'
 import IconPicker, { resolveIcon } from '../../components/IconPicker'
 import ProfilesStore, { Version } from '../../models/ProfilesStore'
 import fs from 'fs-extra'
@@ -13,13 +13,15 @@ import analytics from '../../utils/analytics'
 import Loading from '../../components/Loading'
 import { join } from 'path'
 import { useStore } from 'reqwq'
-import { VERSIONS_PATH } from '../../constants'
+import { createResource, OneCache } from 'react-cache-enhance'
+import { VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
 import { exportVersion } from '../../utils/exporter'
 import { uninstallVersion } from '../../protocol/uninstaller'
 import { autoNotices } from '../../utils'
-import { clipboard } from 'electron'
+import { clipboard, shell } from 'electron'
+import { ResourceVersion } from '../../protocol/types'
 
-const VersionEdit: React.FC<{ version: string, onClose: () => void }> = p => {
+const VersionEdit: React.FC<{ version: string, onClose: () => void, installed: Record<string, ResourceVersion> }> = p => {
   const ref = useRef<HTMLFormElement>()
   const [open, setOpen] = useState(false)
   const [icon, setIcon] = useState('')
@@ -137,13 +139,20 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
           <label>{$('VERSION')}</label>
           <select name='version'>{versions.map(it => <option value={it} key={it}>{it}</option>)}</select>
         </div>
-        <a role='link'>{$('Install the vanilla game / Forge / Fabric?')}</a>
+        <a role='link' onClick={() => shell.openExternal('https://pl.apisium.cn/versions')}>
+          {$('Install the vanilla game / Forge / Fabric?')}
+        </a>
       </form>}
     <IconPicker onClose={it => (setIcon(it), setOpen(false))} open={open} />
   </Dialog>
 }
 
+const cache = new OneCache()
+const useVersions = createResource((): Promise<Record<string, ResourceVersion>> => fs.readJson(RESOURCES_VERSIONS_INDEX_PATH)
+  .catch(() => ({})), cache as any)
+
 const Versions: React.FC = () => {
+  const json = useVersions()
   const [open, setOpen] = useState(false)
   const [currentVersion, setCurrentVersion] = useState('')
   const pm = useStore(ProfilesStore)
@@ -185,13 +194,13 @@ const Versions: React.FC = () => {
                   history.push('/manager/mods/' + ver.key)
                 }}
               >{$('Mods')}</button>
-              {(!pm.extraJson.copyMode || typeof ver.source === 'string') &&
+              {(!pm.extraJson.copyMode || typeof json[ver.lastVersionId]?.source === 'string') &&
                 <button
                   className='btn2 default'
                   onClick={e => {
                     e.stopPropagation()
                     if (pm.extraJson.copyMode) {
-                      clipboard.writeText(ver.source)
+                      clipboard.writeText(json[ver.lastVersionId].source)
                       notice({ content: $('Success!') })
                     } else exportVersion(ver.key)
                   }}
@@ -200,9 +209,11 @@ const Versions: React.FC = () => {
           </li>
         </ToolTip>)}
     </ul> : <Empty />}
-    <VersionEdit version={currentVersion} onClose={() => setCurrentVersion('')} />
+    <VersionEdit version={currentVersion} installed={json} onClose={() => setCurrentVersion('')} />
     <VersionAdd open={open} onClose={() => setOpen(false)} />
   </div>
 }
 
-export default Versions
+export default () => <Suspense fallback={<div style={{ flex: 1, display: 'flex' }}><Loading /></div>}>
+  <Versions />
+</Suspense>

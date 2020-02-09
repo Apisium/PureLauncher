@@ -193,6 +193,12 @@
           "arch": [
             "ia32"
           ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "amd64"
+          ]
         }
       ]
     },
@@ -213,7 +219,7 @@
           "target": "rpm"
         },
         {
-          "target": "AppImage"
+          "target": "tar.gz"
         }
       ]
     }

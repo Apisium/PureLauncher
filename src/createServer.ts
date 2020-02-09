@@ -21,7 +21,7 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
   if (__DEV__) console.log(` \u001b[1;33m${req.method}: \u001b[37m${req.url}\u001b[0m`)
   let body: string
   switch (req.method) {
-    case 'OPTION':
+    case 'OPTIONS':
       body = SUCCESS
       break
     case 'GET':

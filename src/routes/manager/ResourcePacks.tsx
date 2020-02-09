@@ -13,7 +13,7 @@ import { ResourceResourcesPack } from '../../protocol/types'
 import { createResource, OneCache } from 'react-cache-enhance'
 import { uninstallResourcePack } from '../../protocol/uninstaller'
 import { RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH } from '../../constants'
-import { exportResource } from '../../utils/exporter'
+import { exportResource, exportUnidentified } from '../../utils/exporter'
 import { useStore } from 'reqwq'
 import { clipboard } from 'electron'
 
@@ -93,6 +93,12 @@ const ResourcePack: React.FC = () => {
       {it[1] && <img src={it[1]} alt={it[0]} />}
       {it[2] ? <>{it[0]} <span>({it[2]})</span></> : it[0]}
       <div className='buttons'>
+        {!ps.extraJson.copyMode &&
+          <button
+            className='btn2'
+            onClick={() => autoNotices(exportUnidentified(join(RESOURCE_PACKS_PATH, it[0]),
+              'ResourcePack', { description: it[2] }))}
+          >{$('Export')}</button>}
         <button className='btn2 danger' onClick={() => requestUninstall(it[0], true)}>{$('Delete')}</button>
       </div>
     </li>)}

@@ -32,7 +32,7 @@ const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: s
 })
 export default class ResourceInstaller extends Plugin {
   @event()
-  public async protocolInstallProcess (r: T.AllResources | T.ResourceVersion, o?: T.InstallView) {
+  public async protocolPreInstallResource (r: T.AllResources | T.ResourceVersion, o?: T.InstallView) {
     if (!o) return
     switch (r.type) {
       case 'Mod': {
@@ -97,12 +97,6 @@ export default class ResourceInstaller extends Plugin {
       await install(r.extends, false, true, T.isVersion, obj)
       if (obj.confirmed) o.confirmed = true
     }
-    let json = r.json
-    if (!json) json = { }
-    else if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
-    if (r.extends) json.extends = obj.resolvedId
-    o.resolvedId = json.id = id
-    await pluginMaster.emitSync('processResourceVersionJson', json)
     o.resolvedDir = dir
     await fs.ensureDir(dir)
     const p = await makeTempDir()
@@ -121,7 +115,16 @@ export default class ResourceInstaller extends Plugin {
         delete r.files
         delete r.hashes
       }
-      await fs.writeJson(jsonPath, json)
+
+      const obj2 = { notWriteJson: false }
+      await pluginMaster.emitSync('processResourceInstallVersion', r, obj2)
+      let json = r.json
+      if (!json) json = { }
+      else if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
+      if (r.extends) json.extends = obj.resolvedId
+      o.resolvedId = json.id = id
+      await pluginMaster.emitSync('processResourceVersionJson', json)
+      if (!obj2.notWriteJson) await fs.writeJson(jsonPath, json)
       if (r.isolation) o.isolation = true
       if (typeof r.resources === 'object') {
         await pAll(Object.values(r.resources).map(it => () =>

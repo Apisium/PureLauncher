@@ -1,10 +1,10 @@
 import fs from 'fs-extra'
-import { join } from 'path'
 import { ZipFile } from 'yazl'
 import { Stream } from 'stream'
 import { remote } from 'electron'
-import { ResourceVersion, ResourceMod, ResourceResourcesPack } from '../protocol/types'
-import { RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
+import { join, basename } from 'path'
+import { ResourceVersion, ResourceMod, ResourceResourcesPack, Resource } from '../protocol/types'
+import { RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH, RESOURCE_PACKS_PATH } from '../constants'
 
 const waitEnd = (stream: Stream) => new Promise((resolve, reject) => stream.once('end', resolve).once('error', reject))
 
@@ -20,7 +20,7 @@ const html = Buffer.from(`
 <body>
   Loading...
   <script>
-    location.href = 'https://pl.apisium.com/install-local?' + encodeURIComponent(location.href)
+    location.href = 'https://pl.apisium.com/install-local.html?' + encodeURIComponent(location.href)
   </script>
 </body>
 </html>`)
@@ -51,11 +51,34 @@ export const exportVersion = async (key: string, path?: string) => {
       zip.addBuffer(Buffer.from(JSON.stringify(output)), 'resource-manifest.json')
     }
   }
-  const dir = join(VERSIONS_PATH, ver, 'mods')
+  let dir = join(VERSIONS_PATH, ver, 'mods')
+  const local: Resource[] = []
   if (await fs.pathExists(dir)) {
-    (await fs.readdir(dir)).filter(it => it.endsWith('.jar') && it.length !== 44)
-      .forEach(it => zip.addFile(join(dir, it), 'mods/' + it))
+    const arr = (await fs.readdir(dir)).filter(it => it.endsWith('.jar') && it.length !== 44)
+    arr.forEach(it => {
+      zip.addFile(join(dir, it), 'mods/' + it)
+      const id = basename(it, '.jar')
+      const mod: Omit<ResourceMod, 'urls' | 'version'> = {
+        id,
+        type: 'Mod'
+      }
+      local.push(mod)
+    })
   }
+  dir = join(RESOURCE_PACKS_PATH)
+  if (await fs.pathExists(dir)) {
+    const arr = (await fs.readdir(dir)).filter(it => it.endsWith('.zip') && it.length !== 44)
+    arr.forEach(it => {
+      zip.addFile(join(dir, it), 'resourcepacks/' + it)
+      const id = basename(it, '.zip')
+      const resourcePack: Omit<ResourceResourcesPack, 'urls' | 'version'> = {
+        id,
+        type: 'ResourcesPack'
+      }
+      local.push(resourcePack)
+    })
+  }
+  if (local.length) zip.addBuffer(Buffer.from(JSON.stringify(local)), 'local-rsources.json')
   zip.end()
   await waitEnd(zip.outputStream)
 }
@@ -67,6 +90,19 @@ export const exportResource = async (mod: ResourceMod | ResourceResourcesPack, p
   zip.outputStream.pipe(fs.createWriteStream(path))
   zip.addBuffer(html, 'install - 安装.html')
   zip.addBuffer(Buffer.from(JSON.stringify(mod)), 'resource-manifest.json')
+  zip.end()
+  await waitEnd(zip.outputStream)
+}
+
+export const exportUnidentified = async (file: string, type: string, ext: any = { }, path?: string) => {
+  const name = basename(file)
+  if (!path) path = await requestPath(name)
+  if (!path) return
+  const zip = new ZipFile()
+  zip.outputStream.pipe(fs.createWriteStream(path))
+  zip.addBuffer(html, 'install - 安装.html')
+  zip.addFile(file, name)
+  zip.addBuffer(Buffer.from(JSON.stringify({ ...ext, file, type })), 'local-resource.json')
   zip.end()
   await waitEnd(zip.outputStream)
 }

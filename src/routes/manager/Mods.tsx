@@ -10,17 +10,17 @@ import { join, basename } from 'path'
 import { useParams } from 'react-router-dom'
 import { createResource, OneCache } from 'react-cache-enhance'
 import { useStore } from 'reqwq'
-import { exportResource } from '../../utils/exporter'
+import { exportResource, exportUnidentified } from '../../utils/exporter'
 import { uninstallMod } from '../../protocol/uninstaller'
 import { VERSIONS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_MODS_INDEX_FILE_NAME,
   RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
 import { autoNotices } from '../../utils'
 
-interface Ret { installed: ResourceMod[], mods: string[], unUninstallable: ResourceMod[] }
+interface Ret { path: string, installed: ResourceMod[], mods: string[], unUninstallable: ResourceMod[] }
 
 const cache = new OneCache()
 
-const NIL: Ret = { installed: [], mods: [], unUninstallable: [] }
+const NIL: Ret = { path: '', installed: [], mods: [], unUninstallable: [] }
 const useVersion = createResource(async (ver: string): Promise<Ret> => {
   if (!ver) return NIL
   try {
@@ -41,7 +41,7 @@ const useVersion = createResource(async (ver: string): Promise<Ret> => {
       unUninstallable = Object.values(verJson.resources).filter(isMod)
       unUninstallable.forEach(it => Array.isArray(it.hashes) && it.hashes.forEach(h => hashes.add(h)))
     } else unUninstallable = []
-    return { installed, unUninstallable, mods: files.filter(it => !hashes.has(basename(it, '.jar'))) }
+    return { path, installed, unUninstallable, mods: files.filter(it => !hashes.has(basename(it, '.jar'))) }
   } catch (e) { console.error(e) }
   return NIL
 }, cache as any)
@@ -85,6 +85,11 @@ const Version: React.FC<{ version: string }> = p => {
     {ver.mods.map(it => <li key={it}>
       {it}
       <div className='buttons'>
+        {!ps.extraJson.copyMode &&
+          <button
+            className='btn2'
+            onClick={() => autoNotices(exportUnidentified(join(ver.path, it), 'Mod'))}
+          >{$('Export')}</button>}
         <button className='btn2 danger' onClick={() => requestUninstall(it, true)}>{$('Delete')}</button>
       </div>
     </li>)}

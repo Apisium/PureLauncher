@@ -19,7 +19,7 @@ addEventListener('message', function (e) {
     p.stdout.on('data', () => {
       // console.log(data.toString())
     })
-    p.on('exit', (code, signal) => {
+    p.on('close', (code, signal) => {
       postMessage({ state: 'exit', code, signal })
     })
     postMessage({ state: 'launched' })

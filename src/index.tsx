@@ -6,11 +6,12 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import Notification from 'rc-notification'
 import './protocol/index'
-import { remote } from 'electron'
+import { remote, shell } from 'electron'
 
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
 const logo = document.getElementById('top-logo')
+logo.onclick = () => shell.openExternal('https://pl.apisium.cn')
 
 ReactDOM.render(<App />, document.getElementById('root'), () => {
   const content = document.getElementById('main-content')

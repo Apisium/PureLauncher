@@ -12,7 +12,7 @@ export interface Resource <T extends string = string> {
 }
 export interface ResourceVersion extends Resource<'Version'> {
   version: string
-  json: string | Record<string | number, any>
+  json?: string | Record<string | number, any>
   mcVersion: string
   resources?: Record<string, AllResources> | string
   files?: Record<string, string>

@@ -1,7 +1,9 @@
 import * as T from './types'
 import user from '../utils/analytics'
 import { getJson } from '../utils/index'
+import { remote } from 'electron'
 
+const win = remote.getCurrentWindow()
 export default (
   r: T.Resource | string,
   request = true,
@@ -17,8 +19,10 @@ export default (
     if (!checker(r)) return
     obj.request = request
     obj.throws = throws
-    await pluginMaster.emitSync('protocolInstallProcess', r, obj)
+    await pluginMaster.emitSync('protocolPreInstallResource', r, obj)
     if (request) {
+      win.flashFrame(true)
+      win.moveTop()
       const req = await global.__requestInstallResources(r, obj)
       if (pluginsNotInstalled) return req
       if (!req) return

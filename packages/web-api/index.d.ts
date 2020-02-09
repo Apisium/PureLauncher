@@ -1,6 +1,6 @@
 import * as T from '../../src/protocol/types'
 
-export type types = T
+export * from '../../src/protocol/types'
 
 /* eslint-disable camelcase */
 export interface PureLauncherInfo {
