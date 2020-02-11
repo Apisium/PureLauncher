@@ -4,12 +4,12 @@ import isDev from '../utils/isDev'
 import fs from 'fs-extra'
 import React from 'react'
 import EventBus, { INTERRUPTIBLE } from '../utils/EventBus'
+import ErrorHandler, { AUTO_RELOAD } from '../components/ErrorHandler'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, ExtensionsButton } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { remote, ipcRenderer } from 'electron'
 import { join } from 'path'
 import { DELETES_FILE, PLUGINS_ROOT } from '../constants'
-import ErrorHandler from '../components/ErrorHandler'
 
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
@@ -171,7 +171,7 @@ export default class Master extends EventBus {
   }
 
   public addRoute (route: JSX.Element, plugin: Plugin) {
-    const r = React.createElement(ErrorHandler, null, route)
+    const r = React.createElement(ErrorHandler, AUTO_RELOAD, route)
     ;(plugin[ROUTES] || (plugin[ROUTES] = new Set())).add(r)
     this.routes.add(r)
     const u = (window as any).__routerUpdater

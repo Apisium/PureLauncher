@@ -111,3 +111,7 @@ export const autoNotices = <T> (p: Promise<T>) => p.then(r => {
   console.error(e)
   notice({ content: $('Failed!'), error: true })
 }) as any as Promise<T>
+
+export const checkUrl = (url: string) => fetch(url, { cache: 'no-cache' })
+  // eslint-disable-next-line no-throw-literal
+  .then(it => { if (it.ok) return true; else throw null }).catch(() => false)

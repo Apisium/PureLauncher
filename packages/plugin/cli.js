@@ -90,10 +90,8 @@ switch (argv._[0]) {
           console.error(MESSAGES.NOT_DEV)
           process.exit(-1)
         }
-        if (info.devPlugin !== DEV_PLUGIN) {
-          await api.post('setDevPlugin', { path: DEV_PLUGIN })
-          await api.reload()
-        }
+        if (info.devPlugin !== DEV_PLUGIN) await api.post('setDevPlugin', { path: DEV_PLUGIN })
+        await api.reload()
       } catch (e) {
         console.error(e)
         console.error(MESSAGES.NOT_RUNNING)

@@ -7,9 +7,8 @@ import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
 import * as constants from '../constants'
 import * as Reqwq from 'reqwq'
-import * as Launcher from '@xmcl/launch'
+import * as Core from '@xmcl/core'
 import * as Installer from '@xmcl/installer'
-import * as Version from '@xmcl/version'
 import * as Task from '@xmcl/task'
 import * as ResourcePack from '@xmcl/resourcepack'
 
@@ -52,9 +51,8 @@ export const notice: (ctx: { content: React.ReactNode, duration?: number, error?
 export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
   Promise<boolean> = null
 export const xmcl = {
-  Launcher,
+  Core,
   Installer,
-  Version,
   Task,
   ResourcePack
 }

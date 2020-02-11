@@ -1,3 +1,6 @@
+import { Downloader } from '@xmcl/installer/util'
+import { download, checkUrl } from '../utils/index'
+
 export interface DownloadProvider {
   name (): string
   locales?: string[]
@@ -36,5 +39,32 @@ const DownloadProviders = Object.freeze({
     forge: 'https://files.minecraftforge.net/maven'
   })
 })
+
+const downloader: Downloader = {
+  async downloadFileIfAbsent ({ url, destination: file }) {
+    if (Array.isArray(url)) {
+      for (const link of url) {
+        if (await checkUrl(link)) {
+          await download({ file, url: link })
+          return ''
+        }
+      }
+    } else if (await checkUrl(url)) {
+      await download({ file, url })
+      return ''
+    }
+    throw new Error('Can not resolve this file: ' + url)
+  }
+} as any // TODO:
+
+export const getDownloaders = () => {
+  const assets /* TODO: add type AssetsOption */ = {
+    downloader // TODO:
+  }
+  const libraries /* TODO: add type */ = {
+    downloader // TODO:
+  }
+  return { assets, libraries, versions: { ...assets, ...libraries } }
+}
 
 export default DownloadProviders as Record<keyof typeof DownloadProviders, DownloadProvider>

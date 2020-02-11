@@ -1,11 +1,11 @@
-import { Store, injectStore, NOT_PROXY } from 'reqwq'
-import { Launcher } from '@xmcl/launch'
+import { Store, injectStore } from 'reqwq'
+import { LaunchOption, Version, launch } from '@xmcl/core'
 import { Installer } from '@xmcl/installer'
-import { Version } from '@xmcl/version'
-import { download } from '../utils/index'
+import { getVersionTypeText } from '../utils/index'
 import { GAME_ROOT } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer } from 'electron'
+import { getDownloaders } from '../plugin/DownloadProviders'
 import ProfilesStore from './ProfilesStore'
 import Task from '@xmcl/task'
 import user from '../utils/analytics'
@@ -21,44 +21,7 @@ export default class GameStore extends Store {
 
   @injectStore(ProfilesStore)
   private profilesStore: ProfilesStore
-  private currentVersionId: string
-  private worker = Object.assign(new Worker('../workers/launch.ts'), { [NOT_PROXY]: true })
 
-  constructor () {
-    super()
-    this.worker.addEventListener('message', m => {
-      const { state, error } = m.data
-      pluginMaster.emit('launchMessage', this.currentVersionId, state, error)
-      switch (state) {
-        case 'error':
-          console.error(error)
-          notice({ content: $('Fail to launch!'), error: true })
-          this.status = STATUS.READY
-          ipcRenderer.send('close-launching-dialog')
-          if (currentWindow.isMinimized()) {
-            currentWindow.restore()
-            currentWindow.setSize(816, 586)
-          }
-          break
-        case 'launched':
-          console.log('launched!')
-          this.status = STATUS.LAUNCHED
-          break
-        case 'exit':
-          if (m.data.code !== 0) {
-            // this.error = ({ code: m.data.code, signal: m.data.signal })
-          }
-          this.status = STATUS.READY
-          ipcRenderer.send('close-launching-dialog')
-          if (currentWindow.isMinimized()) {
-            currentWindow.restore()
-            currentWindow.setSize(816, 586)
-          }
-          console.log('exit')
-          break
-      }
-    })
-  }
   public async launch (version?: string) {
     if (this.status !== STATUS.READY) return
     try {
@@ -119,13 +82,14 @@ export default class GameStore extends Store {
       await checkModsDirectoryOfVersion(versionId, ret)
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
-      const option: Launcher.Option = {
+      const option: LaunchOption = {
         launcherBrand,
         properties: {},
         version: versionId,
         gamePath: GAME_ROOT,
         userType: 'mojang' as any,
         launcherName: 'pure-launcher',
+        versionType: getVersionTypeText(),
         extraJVMArgs: javaArgs.split(' '),
         accessToken: profile.accessToken || '',
         gameProfile: { id: profile.uuid, name: profile.username },
@@ -137,28 +101,43 @@ export default class GameStore extends Store {
       await pluginMaster.emitSync('preLaunch', versionId, option)
       this.status = STATUS.LAUNCHING
       remote.getCurrentWindow().minimize()
-      if (extraJson.animation) setTimeout(() => ipcRenderer.send('open-launching-dialog'), 3000)
-      this.worker.postMessage(option)
+      if (extraJson.animation) {
+        setTimeout(() => ipcRenderer.send('open-launching-dialog'), 3000)
+        stopAnimation()
+      }
 
-      await new Promise((res, rej) => {
-        const onceLaunch = (m: MessageEvent) => {
-          const { state, error } = m.data
-          switch (state) {
-            case 'error':
-              this.worker.removeEventListener('message', onceLaunch)
-              rej(error)
-              break
-            case 'launched':
-              this.worker.removeEventListener('message', onceLaunch)
-              res()
-              break
+      try {
+        const p = await launch(option)
+        p.once('close', (code, signal) => {
+          if (code !== 0) {
+            // this.error = ({ code: m.data.code, signal: m.data.signal })
+          }
+          ipcRenderer.send('close-launching-dialog')
+          if (this.profilesStore.extraJson.animation) startAnimation()
+          if (currentWindow.isMinimized()) {
+            currentWindow.restore()
+            currentWindow.setSize(816, 586)
+          }
+          this.status = STATUS.READY
+          console.log('exit', code, signal)
+        })
+        await pluginMaster.emit('postLaunch', p, versionId, option)
+      } catch (e) {
+        if (typeof e === 'object' && e.error) {
+          switch (e.error) {
+            case 'MissingLibs':
+              getDownloaders() // TODO: download and relaunch
+              return
+            case 'CorruptedLibs': // TODO: download and notice
+              return
+            case 'CorruptedVersionJar': // TODO: download and notice
+              return
           }
         }
-        this.worker.addEventListener('message', onceLaunch)
-      })
-      this.currentVersionId = versionId
-      await pluginMaster.emit('postLaunch', versionId, option)
+        throw e
+      }
     } catch (e) {
+      notice({ content: $('Fail to launch!'), error: true })
       this.status = STATUS.READY
       ipcRenderer.send('close-launching-dialog')
       if (currentWindow.isMinimized()) {
@@ -168,21 +147,13 @@ export default class GameStore extends Store {
       throw e
     }
   }
-  private async ensureMinecraftVersion (minecraft: string, version: Installer.VersionMeta) {
-    const task = Installer.installTask('client', version, minecraft, {
-      downloader ({ url, destination }) {
-        return download({ url, file: destination }).then(() => undefined)
-      }
-    })
+  private async ensureMinecraftVersion (minecraft: string, version: any /* TODO: need a type */) {
+    const task = Installer.installTask('client', version, minecraft, getDownloaders().assets)
     await Task.execute(task)
   }
   private async ensureLocalVersion (minecraft: string, versionId: string) {
     const resolved = await Version.parse(minecraft, versionId)
-    const task = Installer.installDependenciesTask(resolved, {
-      downloader ({ url, destination }) {
-        return download({ url, file: destination }).then(() => undefined)
-      }
-    })
+    const task = Installer.installDependenciesTask(resolved, getDownloaders().versions)
     await Task.execute(task)
   }
 }
