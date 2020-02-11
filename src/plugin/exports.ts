@@ -17,6 +17,7 @@ export { Plugin, plugin, event } from './Plugin'
 export { default as Authenticator } from './Authenticator'
 export { default as types } from '../protocol/types'
 export { default as fitText } from '../utils/fit-text'
+export { default as requestReload } from '../utils/request-reload'
 export { default as Avatar } from '../components/Avatar'
 export { default as Dots } from '../components/Dots'
 export { default as Dropdown } from '../components/Dropdown'
@@ -40,7 +41,7 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
-export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion,
+export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion, checkUrl,
   DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes, autoNotices } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfilesStore }
 

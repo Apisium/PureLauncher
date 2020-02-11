@@ -38,7 +38,7 @@
   "Incorrect java version!": "Java 版本不正确!",
   "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
   "Have already logged in? Click here!": "已经登陆了? 点击这里切换账户!",
-  "ResourcesInstaller": "资源管理安装器.",
+  "ResourcesInstaller": "资源管理和安装器.",
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
   "OK": "确认",
@@ -50,6 +50,7 @@
   "Deleting...": "文件删除中...",
   "Save failed!": "保存失败!",
   "Installing resources...": "正在安装资源...",
+  "Copied!": "成功复制!",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
     "发生未知错误，请点击上方苦力怕图标以刷新页面!",
   "Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!":

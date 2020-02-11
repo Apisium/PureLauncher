@@ -11,7 +11,7 @@ export interface ExtensionsButton {
   hideFirst?: boolean
 }
 export type PluginInfo = Pick<ResourcePlugin,
-  Exclude<keyof ResourcePlugin, 'type' | 'url' | 'dependencies' | 'extension' | 'title' | 'description'>> &
+  Exclude<keyof ResourcePlugin, 'type' | 'url' | 'dependencies' | 'extension' | 'title' | 'description' | 'hash'>> &
   { title (): string, description? (): string }
   & { dependencies?: string[] }
 export class Plugin {

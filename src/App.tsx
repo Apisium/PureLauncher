@@ -5,7 +5,7 @@ import history from './utils/history'
 import LiveRoute from './components/LiveRoute'
 import { render, unmountComponentAtNode } from 'react-dom'
 import { ipcRenderer } from 'electron'
-import { Router, Redirect } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 
 import Provider from './models/index'
 import './plugin/index'
@@ -41,7 +41,7 @@ const App: React.FC = () => {
             <LiveRoute component={Manager} path='/manager/:type' className='vh100' />
             <LiveRoute exact component={Settings} path='/settings' />
             <LiveRoute exact component={ErrorPage} path='/error' className='vh100' />
-            <Redirect to='/manager/versions' />
+            {/* <Redirect to='/manager/versions' /> */}
             <PluginRoutes />
           </section>
         </Router>

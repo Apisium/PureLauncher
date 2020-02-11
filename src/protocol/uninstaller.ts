@@ -1,7 +1,9 @@
 import fs from 'fs-extra'
 import { join } from 'path'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_VERSIONS_PATH, VERSIONS_PATH,
-  RESOURCES_MODS_INDEX_FILE_NAME, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH } from '../constants'
+  RESOURCES_MODS_INDEX_FILE_NAME, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH, DELETES_FILE, RESOURCES_PLUGINS_INDEX } from '../constants'
+import { Plugin } from '../plugin/Plugin'
+import { FILE } from '../plugin/index'
 
 export const uninstallVersion = async (id: string) => {
   const json = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }
@@ -41,4 +43,15 @@ export const uninstallResourcePack = async (id: string, directly = false) => {
     delete json[id]
     await fs.writeJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, json)
   }
+}
+
+export const uninstallPlugin = async (p: Plugin) => {
+  const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
+  if (!pluginMaster.isPluginUninstallable(p, deletes)) throw new Error('Plugin cannot be uninstalled!')
+  pluginMaster.pluginFileMap[p.pluginInfo.id] = p[FILE]
+  deletes.push(p[FILE])
+  const json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
+  delete json[p.pluginInfo.id]
+  await Promise.all([fs.writeJson(DELETES_FILE, deletes), fs.writeJson(json, DELETES_FILE)])
+  return deletes
 }

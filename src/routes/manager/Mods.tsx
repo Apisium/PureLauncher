@@ -75,7 +75,7 @@ const Version: React.FC<{ version: string }> = p => {
             onClick={() => {
               if (ps.extraJson.copyMode) {
                 clipboard.writeText(it.source)
-                notice({ content: $('Success!') })
+                notice({ content: $('Copied!') })
               } else autoNotices(exportResource(it))
             }}
           >{$('Export')}</button>}

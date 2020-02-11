@@ -3,10 +3,12 @@ import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import install from './install'
 import P from '../models/index'
-import GameStore, { STATUS } from '../models/GameStore'
+import GameStore from '../models/GameStore'
+import requestReload from '../utils/request-reload'
+
+const gameStore = P.getStore(GameStore)
 
 const InterruptedResources = 'interruptedResources'
-const gameStore = P.getStore(GameStore)
 const mappings = {
   async Install (r: T.ProtocolInstall, request?: boolean) {
     if (r.plugins) {
@@ -21,12 +23,7 @@ const mappings = {
         const rs = JSON.parse(localStorage.getItem(InterruptedResources) || '[]')
         rs.push(r)
         localStorage.set(InterruptedResources, JSON.stringify(rs))
-        if (gameStore.status === STATUS.READY) {
-          notice({ content: $('Plugins installed! Restarting...') })
-          setTimeout(() => location.reload(), 5000)
-        } else {
-          openConfirmDialog({ text: $('Currently, the game is launching. Please restart the game manually later to install the plugin!') })
-        }
+        requestReload()
         return
       }
     }

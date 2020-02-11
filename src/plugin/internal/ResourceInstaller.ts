@@ -2,21 +2,19 @@ import { plugin, Plugin, event } from '../Plugin'
 import { version } from '../../../package.json'
 import { download, makeTempDir, getJson, DownloadItem, sha1, genId, md5, validPath, replace } from '../../utils/index'
 import { join, dirname, resolve } from 'path'
-import valid from 'semver/functions/valid'
-import gte from 'semver/functions/gte'
-import major from 'semver/functions/major'
-import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, PLUGINS_ROOT,
-  RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, RESOURCES_MODS_INDEX_FILE_NAME } from '../../constants'
+import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH,
+  PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX,
+  RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../../constants'
 import pAll from 'p-all'
 import fs from 'fs-extra'
+import gte from 'semver/functions/gte'
+import major from 'semver/functions/major'
 import install from '../../protocol/install'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
 
-export const allowExtensions = ['.js', '.mjs', '.asar']
-
 const checkHash = (file: string, hash: string) => sha1(file).then(it => {
-  if (hash.trim() === it) return it
+  if (hash.trim() === it) return it.trim()
   else throw new Error($('Hash is different: {0} -> {1}', it, hash))
 })
 const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: string[] }) =>
@@ -180,9 +178,7 @@ export default class ResourceInstaller extends Plugin {
 
   public async installMod (r: T.ResourceMod, o: T.InstallView = { }, id?: string, dir?: string) {
     if (!r) return
-    if (typeof r !== 'object' || r.type !== 'Mod' || !r.id || !valid(r.version)) {
-      throw new TypeError('Incorrect resource type!')
-    }
+    if (!T.isMod(r)) throw new TypeError('Incorrect resource type!')
     if (!dir && o.resolvedDir) dir = join(o.resolvedDir, 'mods')
     if (!id && o.resolvedId) id = o.resolvedId
     if (!dir || !id) {
@@ -235,12 +231,17 @@ export default class ResourceInstaller extends Plugin {
 
   public async installPlugin (r: T.ResourcePlugin, showDialog = false, o: T.InstallView = { }) {
     if (!r) return
-    if (typeof r !== 'object' || r.type !== 'Plugin' || !r.id || !valid(r.version)) {
-      throw new TypeError('Incorrect resource type!')
+    if (!T.isPlugin(r)) throw new TypeError('Incorrect resource type!')
+    const old: T.ResourcePlugin = (await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { })[r.id]
+    if (old) {
+      if (gte(old.version, r.version)) return
+      if (r.hash !== old.hash) {
+        const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
+        deletes.push(join(PLUGINS_ROOT, old.hash + (old.extension || '.asar')))
+        await fs.writeJson(DELETES_FILE, deletes)
+      }
     }
-    let json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
-    if (r.id in json && gte(json[r.id].version, r.version)) return
-    if (r.extension && !allowExtensions.includes(r.extension)) {
+    if (r.extension && !ALLOW_PLUGIN_EXTENSIONS.includes(r.extension)) {
       throw new Error(`The extension: ${r.extension} is not allowed`)
     }
     if (!o.confirmed && showDialog && !await openConfirmDialog({
@@ -256,13 +257,12 @@ export default class ResourceInstaller extends Plugin {
     try {
       const file = join(p, genId())
       await download({ url: replace(r.url, r), file }, r.title || r.id)
-      const hash = r.hash ? await checkHash(file, r.hash) : await sha1(file)
+      const hash = await checkHash(file, r.hash)
       await fs.ensureDir(PLUGINS_ROOT)
       const path = join(PLUGINS_ROOT, hash + (r.extension || '.asar'))
       if (await fs.pathExists(path)) await fs.unlink(path)
       await fs.move(file, path)
-      json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
-      r.hash = hash
+      const json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
       json[r.id] = r
       await fs.outputJson(RESOURCES_PLUGINS_INDEX, json)
     } finally {

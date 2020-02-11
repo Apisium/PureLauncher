@@ -201,7 +201,7 @@ const Versions: React.FC = () => {
                     e.stopPropagation()
                     if (pm.extraJson.copyMode) {
                       clipboard.writeText(json[ver.lastVersionId].source)
-                      notice({ content: $('Success!') })
+                      notice({ content: $('Copied!') })
                     } else exportVersion(ver.key)
                   }}
                 >{$('Export')}</button>}

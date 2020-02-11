@@ -56,8 +56,9 @@ export interface ResourcePlugin extends Resource<'Plugin'> {
   url: string
   source?: string
   website?: string
-  hash?: string
+  hash: string
   extension?: string
+  updateUrl?: string
   dependencies?: Record<string, ResourcePlugin | string>
 }
 export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer
@@ -72,7 +73,8 @@ export const isResourcesPack = (r: any): r is ResourceResourcesPack => isResourc
 export const isMod = (r: any): r is ResourceMod => isResourceWithVersionAndUrls(r) &&
   r.type === 'Mod'
 export const isPlugin = (r: any): r is ResourcePlugin => isResourceWithVersion(r) &&
-  r.type === 'Plugin' && typeof (r as any).url === 'string' && !!(r as any).url
+  r.type === 'Plugin' && typeof (r as any).url === 'string' && !!(r as any).url &&
+  typeof (r as any).hash === 'string' && !!(r as any).hash
 export const isVersion = (r: any): r is ResourceVersion => isResourceWithVersion(r) &&
   r.type === 'Version' && (typeof (r as any).json === 'object' || typeof (r as any).json === 'string') &&
   (r as any).json && !!valid((r as any).mcVersion)

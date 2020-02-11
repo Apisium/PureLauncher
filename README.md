@@ -2,6 +2,8 @@
 
 An awesome Minecraft Launcher.
 
+[Official Website](https://pl.apisium.cn)
+
 ## Features
 
 - 🚀 Fast launching.
@@ -40,6 +42,8 @@ For plugins developers, resource creators, testers and advanced users:
 npm i
 
 npm run build
+
+npm run pack
 ```
 
 Use taobao registry:
@@ -65,6 +69,11 @@ npm run run
 
 - Shirasawa
 - CI010
+
+## Thanks
+
+- Baline2000
+- Fleey
 
 ## License
 

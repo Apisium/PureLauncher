@@ -8,20 +8,20 @@ import ErrorHandler, { AUTO_RELOAD } from '../components/ErrorHandler'
 import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, ExtensionsButton } from './Plugin'
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { remote, ipcRenderer } from 'electron'
-import { join } from 'path'
-import { DELETES_FILE, PLUGINS_ROOT } from '../constants'
+import { join, extname } from 'path'
+import { PLUGINS_ROOT, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../constants'
 
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
 const ROUTES = Symbol('Pages')
-const FILE = Symbol('File')
+export const FILE = Symbol('File')
 
 export default class Master extends EventBus {
   public routes = new Set<JSX.Element>()
   public extensionsButtons = new Set<ExtensionsButton>()
   public plugins: Record<string, Plugin> = { }
   public logins: Record<string, Authenticator> = { [YGGDRASIL]: new Yggdrasil(), [OFFLINE]: new Offline() }
-  private pluginFileMap: Record<string, string> = { }
+  public pluginFileMap: Record<string, string> = { }
 
   public constructor () {
     super()
@@ -105,7 +105,7 @@ export default class Master extends EventBus {
     }
     let plugins: Array<typeof Plugin> = []
     await Promise.all((await fs.readdir(PLUGINS_ROOT))
-      .filter(it => it.endsWith('.js') || it.endsWith('.asar'))
+      .filter(it => ALLOW_PLUGIN_EXTENSIONS.includes(extname(it)))
       .map(async it => {
         const file = join(PLUGINS_ROOT, it)
         let path = file
@@ -189,15 +189,6 @@ export default class Master extends EventBus {
     } catch {
       return false
     }
-  }
-
-  public async uninstallPlugin (p: Plugin) {
-    const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
-    if (!this.isPluginUninstallable(p, deletes)) throw new Error('Plugin cannot be uninstalled!')
-    this.pluginFileMap[p.pluginInfo.id] = p[FILE]
-    deletes.push(p[FILE])
-    await fs.writeJson(DELETES_FILE, deletes)
-    return deletes
   }
 }
 

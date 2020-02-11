@@ -32,5 +32,6 @@ export const RESOURCES_MODS_INDEX_FILE_NAME = 'mods-index.json'
 export const MC_LOGO = join(process.cwd(), 'unpacked/mc-logo.ico')
 
 export const DEFAULT_EXT_FILTER = ['exe', 'com']
+export const ALLOW_PLUGIN_EXTENSIONS = ['.js', '.mjs', '.asar']
 
 export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
