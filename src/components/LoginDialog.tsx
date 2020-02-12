@@ -27,7 +27,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
     props.onClose()
     setType('')
   }
-  const Component: React.ComponentType = currentLogin[Auth.COMPONENT]
+  const Component: React.ComponentType = currentLogin?.[Auth.COMPONENT]
   return <Dialog
     animation='zoom'
     maskAnimation='fade'
@@ -53,7 +53,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
               }}
               style={{ backgroundImage: `url(${it[Auth.LOGO]})`, width, height: width }}
             />
-            <p>{it[Auth.TITLE]()}</p>
+            <p>{it[Auth.TITLE](it)}</p>
           </div>)}
         </div>
       </>

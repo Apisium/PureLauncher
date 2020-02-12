@@ -121,6 +121,7 @@ export default class ProfilesStore extends Store {
         return this.selectedUser.account ? pluginMaster.logins[YGGDRASIL].getData(this.selectedUser.account) : null
       } else return pluginMaster.getCurrentLogin().getData(this.extraJson.selectedUser)
     } catch (e) {
+      console.error(e)
       this.extraJson.loginType = ''
       this.extraJson.selectedUser = ''
       notice({ content: $('Current account is invalid, please re-login!') })
@@ -318,14 +319,15 @@ export default class ProfilesStore extends Store {
       const s = await fs.lstat(MODS_PATH)
       if (!s.isDirectory() || s.isSymbolicLink()) return
     } catch (e) { return }
-    const dest = join(VERSIONS_PATH, await this.resolveVersion(v.key), 'mods')
+    const id = await this.resolveVersion(v.key)
+    const dest = join(VERSIONS_PATH, id, 'mods')
     if (await fs.pathExists(dest)) {
       await fs.copy(MODS_PATH, dest, { overwrite: false })
       await fs.remove(MODS_PATH)
     } else await fs.rename(MODS_PATH, dest)
     await fs.symlink(dest, MODS_PATH, 'junction')
     openConfirmDialog({
-      text: $('Mods folder detected, which has been moved to the game version {0}\'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.', v.lastVersionId)
+      text: $('Mods folder detected, which has been moved to the game version {0}\'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.', id)
     })
     return v
   }

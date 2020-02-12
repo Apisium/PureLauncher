@@ -8,7 +8,6 @@ import { ipcRenderer } from 'electron'
 import { Router } from 'react-router-dom'
 
 import Provider from './models/index'
-import './plugin/index'
 
 import Home from './routes/Home'
 import Settings from './routes/Settings'
@@ -16,10 +15,6 @@ import Manager from './routes/Manager'
 import ErrorPage from './routes/Error'
 import SideBar from './SideBar'
 import InstallList from './components/InstallList'
-
-Object.defineProperty(window, 'PureLauncherPluginExports', {
-  value: Object.freeze(require('./plugin/exports'))
-})
 
 ipcRenderer.on('pure-launcher-reload', () => location.reload())
 const ref = createRef()

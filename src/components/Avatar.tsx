@@ -16,7 +16,11 @@ const Avatar: React.FC<React.HTMLAttributes<HTMLDivElement> & { src: string | st
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Img src={src || steve} loader={<img src={steve} alt={$('Avatar')} />} />
+      <Img
+        src={src || steve}
+        loader={<img src={steve} alt={$('Avatar')} />}
+        unloader={<img src={steve} alt={$('Avatar')} />}
+      />
       <Img src={src} className='cover' />
     </Div>
   </AnimatePresence>

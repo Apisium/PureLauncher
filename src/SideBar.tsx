@@ -59,7 +59,10 @@ const SideBar: React.FC = () => {
         break
       default: btnText = $('Unknown')
     }
-  } else btnText = name = $('Log in')
+  } else {
+    btnText = $('Log in')
+    name = $('NOT LOGGED-IN')
+  }
   const fontSize = useMemo(() => fitText(btnText.toUpperCase(), 98, 20), [btnText]) + 'px'
   return (
     <div className='side-bar'>

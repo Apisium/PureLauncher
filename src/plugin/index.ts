@@ -1,4 +1,5 @@
-import Authenticator from './Authenticator'
+import '../models/index'
+import Authenticator, { NAME } from './Authenticator'
 import internal from './internal/index'
 import isDev from '../utils/isDev'
 import fs from 'fs-extra'
@@ -72,11 +73,10 @@ export default class Master extends EventBus {
   }
 
   public registerAuthenticator (name: string, plugin: Plugin, a: Authenticator) {
-    if (!(a instanceof Authenticator)) throw new TypeError('arg 1 is not an Authenticator!')
+    if (!(a instanceof Authenticator) || !a[NAME]) throw new TypeError('arg 1 is not an Authenticator!')
     if (name in this.logins) throw new Error(`the Authenticator (${name}) is already exists!`)
-    this.checkPlugin(plugin)
     this.logins[name] = a
-    ;(plugin[AUTHENTICATORS] || (plugin[AUTHENTICATORS] = new Set())).push(name)
+    ;(plugin[AUTHENTICATORS] || (plugin[AUTHENTICATORS] = new Set())).add(name)
   }
 
   public async unloadPlugin (plugin: Plugin) {
@@ -193,3 +193,6 @@ export default class Master extends EventBus {
 }
 
 Object.defineProperty(window, 'pluginMaster', { value: new Master() })
+Object.defineProperty(window, 'PureLauncherPluginExports', {
+  value: Object.freeze(require('./exports'))
+})

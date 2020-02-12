@@ -13,7 +13,7 @@ export interface Field {
 }
 export const registerAuthenticator = (args: {
   name: string
-  title: () => string
+  title: (authenticator: Authenticator, profile?: Profile) => string
   logo: string
   fields?: Field[]
   link?: { name: () => string, url: () => string }
@@ -23,7 +23,7 @@ export const registerAuthenticator = (args: {
   public [TITLE] = args.title
   public [FIELDS] = args.fields || []
   public [LINK] = args.link
-  public [LOGO] = args.logo
+  public [LOGO] = args.logo.replace(/\\/g, '/')
   public [COMPONENT] = args.compoent
 }
 

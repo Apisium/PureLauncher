@@ -32,7 +32,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
   public async login (options: { email: string, password: string }) {
     const m = profilesStore
     const p = Object.values(m.authenticationDatabase)
-    if (p.find(it => it.username.toLowerCase() === options.password.toLowerCase())) {
+    if (p.some(it => it.username.toLowerCase() === options.email.toLowerCase())) {
       throw new Error($('You have already logged in with this account!'))
     }
     const data = await fetchJson(BASE_URL + 'authenticate', true, {

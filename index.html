@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="opacity:0;transition:opacity .6s">
+<html lang="en" style="opacity:0;transition:opacity 1s">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline'">
@@ -93,7 +93,6 @@
         colors: [colors0, colors1, colors2],
         blocks: [fn(0, colors0, blocks0), fn(2, colors1, blocks1), fn(16, colors2, blocks2)]
       }
-      document.addEventListener('DOMContentLoaded', () => (document.getElementsByTagName('html')[0].style.opacity = '1'))
 
       let timer1
       window.animationStopped = true

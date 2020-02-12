@@ -2,6 +2,7 @@ import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
 import PluginMaster from './index'
 import ProfilesStore from '../models/ProfilesStore'
+import * as fs from 'fs-extra'
 import * as skinView3d from 'skinview3d'
 import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
@@ -44,7 +45,8 @@ export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion, checkUrl,
   DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes, autoNotices } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfilesStore, Authenticator }
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
+  constants, Reqwq, ProfilesStore, Authenticator, fs }
 
 export const $: Window['$'] = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
