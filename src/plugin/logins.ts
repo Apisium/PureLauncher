@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import Authenticator, { RegisterAuthenticator, Profile, SkinChangeable } from './Authenticator'
+import Authenticator, { registerAuthenticator, Profile, SkinChangeable } from './Authenticator'
 import { genUUID, fetchJson } from '../utils/index'
 import { OFFLINE_ACCOUNTS_FILE } from '../constants'
 
@@ -10,18 +10,24 @@ const saveFile = () => profilesStore.saveLaunchProfileJson().catch(e => {
 })
 
 export const YGGDRASIL = 'yggdrasil'
-@RegisterAuthenticator(YGGDRASIL, () => $('Online Login'), require('../assets/images/steve-head.png'), [
-  {
-    name: 'email',
-    title: () => $('Email'),
-    inputProps: { type: 'email', required: true, autoFocus: true }
-  },
-  {
-    name: 'password',
-    title: () => $('Password'),
-    inputProps: { type: 'password', required: true }
-  }
-], { name: () => $('Register'), url: () => 'https://my.minecraft.net/store/minecraft/#register' })
+@registerAuthenticator({
+  name: YGGDRASIL,
+  title: () => $('Online Login'),
+  logo: require('../assets/images/steve-head.png'),
+  fields: [
+    {
+      name: 'email',
+      title: () => $('Email'),
+      inputProps: { type: 'email', required: true, autoFocus: true }
+    },
+    {
+      name: 'password',
+      title: () => $('Password'),
+      inputProps: { type: 'password', required: true }
+    }
+  ],
+  link: { name: () => $('Register'), url: () => 'https://my.minecraft.net/store/minecraft/#register' }
+})
 export class Yggdrasil extends Authenticator implements SkinChangeable {
   public async login (options: { email: string, password: string }) {
     const m = profilesStore
@@ -172,13 +178,18 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
 }
 
 export const OFFLINE = 'Offline'
-@RegisterAuthenticator(OFFLINE, () => $('Offline Login'), require('../assets/images/zombie-head.png'), [
-  {
-    name: 'username',
-    title: () => $('Username'),
-    inputProps: { required: true, pattern: '\\w{2,16}', autoFocus: true }
-  }
-])
+@registerAuthenticator({
+  name: OFFLINE,
+  title: () => $('Offline Login'),
+  logo: require('../assets/images/zombie-head.png'),
+  fields: [
+    {
+      name: 'username',
+      title: () => $('Username'),
+      inputProps: { required: true, pattern: '\\w{2,16}', autoFocus: true }
+    }
+  ]
+})
 export class Offline extends Authenticator {
   private db: { [key: string]: string } = fs.readJsonSync(OFFLINE_ACCOUNTS_FILE, { throws: false }) || { }
   public async login (options: { username: string }) {

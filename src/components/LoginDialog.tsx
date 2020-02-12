@@ -27,6 +27,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
     props.onClose()
     setType('')
   }
+  const Component: React.ComponentType = currentLogin[Auth.COMPONENT]
   return <Dialog
     animation='zoom'
     maskAnimation='fade'
@@ -50,7 +51,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
                 setSubmitted(false)
                 setType(it[Auth.NAME])
               }}
-              style={{ backgroundImage: `url(${it[Auth.IMAGE]})`, width, height: width }}
+              style={{ backgroundImage: `url(${it[Auth.LOGO]})`, width, height: width }}
             />
             <p>{it[Auth.TITLE]()}</p>
           </div>)}
@@ -87,6 +88,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
             <div className='dot3' />
           </div>
         </React.Fragment>)}
+        {Component && <Component />}
         <div className='links'>
           <span data-sound className='left' role='button' onClick={() => !loading && setType('')}>{$('Back')}</span>
           {currentLogin[Auth.LINK] &&

@@ -11,15 +11,16 @@ import * as Core from '@xmcl/core'
 import * as Installer from '@xmcl/installer'
 import * as Task from '@xmcl/task'
 import * as ResourcePack from '@xmcl/resourcepack'
+import * as Authenticator from './Authenticator'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
-export { default as Authenticator } from './Authenticator'
 export { default as types } from '../protocol/types'
 export { default as fitText } from '../utils/fit-text'
 export { default as requestReload } from '../utils/request-reload'
 export { default as Avatar } from '../components/Avatar'
 export { default as Dots } from '../components/Dots'
+export { default as Locates } from '../utils/Locates'
 export { default as Dropdown } from '../components/Dropdown'
 export { default as Switch } from '../components/Switch'
 export { default as ShowMore } from '../components/ShowMore'
@@ -43,7 +44,7 @@ export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion, checkUrl,
   DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes, autoNotices } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfilesStore }
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, constants, Reqwq, ProfilesStore, Authenticator }
 
 export const $: Window['$'] = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
