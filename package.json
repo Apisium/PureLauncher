@@ -132,7 +132,7 @@
   },
   "replacer": {
     "@['\"]lodash.debounce['\"]": "'lodash/debounce'",
-    "from 'three'": "from '/packages/minimize-three/index.js'"
+    "require(\"three\")": "require('/packages/minimize-three/index.js')"
   },
   "build": {
     "productName": "PureLauncher",

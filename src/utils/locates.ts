@@ -1,6 +1,6 @@
 import { replaceArgs } from '../i18n'
 
-export interface Locates <T extends object> extends T {
+export type Locates <T extends object> = T & {
   setCurrentLanguage (name?: string): void
   (key: keyof T, ...args: any[]): 233
 }
