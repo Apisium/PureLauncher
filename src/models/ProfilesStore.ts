@@ -419,11 +419,13 @@ export default class ProfilesStore extends Store {
   }
 
   private loadLaunchProfileJson (json: this) {
-    this.selectedUser = json.selectedUser
-    this.authenticationDatabase = json.authenticationDatabase
-    this.clientToken = json.clientToken
-    this.settings = json.settings
-    this.profiles = json.profiles
+    this.selectedUser = json.selectedUser || this.selectedUser
+    this.authenticationDatabase = json.authenticationDatabase || this.authenticationDatabase
+    this.clientToken = !json.clientToken || json.clientToken === '88888888-8888-8888-8888-888888888888'
+      ? genUUID() : json.clientToken
+    this.settings = json.settings || this.settings
+    if (json.profiles) delete json.profiles['(Default)']
+    this.profiles = json.profiles || this.profiles
     if (!Object.values(this.profiles).find(it => it.type === 'latest-release')) this.setDefaultVersions()
     applyLocate(this.settings.locale || DEFAULT_LOCATE, true)
     this.setTasks()

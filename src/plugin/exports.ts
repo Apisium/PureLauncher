@@ -21,7 +21,7 @@ export { default as fitText } from '../utils/fit-text'
 export { default as requestReload } from '../utils/request-reload'
 export { default as Avatar } from '../components/Avatar'
 export { default as Dots } from '../components/Dots'
-export { default as Locates } from '../utils/Locates'
+export { default as locates } from '../utils/Locates'
 export { default as Dropdown } from '../components/Dropdown'
 export { default as Switch } from '../components/Switch'
 export { default as ShowMore } from '../components/ShowMore'
@@ -48,7 +48,7 @@ export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDi
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
   constants, Reqwq, ProfilesStore, Authenticator, fs }
 
-export const $: Window['$'] = (window as any).__$pli0
+export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
 export const profilesStore: ProfilesStore = window.profilesStore
 export const notice: (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => void = null

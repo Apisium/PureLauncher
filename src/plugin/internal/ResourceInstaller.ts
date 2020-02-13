@@ -116,13 +116,15 @@ export default class ResourceInstaller extends Plugin {
 
       const obj2 = { notWriteJson: false }
       await pluginMaster.emitSync('processResourceInstallVersion', r, obj2)
-      let json = r.json
-      if (!json) json = { }
-      else if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
-      if (r.extends) json.extends = obj.resolvedId
-      o.resolvedId = json.id = id
-      await pluginMaster.emitSync('processResourceVersionJson', json)
-      if (!obj2.notWriteJson) await fs.writeJson(jsonPath, json)
+      if (!obj2.notWriteJson) {
+        let json = r.json
+        if (!json) json = { }
+        else if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
+        if (r.extends) json.extends = obj.resolvedId
+        o.resolvedId = json.id = id
+        await pluginMaster.emitSync('processResourceVersionJson', json)
+        await fs.writeJson(jsonPath, json)
+      }
       if (r.isolation) o.isolation = true
       if (typeof r.resources === 'object') {
         await pAll(Object.values(r.resources).map(it => () =>

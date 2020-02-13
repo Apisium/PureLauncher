@@ -58,16 +58,16 @@ export default class GameStore extends Store {
         case 'latest-release':
           await ensureVersionManifest()
           versionId = versionManifest.latest.release
-          await this.ensureMinecraftVersion(GAME_ROOT, versionManifest.versions.find(v => v.id === versionId))
+          await this.ensureMinecraftVersion(versionManifest.versions.find(v => v.id === versionId))
           break
         case 'latest-snapshot':
           await ensureVersionManifest()
           versionId = versionManifest.latest.snapshot
-          await this.ensureMinecraftVersion(GAME_ROOT, versionManifest.versions.find(v => v.id === versionId))
+          await this.ensureMinecraftVersion(versionManifest.versions.find(v => v.id === versionId))
           break
         default:
           versionId = version
-          await this.ensureLocalVersion(GAME_ROOT, versionId)
+          await this.ensureLocalVersion(versionId)
           break
       }
 
@@ -147,12 +147,12 @@ export default class GameStore extends Store {
       throw e
     }
   }
-  private async ensureMinecraftVersion (minecraft: string, version: any /* TODO: need a type */) {
-    const task = Installer.installTask('client', version, minecraft, getDownloaders().assets)
+  private async ensureMinecraftVersion (version: any /* TODO: need a type */) {
+    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders().versions)
     await Task.execute(task)
   }
-  private async ensureLocalVersion (minecraft: string, versionId: string) {
-    const resolved = await Version.parse(minecraft, versionId)
+  private async ensureLocalVersion (versionId: string) {
+    const resolved = await Version.parse(GAME_ROOT, versionId)
     const task = Installer.installDependenciesTask(resolved, getDownloaders().versions)
     await Task.execute(task)
   }
