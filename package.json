@@ -135,7 +135,7 @@
     "require(\"three\")": "require('/packages/minimize-three/index.js')"
   },
   "build": {
-    "productName": "PureLauncher",
+    "productName": "pure-launcher",
     "appId": "cn.apisium.purelauncher",
     "directories": {
       "output": "release"
@@ -202,6 +202,7 @@
       ]
     },
     "nsis": {
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
