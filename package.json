@@ -5,8 +5,8 @@
   "description": "An awesome Minecraft Launcher.",
   "main": "dist/src/main.js",
   "scripts": {
-    "lint": "eslint src/ packages/ --ext .js,.ts,.tsx",
-    "fix": "eslint src/ packages/ --fix --ext .js,.ts,.tsx",
+    "lint": "eslint src/ packages/ build/ --ext .js,.ts,.tsx",
+    "fix": "eslint src/ packages/ build/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --no-autoinstall  --bundle-node-modules --target electron --public-url .",
     "run": "electron .",
     "pack": "electron-builder",

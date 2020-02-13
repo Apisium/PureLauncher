@@ -24,18 +24,18 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        
+
       - name: Build app
         run: npm run build
-      
+
       - name: Pack app
         run: npm run pack
-      
+
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: release/*.{exe,dmg,deb,rpm,AppImage}
+          file: release/*.{exe,dmg,deb,rpm,tar.gz}
           tag: ${{ github.ref }}
           file_glob: true
 
@@ -47,3 +47,6 @@ jobs:
           tag: ${{ github.ref }}
           file_glob: true
           overwrite: true
+
+      - name: Publish
+        run: node build/release.js
