@@ -137,6 +137,8 @@
   "build": {
     "productName": "pure-launcher",
     "appId": "cn.apisium.purelauncher",
+    "copyright": "Copyright © 2020 Apisium",
+    "artifactName": "${productName}-${version}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -192,17 +194,10 @@
           "arch": [
             "ia32"
           ]
-        },
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
         }
       ]
     },
     "nsis": {
-      "artifactName": "${productName}-${version}-${arch}.${ext}",
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
