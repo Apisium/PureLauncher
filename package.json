@@ -196,7 +196,7 @@
         {
           "target": "nsis",
           "arch": [
-            "amd64"
+            "x64"
           ]
         }
       ]
