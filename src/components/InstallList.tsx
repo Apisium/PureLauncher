@@ -45,7 +45,7 @@ const InstallList: React.FC = () => {
           case 'Server':
             servers.push({ id: it.ip, name: it.title || (it.port ? `${it.ip}:${it.port}` : it.ip) })
             break
-          case 'ResourcesPack':
+          case 'ResourcePack':
             resources.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })
             break
           case 'Plugin':
@@ -96,8 +96,8 @@ const InstallList: React.FC = () => {
       </>
       break
     }
-    case 'ResourcesPack':
-      name = $('Resources')
+    case 'ResourcePack':
+      name = $('ResourcePacks')
       break
     case 'Server': {
       name = $('Servers')

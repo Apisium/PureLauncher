@@ -4,18 +4,18 @@ import history from '../../utils/history'
 import Empty from '../../components/Empty'
 import Loading from '../../components/Loading'
 import ProfilesStore from '../../models/ProfilesStore'
-import React, { Suspense, useState } from 'react'
+import React, { Suspense, useState, useMemo } from 'react'
 import { join, basename } from 'path'
 import { plugins } from '../../plugin/internal/index'
 import { removeFormatCodes, autoNotices } from '../../utils/index'
 import { ResourcePack as RPP } from '@xmcl/resourcepack'
-import { ResourceResourcesPack } from '../../protocol/types'
+import { ResourceResourcePack } from '../../protocol/types'
 import { createResource, OneCache } from 'react-cache-enhance'
 import { uninstallResourcePack } from '../../protocol/uninstaller'
 import { RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH } from '../../constants'
-import { exportResource, exportUnidentified } from '../../utils/exporter'
+import { exportResource, exportUnidentified } from '../../protocol/exporter'
 import { useStore } from 'reqwq'
-import { clipboard } from 'electron'
+import { clipboard, remote } from 'electron'
 
 pluginMaster.addExtensionsButton({
   title: () => $('ResourcePacks'),
@@ -23,7 +23,7 @@ pluginMaster.addExtensionsButton({
   onClick () { history.push('/manager/resourcePacks') }
 }, plugins.resourceInstaller)
 
-interface Ret { installed: ResourceResourcesPack[], unidentified: string[][] }
+interface Ret { installed: ResourceResourcePack[], unidentified: string[][] }
 
 const cache = new OneCache()
 
@@ -31,9 +31,10 @@ const NIL: Ret = { installed: [], unidentified: [] }
 const useResourcePack = createResource(async (): Promise<Ret> => {
   try {
     let files = (await fs.readdir(RESOURCE_PACKS_PATH)).filter(it => it.endsWith('.zip'))
-    const stats = await Promise.all(files.map(it => fs.stat(join(RESOURCE_PACKS_PATH, it))))
-    files = files.filter((_, i) => stats[i].isFile())
-    const json: Record<string, ResourceResourcesPack> =
+    const stats = await Promise.all(files.map(it => fs.stat(join(RESOURCE_PACKS_PATH, it)).catch(() => null)))
+    files = files.filter((_, i) => stats[i]?.isFile())
+    console.log(files, stats)
+    const json: Record<string, ResourceResourcePack> =
       await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || { }
     const hashes = new Set<string>()
     const installed = Object.values(json)
@@ -49,17 +50,19 @@ const useResourcePack = createResource(async (): Promise<Ret> => {
           console.error(e)
           return [it]
         })))).sort((a, b) => +!a[1] - +!b[1]) }
-  } catch { }
+  } catch (e) { console.error(e) }
   return NIL
 }, cache as any)
 
 const ResourcePack: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const pack = useResourcePack()
+  useMemo(() => cache.delete(cache.key), [0])
   const requestUninstall = (id: string, d?: boolean) => !loading && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
-    text: $('Are you sure to delete this resource pack? This is a dangerous operation and cannot be recovered after deletion!')
+    text: $(d ? 'Are you sure to delete this resource pack? Files can be recovered in the recycle bin.'
+      : 'Are you sure to delete this resource pack? This is a dangerous operation and cannot be recovered after deletion!')
   }).then(ok => {
     if (ok) {
       setLoading(true)
@@ -89,7 +92,15 @@ const ResourcePack: React.FC = () => {
         <button className='btn2 danger' onClick={() => requestUninstall(it.id)}>{$('Delete')}</button>
       </div>
     </li>)}
-    {pack.unidentified.map(it => <li key={it[0]}>
+    {pack.unidentified.map(it => <li
+      key={it[0]}
+      draggable='true'
+      onDragStart={e => {
+        e.preventDefault()
+        console.log(2333)
+        remote.getCurrentWebContents().startDrag({ file: it[0], icon: it[1] })
+      }}
+    >
       {it[1] && <img src={it[1]} alt={it[0]} />}
       {it[2] ? <>{it[0]} <span>({it[2]})</span></> : it[0]}
       <div className='buttons'>
@@ -97,7 +108,7 @@ const ResourcePack: React.FC = () => {
           <button
             className='btn2'
             onClick={() => autoNotices(exportUnidentified(join(RESOURCE_PACKS_PATH, it[0]),
-              'ResourcePack', { description: it[2] }))}
+              'ResourcePack', it[2] ? { description: it[2] } : undefined))}
           >{$('Export')}</button>}
         <button className='btn2 danger' onClick={() => requestUninstall(it[0], true)}>{$('Delete')}</button>
       </div>

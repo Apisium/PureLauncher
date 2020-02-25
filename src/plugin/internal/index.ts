@@ -1,8 +1,10 @@
 import { Plugin } from '../Plugin'
 import ResourceInstaller from './ResourceInstaller'
+import ResourceResolver from './ResourceResolver'
 
 const map = {
-  resourceInstaller: ResourceInstaller
+  resourceInstaller: ResourceInstaller,
+  resourceResolver: ResourceResolver
 }
 
 const _plugins: { [k in keyof typeof map]: InstanceType<(typeof map)[k]> } = { } as any

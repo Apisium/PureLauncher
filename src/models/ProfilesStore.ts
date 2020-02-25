@@ -3,17 +3,20 @@ import { join } from 'path'
 import { getJavaVersion, cacheSkin, genUUID } from '../utils/index'
 import { remote } from 'electron'
 import { platform } from 'os'
-import { Installer } from '@xmcl/installer'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import { ResourceVersion } from '../protocol/types'
-import { LAUNCH_PROFILE_PATH, VERSION_MANIFEST_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH,
-  LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH, GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
+import { LAUNCH_PROFILE_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH, LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH,
+  GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
 import fs from 'fs-extra'
 import pAll from 'p-all'
 import moment from 'moment'
+import urlJoin from 'url-join'
 import * as Auth from '../plugin/Authenticator'
-import DownloadProviders from '../plugin/DownloadProviders'
+import DownloadProviders, { DownloadProvider } from '../plugin/DownloadProviders'
+
+const MINECRAFT_MANIFEST = 'minecraftManifest'
+const MINECRAFT_MANIFEST_UPDATE_TIME = 'minecraftManifestUpdateTime'
 
 export interface Version {
   name: string
@@ -57,7 +60,7 @@ export default class ProfilesStore extends Store {
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow'
   }
-  public versionManifest: Installer.VersionMetaList & { [NOT_PROXY]: true } = {
+  public versionManifest = {
     [NOT_PROXY]: true,
     timestamp: '',
     versions: [],
@@ -92,6 +95,11 @@ export default class ProfilesStore extends Store {
       .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
   }
 
+  public get downloadProvider (): DownloadProvider {
+    if (!this.extraJson) return DownloadProviders.OFFICIAL
+    return DownloadProviders[this.extraJson.downloadProvider] || DownloadProviders.OFFICIAL
+  }
+
   constructor () {
     super()
     try {
@@ -106,10 +114,10 @@ export default class ProfilesStore extends Store {
       this.onLoadExtraConfigFailed(e)
     }
 
-    this.loadVersionManifest().catch(console.error)
     this.cacheSkins().catch(console.error)
     this.checkModsDirectory().catch(console.error)
     this.syncVersions().catch(console.error)
+    // this.ensureVersionManifest().catch(console.error)
   }
 
   public setLoginDialogVisible (state = true) { this.loginDialogVisible = state }
@@ -217,7 +225,7 @@ export default class ProfilesStore extends Store {
   public async setSelectedProfile (key: string, type?: Auth.default | string) {
     if (typeof type === 'string') type = pluginMaster.logins[type]
     if (!type) type = pluginMaster.logins[pluginMaster.getAllProfiles().find(it => it.key === key).type]
-    await type.validate(key)
+    await type.validate(key).catch(console.error)
     const name = type[Auth.NAME]
     if (name === YGGDRASIL) {
       this.selectedUser.account = key
@@ -391,31 +399,26 @@ export default class ProfilesStore extends Store {
   }
 
   public async ensureVersionManifest () {
-    if (this.versionManifest.timestamp === '0') {
-      const data: any = await Installer.updateVersionMeta()
-      data[NOT_PROXY] = true
-      this.versionManifest = data
-      this.saveVersionManifest()
+    const timeStr = localStorage.getItem(MINECRAFT_MANIFEST_UPDATE_TIME)
+    const time = timeStr ? parseInt(timeStr) : 0
+    const t = time + 12 * 60 * 60 * 1000 > Date.now()
+    if (t && this.versionManifest.timestamp) return
+    let data: any
+    if (t) {
+      const d = localStorage.getItem(MINECRAFT_MANIFEST)
+      if (d) try { data = JSON.parse(d) } catch (e) { console.error(e) }
     }
+    if (!data) await this.refreshVersionManifest().catch(console.error)
   }
 
   public async refreshVersionManifest () {
-    const data: any = await Installer.updateVersionMeta({ fallback: this.versionManifest })
-    data[NOT_PROXY] = true
-    this.versionManifest = data
-    this.saveVersionManifest()
-  }
-
-  private async saveVersionManifest () {
-    await fs.writeFile(VERSION_MANIFEST_PATH, JSON.stringify(this.versionManifest))
-  }
-
-  private async loadVersionManifest () {
-    try {
-      this.versionManifest = await fs.readFile(VERSION_MANIFEST_PATH).then(b => JSON.parse(b.toString()))
-    } catch {
-      this.refreshVersionManifest()
-    }
+    const str = await fetch(urlJoin(
+      this.downloadProvider.launchermeta || DownloadProviders.OFFICIAL.launchermeta,
+      'mc/game/version_manifest.json'
+    ), { cache: 'no-cache' }).then(it => it.text())
+    this.versionManifest = JSON.parse(str)
+    localStorage.setItem(MINECRAFT_MANIFEST, str)
+    localStorage.setItem(MINECRAFT_MANIFEST_UPDATE_TIME, Date.now().toString())
   }
 
   private loadLaunchProfileJson (json: this) {

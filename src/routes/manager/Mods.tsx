@@ -10,7 +10,7 @@ import { join, basename } from 'path'
 import { useParams } from 'react-router-dom'
 import { createResource, OneCache } from 'react-cache-enhance'
 import { useStore } from 'reqwq'
-import { exportResource, exportUnidentified } from '../../utils/exporter'
+import { exportResource, exportUnidentified } from '../../protocol/exporter'
 import { uninstallMod } from '../../protocol/uninstaller'
 import { VERSIONS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_MODS_INDEX_FILE_NAME,
   RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
@@ -51,7 +51,8 @@ const Version: React.FC<{ version: string }> = p => {
   const requestUninstall = (id: string, d?: boolean) => !loading && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
-    text: $('Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!')
+    text: $(d ? 'Are you sure to delete this mod? Files can be recovered in the recycle bin.'
+      : 'Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!')
   }).then(ok => {
     if (ok) {
       setLoading(true)

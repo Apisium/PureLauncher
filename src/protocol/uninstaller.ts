@@ -1,5 +1,6 @@
 import fs from 'fs-extra'
 import { join } from 'path'
+import { shell } from 'electron'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_VERSIONS_PATH, VERSIONS_PATH,
   RESOURCES_MODS_INDEX_FILE_NAME, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH, DELETES_FILE, RESOURCES_PLUGINS_INDEX } from '../constants'
 import { Plugin } from '../plugin/Plugin'
@@ -22,8 +23,9 @@ export const uninstallVersion = async (id: string) => {
 
 export const uninstallMod = async (version: string, id: string, directly = false) => {
   const dir = join(VERSIONS_PATH, version, 'mods')
-  if (directly) await fs.unlink(join(dir, id)).catch(() => {})
-  else {
+  if (directly) {
+    if (!shell.moveItemToTrash(join(dir, id))) throw new Error('Delete failed!')
+  } else {
     const jsonPath = join(RESOURCES_VERSIONS_PATH, version, RESOURCES_MODS_INDEX_FILE_NAME)
     const json = await fs.readJson(jsonPath, { throws: false }) || {}
     if (!Array.isArray(json[id]?.hashes)) return
@@ -34,8 +36,9 @@ export const uninstallMod = async (version: string, id: string, directly = false
 }
 
 export const uninstallResourcePack = async (id: string, directly = false) => {
-  if (directly) await fs.unlink(join(RESOURCE_PACKS_PATH, id)).catch(() => {})
-  else {
+  if (directly) {
+    if (!shell.moveItemToTrash(join(RESOURCE_PACKS_PATH, id))) throw new Error('Delete failed!')
+  } else {
     const json = await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || {}
     if (!Array.isArray(json[id]?.hashes)) return
     await Promise.all(json[id].hashes.map((it: string) => fs.unlink(join(RESOURCE_PACKS_PATH, it + '.zip'))

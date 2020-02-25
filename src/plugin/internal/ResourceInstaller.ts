@@ -53,7 +53,7 @@ export default class ResourceInstaller extends Plugin {
       case 'Mod':
         await this.installMod(r, o)
         break
-      case 'ResourcesPack':
+      case 'ResourcePack':
         await this.installResourcePack(r, o)
         break
       case 'Plugin':
@@ -146,17 +146,17 @@ export default class ResourceInstaller extends Plugin {
     }
   }
 
-  public async installResourcePack (r: T.ResourceResourcesPack, o: T.InstallView = { }) {
+  public async installResourcePack (r: T.ResourceResourcePack, o: T.InstallView = { }) {
     if (!r) return
-    if (!T.isResourcesPack(r)) throw new TypeError('Incorrect resource type!')
+    if (!T.isResourcePack(r)) throw new TypeError('Incorrect resource type!')
     const dir = o.isolation ? join(VERSIONS_PATH, o.resolvedId, 'resourcepacks') : RESOURCE_PACKS_PATH
-    const old: T.ResourceResourcesPack = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
+    const old: T.ResourceResourcePack = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
       : (await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || { })[r.id]
     if (old) {
       if (gte(old.version, r.version)) return
       if (old.hashes) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.zip')).catch(() => {})))
     }
-    if (r.extends) await install(r.extends, false, true, T.isResourcesPack)
+    if (r.extends) await install(r.extends, false, true, T.isResourcePack)
     const p = await makeTempDir()
     const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) =>
       ({ url: replace(url, r), file: join(p, it.toString()) }))
@@ -183,23 +183,11 @@ export default class ResourceInstaller extends Plugin {
     if (!T.isMod(r)) throw new TypeError('Incorrect resource type!')
     if (!dir && o.resolvedDir) dir = join(o.resolvedDir, 'mods')
     if (!id && o.resolvedId) id = o.resolvedId
-    if (!dir || !id) {
-      const version = profilesStore.profiles[o.selectedVersion]
-      if (version) {
-        id = version.lastVersionId
-        switch (version.type) {
-          case 'latest-snapshot':
-            await profilesStore.ensureVersionManifest()
-            id = profilesStore.versionManifest.latest.snapshot
-            break
-          case 'latest-release':
-            await profilesStore.ensureVersionManifest()
-            id = profilesStore.versionManifest.latest.release
-        }
-        dir = join(VERSIONS_PATH, id, 'mods')
-        o.resolvedDir = dirname(dir)
-        o.resolvedId = id
-      }
+    if ((!dir || !id) && o.selectedVersion) {
+      id = await profilesStore.resolveVersion(o.selectedVersion)
+      dir = join(VERSIONS_PATH, id, 'mods')
+      o.resolvedDir = dirname(dir)
+      o.resolvedId = id
     }
     if (!id) throw new Error('No suck version: ' + o.selectedVersion)
     await fs.ensureDir(dir)

@@ -13,6 +13,9 @@ import * as Installer from '@xmcl/installer'
 import * as Task from '@xmcl/task'
 import * as ResourcePack from '@xmcl/resourcepack'
 import * as Authenticator from './Authenticator'
+import * as Yazl from 'yazl'
+import * as Yauzl from 'yauzl'
+import urlJoin from 'url-join'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
@@ -43,10 +46,11 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
-export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, getJavaVersion, checkUrl,
-  DownloadItem, validPath, sha1, md5, replace, getVersionTypeText, removeFormatCodes, autoNotices } from '../utils/index'
+export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin,
+  getJavaVersion, checkUrl, DownloadItem, validPath, sha1, md5, replace, getVersionTypeText,
+  removeFormatCodes, autoNotices, readBuffer } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
-  constants, Reqwq, ProfilesStore, Authenticator, fs }
+  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, urlJoin }
 
 export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster

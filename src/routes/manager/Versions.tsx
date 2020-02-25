@@ -15,7 +15,7 @@ import { join } from 'path'
 import { useStore } from 'reqwq'
 import { createResource, OneCache } from 'react-cache-enhance'
 import { VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
-import { exportVersion } from '../../utils/exporter'
+import { exportVersion } from '../../protocol/exporter'
 import { uninstallVersion } from '../../protocol/uninstaller'
 import { autoNotices } from '../../utils'
 import { clipboard, shell } from 'electron'
@@ -202,7 +202,7 @@ const Versions: React.FC = () => {
                     if (pm.extraJson.copyMode) {
                       clipboard.writeText(json[ver.lastVersionId].source)
                       notice({ content: $('Copied!') })
-                    } else exportVersion(ver.key)
+                    } else autoNotices(exportVersion(ver.key))
                   }}
                 >{$('Export')}</button>}
             </div>

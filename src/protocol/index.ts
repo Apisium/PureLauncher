@@ -3,6 +3,7 @@ import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import install from './install'
 import P from '../models/index'
+import installLocal from './install-local'
 import GameStore from '../models/GameStore'
 import requestReload from '../utils/request-reload'
 
@@ -31,6 +32,9 @@ const mappings = {
   },
   Launch (data: T.ProtocolLaunch) {
     gameStore.launch(typeof data.version === 'object' ? data.version.id : data.version)
+  },
+  InstallLocal (data: T.ProtocolInstallLocal) {
+    installLocal(data.path)
   }
 }
 

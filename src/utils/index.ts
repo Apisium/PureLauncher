@@ -7,6 +7,7 @@ import { join, resolve, extname } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
+import { Readable } from 'stream'
 import { DEFAULT_EXT_FILTER, SKINS_PATH } from '../constants'
 
 export function getJavaVersion (path: string) {
@@ -112,6 +113,11 @@ export const autoNotices = <T> (p: Promise<T>) => p.then(r => {
   notice({ content: $('Failed!'), error: true })
 }) as any as Promise<T>
 
-export const checkUrl = (url: string) => fetch(url, { cache: 'no-cache' })
+export const checkUrl = (url: string) => fetch(url, { method: 'HEAD', cache: 'no-cache' })
   // eslint-disable-next-line no-throw-literal
   .then(it => { if (it.ok) return true; else throw null }).catch(() => false)
+
+export const readBuffer = (stream: Readable) => new Promise<Buffer>((resolve, reject) => {
+  const arr = []
+  stream.on('data', d => arr.push(d)).on('end', () => resolve(Buffer.from(arr))).on('error', reject)
+})

@@ -33,12 +33,13 @@
   "Downloading...": "下载中...",
   "Preparing...": "准备中...",
   "Launched": "游戏运行中",
-  "Fail to launch!": "启动失败!",
+  "Fail to launch": "启动失败",
   "No such version:": "没有这个版本:",
   "Incorrect java version!": "Java 版本不正确!",
   "Current account is invalid, please re-login!": "当前帐号已失效, 请重新登陆!",
   "Have already logged in? Click here!": "已经登陆了? 点击这里切换账户!",
-  "ResourcesInstaller": "资源管理和安装器.",
+  "ResourcesInstaller": "资源管理和安装器",
+  "ResourcesResolver": "资源解析器",
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
   "OK": "确认",
@@ -51,10 +52,18 @@
   "Save failed!": "保存失败!",
   "Installing resources...": "正在安装资源...",
   "Copied!": "成功复制!",
+  "Found wrong libraries, will automatically download again!": "发现错误的支持库，将自动重新下载!",
+  "Bad version jar!": "错误的版本Jar!",
+  "Missing libraries": "缺少支持库",
+  "Bad libraries": "错误的支持库",
+  "Unable to find the Java, do you want to install Java automatically?":
+    "无法找到合适的java，是否要需要帮您安装java?",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
     "发生未知错误，请点击上方苦力怕图标以刷新页面!",
   "Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!":
-  "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
+    "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
+  "Are you sure to delete this mod? Files can be recovered in the recycle bin.":
+    "是否确认删除该模组? 文件删除后可在回收站中恢复.",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
   "Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}":
@@ -63,8 +72,15 @@
     "是否确认删除该版本? 这是一个危险的操作且删除后无法恢复!",
   "Are you sure to delete this resource pack? This is a dangerous operation and cannot be recovered after deletion!":
     "是否确认删除该资源包? 这是一个危险的操作且删除后无法恢复!",
+  "Are you sure to delete this resource pack? Files can be recovered in the recycle bin.":
+    "是否确认删除该资源包? 文件删除后可在回收站中恢复.",
   "This version ({0}) already exists! Delete this version? Warning: cannot recover after deletion!":
     "该版本（{0}）已经存在！是否删除该版本？警告：删除后将无法复原!",
+  "Network connection failed. Do you want to play offline?": "网络连接失败, 是否要离线游玩?",
+  "File drag detected, release to install.": "检测到文件拖入，释放后即可安装",
+  "Illegal resource type!": "非法的资源类型!",
+  "Do you want to export MODS and resource packs?": "是否要导出模组和材质包?",
+  "No resources found!": "找不到任何资源!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",

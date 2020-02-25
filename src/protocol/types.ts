@@ -37,13 +37,13 @@ export interface ResourceMod extends Resource<'Mod'> {
   extends?: string | ResourceMod
   updateUrl?: string
 }
-export interface ResourceResourcesPack extends Resource<'ResourcesPack'> {
+export interface ResourceResourcePack extends Resource<'ResourcePack'> {
   version: string
   urls: string[]
   source?: string
   website?: string
   hashes?: string[]
-  extends?: string | ResourceResourcesPack
+  extends?: string | ResourceResourcePack
   updateUrl?: string
 }
 export interface ResourceServer extends Resource<'Server'> {
@@ -61,15 +61,15 @@ export interface ResourcePlugin extends Resource<'Plugin'> {
   updateUrl?: string
   dependencies?: Record<string, ResourcePlugin | string>
 }
-export type AllResources = ResourceMod | ResourceResourcesPack | ResourceServer
+export type AllResources = ResourceMod | ResourceResourcePack | ResourceServer
 export const isResource = (r: any): r is Resource => !!(typeof r === 'object' && typeof r.id === 'string' &&
   r.id && typeof r.type === 'string' && r.type)
 export const isResourceWithVersion = (r: any): r is Resource & { version: string } =>
   isResource(r) && !!valid((r as any).version)
 export const isResourceWithVersionAndUrls = (r: any): r is Resource & { version: string, urls: string[] } =>
   isResourceWithVersion(r) && Array.isArray((r as any).urls)
-export const isResourcesPack = (r: any): r is ResourceResourcesPack => isResourceWithVersionAndUrls(r) &&
-  r.type === 'ResourcesPack'
+export const isResourcePack = (r: any): r is ResourceResourcePack => isResourceWithVersionAndUrls(r) &&
+  r.type === 'ResourcePack'
 export const isMod = (r: any): r is ResourceMod => isResourceWithVersionAndUrls(r) &&
   r.type === 'Mod'
 export const isPlugin = (r: any): r is ResourcePlugin => isResourceWithVersion(r) &&
@@ -92,10 +92,14 @@ export interface ProtocolInstall extends Protocol<'Install'> {
   plugins?: Record<string, string | ResourcePlugin>
   notInstallPlugins?: boolean
 }
+export interface ProtocolInstallLocal extends Protocol<'InstallLocal'> {
+  path: string
+}
 export interface InstallView {
   [key: string]: any
   [key: number]: any
   throws?: boolean
   request?: boolean
+  type?: string
   render?: (...args: any[]) => ReactElement
 }

@@ -2,10 +2,12 @@ import { Store, injectStore } from 'reqwq'
 import { LaunchOption, Version, launch } from '@xmcl/core'
 import { Installer } from '@xmcl/installer'
 import { getVersionTypeText } from '../utils/index'
-import { GAME_ROOT } from '../constants'
+import { GAME_ROOT, LIBRARIES_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer } from 'electron'
 import { getDownloaders } from '../plugin/DownloadProviders'
+import { join, dirname, basename } from 'path'
+import { promises as fs } from 'fs'
 import ProfilesStore from './ProfilesStore'
 import Task from '@xmcl/task'
 import user from '../utils/analytics'
@@ -27,7 +29,7 @@ export default class GameStore extends Store {
     try {
       this.status = STATUS.PREPARING
       const { extraJson, getCurrentProfile, selectedVersion, versionManifest, profiles,
-        ensureVersionManifest, checkModsDirectoryOfVersion } = this.profilesStore
+        ensureVersionManifest, checkModsDirectoryOfVersion, settings: { showGameLog } } = this.profilesStore
 
       if (version in profiles) version = profiles[version].lastVersionId
       if (!version) {
@@ -43,12 +45,19 @@ export default class GameStore extends Store {
       version = v.version
 
       user.event('game', 'launch').catch(console.error)
-      const { javaArgs, javaPath } = extraJson
+      const { javaArgs, javaPath: jp } = extraJson
 
       let profile = getCurrentProfile()
       if (!profile) throw new Error('No selected profile!')
       const authenticator = pluginMaster.logins[profile.type]
-      if (!await authenticator.validate(profile.key)) await authenticator.refresh(profile.key)
+      try {
+        if (!await authenticator.validate(profile.key)) await authenticator.refresh(profile.key)
+      } catch (e) {
+        if (!e || !e.message.includes('Failed to fetch') || !await openConfirmDialog({
+          text: $('Network connection failed. Do you want to play offline?'),
+          cancelButton: true
+        })) throw e
+      }
       profile = getCurrentProfile()
 
       let versionId: string
@@ -82,20 +91,23 @@ export default class GameStore extends Store {
       await checkModsDirectoryOfVersion(versionId, ret)
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
+      const javaPath = jp || 'javaw'
       const option: LaunchOption = {
         launcherBrand,
         properties: {},
         version: versionId,
         gamePath: GAME_ROOT,
+        resourcePath: GAME_ROOT,
         userType: 'mojang' as any,
         launcherName: 'pure-launcher',
         versionType: getVersionTypeText(),
         extraJVMArgs: javaArgs.split(' '),
         accessToken: profile.accessToken || '',
         gameProfile: { id: profile.uuid, name: profile.username },
-        javaPath: javaPath || 'javaw',
+        javaPath: showGameLog ? join(dirname(javaPath), basename(javaPath).replace('javaw', 'java')) : javaPath,
         extraExecOption: {
-          detached: true
+          detached: true,
+          shell: showGameLog
         }
       }
       await pluginMaster.emitSync('preLaunch', versionId, option)
@@ -106,38 +118,70 @@ export default class GameStore extends Store {
         stopAnimation()
       }
 
-      try {
-        const p = await launch(option)
-        p.once('close', (code, signal) => {
-          if (code !== 0) {
-            // this.error = ({ code: m.data.code, signal: m.data.signal })
+      let launched = false
+      const launch2 = async () => {
+        try {
+          const p = await launch({ ...option, prechecks: [] })
+          p.once('close', (code, signal) => {
+            if (code !== 0) {
+              // this.error = ({ code: m.data.code, signal: m.data.signal })
+            }
+            ipcRenderer.send('close-launching-dialog')
+            if (this.profilesStore.extraJson.animation) startAnimation()
+            if (currentWindow.isMinimized()) {
+              currentWindow.restore()
+              currentWindow.setSize(816, 586)
+            }
+            this.status = STATUS.READY
+            console.log('exit', code, signal)
+          }).once('error', async e => {
+            console.error(e)
+            notice({ content: $('Fail to launch') + ': ' + ((e ? e.message : e) || $('Unknown')), error: true })
+            if (e?.message?.includes('ENOENT') && await openConfirmDialog({
+              text: $('Unable to find the Java, do you want to install Java automatically?'),
+              cancelButton: true
+            })) { /* TODO: */ }
+          })
+          await pluginMaster.emit('postLaunch', p, versionId, option)
+        } catch (e) {
+          if (typeof e === 'object' && e.error) {
+            switch (e.error) {
+              case 'MissingLibs':
+                if (launched) {
+                  const m = $('Missing libraries')
+                  openConfirmDialog({ text: `${$('Fail to launch')}, ${m}: ${e.libs.map(it => it.name).join(', ')}` })
+                  throw new Error(m)
+                }
+                launched = true
+                this.status = STATUS.DOWNLOADING
+                await this.ensureLocalVersion(versionId)
+                this.status = STATUS.LAUNCHING
+                await launch2()
+                return
+              case 'CorruptedLibs':
+                if (launched) {
+                  const m = $('Bad libraries')
+                  openConfirmDialog({ text: `${$('Fail to launch')}, ${m}:\n${e.libs.map(it => it.name).join('\n')}` })
+                  throw new Error(m)
+                }
+                launched = true
+                notice({ content: $('Found wrong libraries, will automatically download again!') })
+                this.status = STATUS.DOWNLOADING
+                await Promise.all(e.libs.map(it => fs.unlink(join(LIBRARIES_PATH, it.path)).catch(console.error)))
+                await this.ensureLocalVersion(versionId)
+                this.status = STATUS.LAUNCHING
+                await launch2()
+                throw new Error('')
+              case 'CorruptedVersionJar':
+                throw new Error($('Bad version jar!'))
+            }
           }
-          ipcRenderer.send('close-launching-dialog')
-          if (this.profilesStore.extraJson.animation) startAnimation()
-          if (currentWindow.isMinimized()) {
-            currentWindow.restore()
-            currentWindow.setSize(816, 586)
-          }
-          this.status = STATUS.READY
-          console.log('exit', code, signal)
-        })
-        await pluginMaster.emit('postLaunch', p, versionId, option)
-      } catch (e) {
-        if (typeof e === 'object' && e.error) {
-          switch (e.error) {
-            case 'MissingLibs':
-              getDownloaders() // TODO: download and relaunch
-              return
-            case 'CorruptedLibs': // TODO: download and notice
-              return
-            case 'CorruptedVersionJar': // TODO: download and notice
-              return
-          }
+          throw e
         }
-        throw e
       }
+      await launch2()
     } catch (e) {
-      notice({ content: $('Fail to launch!'), error: true })
+      notice({ content: $('Fail to launch') + ': ' + ((e ? e.message : e) || $('Unknown')), error: true })
       this.status = STATUS.READY
       ipcRenderer.send('close-launching-dialog')
       if (currentWindow.isMinimized()) {
@@ -148,12 +192,12 @@ export default class GameStore extends Store {
     }
   }
   private async ensureMinecraftVersion (version: any /* TODO: need a type */) {
-    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders().versions)
-    await Task.execute(task)
+    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders())
+    await Task.execute(task).wait()
   }
   private async ensureLocalVersion (versionId: string) {
     const resolved = await Version.parse(GAME_ROOT, versionId)
-    const task = Installer.installDependenciesTask(resolved, getDownloaders().versions)
-    await Task.execute(task)
+    const task = Installer.installDependenciesTask(resolved, getDownloaders())
+    await Task.execute(task).wait()
   }
 }

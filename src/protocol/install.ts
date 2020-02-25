@@ -19,6 +19,7 @@ export default (
     if (!checker(r)) return
     obj.request = request
     obj.throws = throws
+    obj.type = r.type
     await pluginMaster.emitSync('protocolPreInstallResource', r, obj)
     if (request) {
       win.flashFrame(true)

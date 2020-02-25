@@ -1,4 +1,6 @@
+/* eslint-disable node/no-deprecated-api */
 import { join, basename } from 'path'
+import { exists } from 'fs'
 import { app, BrowserWindow, ipcMain, webContents, DownloadItem as IDownloadItem, WebContents } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
@@ -23,14 +25,17 @@ const closeLaunchingDialog = () => {
 }
 const openLaunchingDialog = () => {
   if (!launchingWindow || launchingDialogOpened) return
-  launchingDialogOpened = true
-  launchingWindow.show()
-  launchingWindow.webContents.executeJavaScript(`
-    if (!window.img) window.img = document.getElementsByTagName("img")[0]
-    window.img.src = '${webp.replace(/\\/g, '\\\\')}'
-    window.img.style.opacity = '1'
-  `)
-  setTimeout(closeLaunchingDialog, 26000)
+  exists(webp, e => {
+    if (!e) return
+    launchingDialogOpened = true
+    launchingWindow.show()
+    launchingWindow.webContents.executeJavaScript(`
+      if (!window.img) window.img = document.getElementsByTagName("img")[0]
+      window.img.src = '${webp.replace(/\\/g, '\\\\')}'
+      window.img.style.opacity = '1'
+    `)
+    setTimeout(closeLaunchingDialog, 26000)
+  })
 }
 
 interface Item { file: string, url: string, instance?: any, length?: number }

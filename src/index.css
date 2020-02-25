@@ -143,13 +143,15 @@ img {
   margin-top: 1px;
 }
 
-.rc-dialog-mask {
-  height: calc(100% - 90px);
-  top: 52px;
-  width: calc(100% - 40px);
+.rc-dialog-mask, #pl-drag {
   left: 20px;
+  right: 20px;
+  top: 52px;
+  bottom: 38px;
+  left: 20px;
+  height: auto;
   border-radius: 4px;
-  backdrop-filter: blur(2px);
+  backdrop-filter: brightness(0.7) blur(2px);
   background-color: #37373780;
 }
 .rc-dialog-wrap {
@@ -252,4 +254,20 @@ img {
 }
 .pl-form input, .pl-form select {
   width: 100%;
+}
+
+#pl-drag {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  z-index: 500;
+  text-align: center;
+  padding: 140px 0 0;
+  pointer-events: none;
+  transition: opacity 1.4s;
+}
+#pl-drag i {
+  font-size: 70px;
 }

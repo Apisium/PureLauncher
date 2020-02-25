@@ -1,5 +1,8 @@
-import { Downloader } from '@xmcl/installer/util'
+import fs from 'fs-extra'
+import urlJoin from 'url-join'
 import { download, checkUrl } from '../utils/index'
+import { Downloader } from '@xmcl/installer/cjs/util'
+import { Option } from '@xmcl/installer/cjs/minecraft'
 
 export interface DownloadProvider {
   name (): string
@@ -30,7 +33,7 @@ const DownloadProviders = Object.freeze({
     libraries: 'https://download.mcbbs.net/maven',
     forge: 'https://download.mcbbs.net/maven'
   }),
-  OFFICAL: Object.freeze({
+  OFFICIAL: Object.freeze({
     name: () => $('OFFICIAL'),
     launchermeta: 'http://launchermeta.mojang.com',
     launcher: 'https://launcher.mojang.com',
@@ -40,31 +43,38 @@ const DownloadProviders = Object.freeze({
   })
 })
 
-const downloader: Downloader = {
-  async downloadFileIfAbsent ({ url, destination: file }) {
-    if (Array.isArray(url)) {
-      for (const link of url) {
-        if (await checkUrl(link)) {
-          await download({ file, url: link })
-          return ''
-        }
+const downloadFileIfAbsent = async ({ url, destination: file }: { url: string, destination: string }) => {
+  if (await fs.pathExists(file)) return
+  if (Array.isArray(url)) {
+    for (const link of url) {
+      if (await checkUrl(link)) {
+        await download({ file, url: link })
+        return file
       }
-    } else if (await checkUrl(url)) {
-      await download({ file, url })
-      return ''
     }
-    throw new Error('Can not resolve this file: ' + url)
+  } else if (await checkUrl(url)) {
+    await download({ file, url })
+    return file
   }
-} as any // TODO:
+  throw new Error('Can not resolve this file: ' + url)
+}
+const downloader: Downloader = {
+  downloadFileIfAbsent,
+  async downloadFile (obj: { url: string, destination: string }) {
+    if (await fs.pathExists(obj.destination)) await fs.unlink(obj.destination)
+    return downloadFileIfAbsent(obj)
+  }
+} as any
 
-export const getDownloaders = () => {
-  const assets /* TODO: add type AssetsOption */ = {
-    downloader // TODO:
+export const getDownloaders = (): Option => {
+  let isOffcical = profilesStore.extraJson.downloadProvider === 'OFFICIAL'
+  const provider: DownloadProvider = DownloadProviders[profilesStore.extraJson.downloadProvider]
+  if (!provider) isOffcical = true
+  return {
+    assetsHost: isOffcical ? undefined : [provider.resources],
+    libraryHost: isOffcical && provider?.libraries ? undefined : lib => urlJoin(provider.libraries, lib.download.path),
+    downloader
   }
-  const libraries /* TODO: add type */ = {
-    downloader // TODO:
-  }
-  return { assets, libraries, versions: { ...assets, ...libraries } }
 }
 
 export default DownloadProviders as Record<keyof typeof DownloadProviders, DownloadProvider>

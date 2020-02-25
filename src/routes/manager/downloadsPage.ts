@@ -36,7 +36,7 @@ const addItem = (_: any, id: string, file: string, name?: string, finish = false
   const btn = document.createElement('button')
   div2.className = 'b'
   btn.className = 'btn2 danger'
-  btn.innerText = (window as any).__cancelText
+  btn.innerText = (window as any).__cancelText || '取消'
   btn.onclick = () => ipcRenderer.send('download-cancel', id)
   div2.append(btn)
   li.append(div2, p)
