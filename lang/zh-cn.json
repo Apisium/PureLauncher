@@ -56,6 +56,7 @@
   "Bad version jar!": "错误的版本Jar!",
   "Missing libraries": "缺少支持库",
   "Bad libraries": "错误的支持库",
+  "Abnormal exit detected, exit code:": "检测到异常退出，退出代码:",
   "Unable to find the Java, do you want to install Java automatically?":
     "无法找到合适的java，是否要需要帮您安装java?",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
@@ -80,7 +81,11 @@
   "File drag detected, release to install.": "检测到文件拖入，释放后即可安装",
   "Illegal resource type!": "非法的资源类型!",
   "Do you want to export MODS and resource packs?": "是否要导出模组和材质包?",
-  "No resources found!": "找不到任何资源!",
+  "No resources found!": "错误的资源类型!",
+  "It has been detected that the file type dragged in is resource package. Do you want to install it?":
+    "检测到拖入的文件类型为资源包，请问是否需要安装?",
+  "It has been detected that the file type dragged in is mod. Do you want to install it?":
+    "检测到拖入的文件类型为模组，请问是否需要安装?",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",

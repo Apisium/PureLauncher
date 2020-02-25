@@ -25,6 +25,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   isolation?: boolean
   icon?: string
   useIdAsName?: boolean
+  serverHome?: string
 }
 export interface ResourceMod extends Resource<'Mod'> {
   version: string

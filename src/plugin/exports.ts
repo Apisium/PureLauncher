@@ -8,14 +8,17 @@ import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
 import * as constants from '../constants'
 import * as Reqwq from 'reqwq'
+import * as Nbt from '@xmcl/nbt'
 import * as Core from '@xmcl/core'
-import * as Installer from '@xmcl/installer'
 import * as Task from '@xmcl/task'
+import * as Unzip from '@xmcl/unzip'
+import * as Client from '@xmcl/client'
+import * as Installer from '@xmcl/installer'
 import * as ResourcePack from '@xmcl/resourcepack'
+import * as TextComponent from '@xmcl/text-component'
 import * as Authenticator from './Authenticator'
 import * as Yazl from 'yazl'
 import * as Yauzl from 'yauzl'
-import urlJoin from 'url-join'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
@@ -39,6 +42,7 @@ export { default as installResource } from '../protocol/index'
 export { default as isDev } from '../utils/isDev'
 export { default as history } from '../utils/history'
 export { default as React } from 'react'
+export { default as urlJoin } from 'url-join'
 export { default as ReactDOM } from 'react-dom'
 export { default as Dialog } from 'rc-dialog'
 export { default as Notification } from 'rc-notification'
@@ -50,7 +54,7 @@ export { download, genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDi
   getJavaVersion, checkUrl, DownloadItem, validPath, sha1, md5, replace, getVersionTypeText,
   removeFormatCodes, autoNotices, readBuffer } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
-  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, urlJoin }
+  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl }
 
 export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
@@ -59,10 +63,14 @@ export const notice: (ctx: { content: React.ReactNode, duration?: number, error?
 export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
   Promise<boolean> = null
 export const xmcl = {
+  Nbt,
   Core,
-  Installer,
   Task,
-  ResourcePack
+  Unzip,
+  Client,
+  Installer,
+  ResourcePack,
+  TextComponent
 }
 
 const gs = P.getStore(GameStore)

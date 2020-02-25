@@ -1,12 +1,12 @@
 import React, { createRef, useState, useEffect } from 'react'
+import installLocal, { installMod } from './protocol/install-local'
 import Dialog from 'rc-dialog'
 import isDev from './utils/isDev'
 import history from './utils/history'
 import LiveRoute from './components/LiveRoute'
-import installLocal from './protocol/install-local'
-import { render, unmountComponentAtNode } from 'react-dom'
 import { ipcRenderer } from 'electron'
-import { Router, Redirect } from 'react-router-dom'
+import { render, unmountComponentAtNode } from 'react-dom'
+import { Router, Redirect, Route } from 'react-router-dom'
 
 import Provider from './models/index'
 
@@ -15,6 +15,7 @@ import Settings from './routes/Settings'
 import Manager from './routes/Manager'
 import ErrorPage from './routes/Error'
 import ServerHome from './routes/ServerHome'
+import CustomServerHome from './routes/CustomServerHome'
 import SideBar from './SideBar'
 import InstallList from './components/InstallList'
 
@@ -39,14 +40,23 @@ const Drag: React.FC = () => {
       const file = files.item(0)
       if (!file || !file.size) return
       console.log(file)
-      switch (file.type) {
-        case 'application/x-zip-compressed':
-          notice({ content: $('Installing resources...') })
-          installLocal(file.path)
-            .then(() => notice({ content: $('Success!') }))
-            .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
-          break
-      }
+      if (file.name.endsWith('.zip')) {
+        notice({ content: $('Installing resources...') })
+        installLocal(file.path, true)
+          .then(success => {
+            if (success) notice({ content: $('Success!') })
+            else notice({ content: $('Failed!') })
+          })
+          .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
+      } else if (file.name.endsWith('.jar')) {
+        notice({ content: $('Installing resources...') })
+        installMod(file.path)
+          .then(success => {
+            if (success) notice({ content: $('Success!') })
+            else notice({ content: $('Failed!') })
+          })
+          .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
+      } else notice({ content: $('No resources found!'), error: true })
     }
     document.ondragover = e => {
       e.preventDefault()
@@ -80,7 +90,8 @@ const App: React.FC = () => {
             <LiveRoute exact component={Settings} path='/settings' />
             <LiveRoute exact component={ErrorPage} path='/error' className='vh100' />
             <LiveRoute exact component={ServerHome} path='/serverHome' className='vh100' />
-            <Redirect to='/serverHome?host=hz.apisium.cn&port=25587&name=NekoCraft' />
+            <Route component={CustomServerHome} path='/customServerHome' className='vh100' />
+            <Redirect to='/' />
             <PluginRoutes />
           </section>
         </Router>
@@ -95,7 +106,8 @@ const App: React.FC = () => {
   }
 }
 
-global.openConfirmDialog = (data: { text: string, title?: string, cancelButton?: boolean }) => new Promise(r => {
+interface Ctx { text: string, title?: string, cancelButton?: boolean, component?: React.ComponentType }
+global.openConfirmDialog = (data: Ctx) => new Promise(r => {
   const elm = document.createElement('div')
   const E = () => {
     const [open, setOpen] = useState(true)
@@ -111,7 +123,7 @@ global.openConfirmDialog = (data: { text: string, title?: string, cancelButton?:
       maskAnimation='fade'
       onClose={() => fn(false)}
       title={data.title || $('News:')}
-      children={data.text}
+      children={data.component ? <>{data.text}<data.component /></> : data.text}
       bodyStyle={{ whiteSpace: 'pre-wrap' }}
       footer={[
         <button key='ok' className='btn btn-primary' onClick={() => fn(true)}>{$('OK')}</button>,

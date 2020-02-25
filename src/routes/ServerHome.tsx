@@ -66,7 +66,8 @@ const Context: React.FC = () => {
     {useMemo(() => {
       if (!desc) return
       const p = render(fromFormattedString(desc))
-      return <p className='desc' key={desc}>{p.text}{p.children?.map((it, i) => <span key={i}>{it.text}</span>)}</p>
+      return <p className='desc' key={desc} style={p.style}>{p.component.text}{p.children?.map((it, i) =>
+        <span key={i} style={it.style}>{it.component.text}</span>)}</p>
     }, [desc])}
   </Div>
 }

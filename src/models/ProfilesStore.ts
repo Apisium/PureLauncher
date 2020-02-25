@@ -76,10 +76,11 @@ export default class ProfilesStore extends Store {
     let version: Version
     let time = -Infinity
     let key = ''
-    for (key in this.profiles) {
-      const v = this.profiles[key]
+    for (const k in this.profiles) {
+      const v = this.profiles[k]
       const t = moment(v.lastUsed).valueOf()
       if (t > time && (this.settings.enableSnapshots || v.type !== 'latest-snapshot')) {
+        key = k
         version = v
         time = t
       }

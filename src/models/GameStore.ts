@@ -2,16 +2,18 @@ import { Store, injectStore } from 'reqwq'
 import { LaunchOption, Version, launch } from '@xmcl/core'
 import { Installer } from '@xmcl/installer'
 import { getVersionTypeText } from '../utils/index'
-import { GAME_ROOT, LIBRARIES_PATH } from '../constants'
+import { GAME_ROOT, LIBRARIES_PATH, RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer } from 'electron'
 import { getDownloaders } from '../plugin/DownloadProviders'
 import { join, dirname, basename } from 'path'
-import { promises as fs } from 'fs'
-import ProfilesStore from './ProfilesStore'
+import fs from 'fs-extra'
 import Task from '@xmcl/task'
 import user from '../utils/analytics'
+import history from '../utils/history'
+import ProfilesStore from './ProfilesStore'
 import updateResources from '../protocol/check-update'
+import { ResourceVersion } from '../protocol/types'
 
 export enum STATUS {
   READY, PREPARING, LAUNCHING, LAUNCHED, DOWNLOADING
@@ -88,6 +90,22 @@ export default class GameStore extends Store {
       const ret = await updateResources(versionId)
       await pluginMaster.emit('launchPostUpdate', v.version)
 
+      const json: ResourceVersion =
+        (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[versionId]
+      const url = json?.serverHome
+      if (url && typeof url === 'string') {
+        if (url.startsWith('/serverHome?')) history.push(url)
+        else {
+          try {
+            // eslint-disable-next-line no-new
+            new URL(url)
+            if (url.startsWith('https://') || url.startsWith('http://')) {
+              history.push('/customServerHome?' + encodeURIComponent(url))
+            }
+          } catch { }
+        }
+      }
+
       await checkModsDirectoryOfVersion(versionId, ret)
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
@@ -96,7 +114,6 @@ export default class GameStore extends Store {
         launcherBrand,
         properties: {},
         version: versionId,
-        gamePath: GAME_ROOT,
         resourcePath: GAME_ROOT,
         userType: 'mojang' as any,
         launcherName: 'pure-launcher',
@@ -104,6 +121,7 @@ export default class GameStore extends Store {
         extraJVMArgs: javaArgs.split(' '),
         accessToken: profile.accessToken || '',
         gameProfile: { id: profile.uuid, name: profile.username },
+        gamePath: json?.isolation ? join(VERSIONS_PATH, versionId) : GAME_ROOT,
         javaPath: showGameLog ? join(dirname(javaPath), basename(javaPath).replace('javaw', 'java')) : javaPath,
         extraExecOption: {
           detached: true,
@@ -121,11 +139,9 @@ export default class GameStore extends Store {
       let launched = false
       const launch2 = async () => {
         try {
-          const p = await launch({ ...option, prechecks: [] })
+          const p = await launch({ ...option })
           p.once('close', (code, signal) => {
-            if (code !== 0) {
-              // this.error = ({ code: m.data.code, signal: m.data.signal })
-            }
+            if (code !== 0) notice({ content: $('Abnormal exit detected, exit code:') + ' ' + code, error: true })
             ipcRenderer.send('close-launching-dialog')
             if (this.profilesStore.extraJson.animation) startAnimation()
             if (currentWindow.isMinimized()) {
@@ -171,7 +187,7 @@ export default class GameStore extends Store {
                 await this.ensureLocalVersion(versionId)
                 this.status = STATUS.LAUNCHING
                 await launch2()
-                throw new Error('')
+                return
               case 'CorruptedVersionJar':
                 throw new Error($('Bad version jar!'))
             }

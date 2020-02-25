@@ -21,6 +21,8 @@ export const MODS_PATH = join(GAME_ROOT, 'mods')
 export const VERSIONS_PATH = join(GAME_ROOT, 'versions')
 export const RESOURCE_PACKS_PATH = join(GAME_ROOT, 'resourcepacks')
 export const LIBRARIES_PATH = join(GAME_ROOT, 'libraries')
+export const SERVERS_FILE_NAME = 'servers.dat'
+export const SERVERS_PATH = join(GAME_ROOT, SERVERS_FILE_NAME)
 
 export const RESOURCES_PATH = join(APP_PATH, 'resources')
 export const RESOURCES_VERSIONS_PATH = join(RESOURCES_PATH, 'versions')

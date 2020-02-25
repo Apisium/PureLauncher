@@ -49,7 +49,7 @@
 
 .scrollable::-webkit-scrollbar, .scrollable-dialog .rc-dialog-body::-webkit-scrollbar {
   width: 7px;
-  height: 1px;
+  height: 7px;
 }
 
 .scrollable::-webkit-scrollbar-thumb, .scrollable-dialog .rc-dialog-body::-webkit-scrollbar-thumb {

@@ -2,12 +2,13 @@ import Lang from '../lang/zh-cn.json'
 import Master from './plugin/index'
 import ProfilesStore from './models/ProfilesStore'
 import { GetStore } from 'reqwq'
+import { ComponentType } from 'react'
 import { Resources, Resource, InstallView } from './protocol/types'
 
 type Keys = keyof typeof Lang
 type $ = (name: Keys, ...args: string[]) => string
 interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
-interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean }
+interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean, component?: ComponentType }
 interface TopBar { blocks: Array<HTMLDivElement[]>, colors: Array<string[]>, containers: HTMLDivElement[] }
 declare global {
   declare const topBar: TopBar

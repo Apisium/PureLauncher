@@ -1,9 +1,10 @@
-import { plugin, Plugin, event } from '../Plugin'
-import { version } from '../../../package.json'
-import { download, makeTempDir, getJson, DownloadItem, sha1, genId, md5, validPath, replace } from '../../utils/index'
 import { join, dirname, resolve } from 'path'
+import { version } from '../../../package.json'
+import { plugin, Plugin, event } from '../Plugin'
+import { serialize, deserialize, TagType } from '@xmcl/nbt'
+import { download, makeTempDir, getJson, DownloadItem, sha1, genId, md5, validPath, replace } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH,
-  PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX,
+  PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,
   RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../../constants'
 import pAll from 'p-all'
 import fs from 'fs-extra'
@@ -12,6 +13,24 @@ import major from 'semver/functions/major'
 import install from '../../protocol/install'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
+
+class ServerInfo {
+  @TagType(TagType.String)
+  public icon = ''
+  @TagType(TagType.String)
+  public ip = ''
+  @TagType(TagType.String)
+  public name = ''
+  @TagType(TagType.Byte)
+  public acceptTextures = 0
+  @TagType(TagType.Byte)
+  public hideAddress = 0
+}
+
+class Servers {
+  @TagType([ServerInfo])
+  servers: ServerInfo[] = []
+}
 
 const checkHash = (file: string, hash: string) => sha1(file).then(it => {
   if (hash.trim() === it) return it.trim()
@@ -65,7 +84,22 @@ export default class ResourceInstaller extends Plugin {
     }
   }
 
-  public async installServer (_: T.ResourceServer) {
+  public async installServer (r: T.ResourceServer, o: T.InstallView = { }) {
+    const file = o.isolation ? join(VERSIONS_PATH, o.resolvedId, SERVERS_FILE_NAME) : SERVERS_PATH
+    let data: Servers
+    try {
+      data = await deserialize(await fs.readFile(file), { type: Servers })
+    } catch (e) {
+      if (!e?.message.includes('no such file or directory')) console.error(e)
+      data = new Servers()
+    }
+    let hostname = r.ip
+    if (r.port) hostname += ':' + r.port
+    let server = data.servers.find(it => it.ip === hostname)
+    if (!server) data.servers.unshift((server = new ServerInfo()))
+    if (typeof r.title === 'string') server.name = r.title
+    if (typeof r.hideAddress === 'boolean') server.hideAddress = +r.hideAddress
+    await fs.writeFile(file, serialize(data))
   }
 
   public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
