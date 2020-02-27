@@ -3,6 +3,7 @@ import Master from './plugin/index'
 import ProfilesStore from './models/ProfilesStore'
 import { GetStore } from 'reqwq'
 import { ComponentType } from 'react'
+import { PureLauncherTask } from './utils/index'
 import { Resources, Resource, InstallView } from './protocol/types'
 
 type Keys = keyof typeof Lang
@@ -17,6 +18,7 @@ declare global {
   declare const profilesStore: ProfilesStore
   declare const pluginMaster: Master
   declare const __getStore: GetStore
+  declare const __tasks: PureLauncherTask[]
   declare const notice: (ctx: Ctx) => void
   declare const installResources: (data: Resources) => Promise<void>
   declare const __requestInstallResources: (data: Resources, views?: InstallView) => Promise<boolean>
@@ -24,6 +26,7 @@ declare global {
   declare const startAnimation: () => void
   declare const stopAnimation: () => void
   declare const animationStopped: boolean
+  declare const __updateTasksView: (() => void) | null
   declare interface Window {
     $: $
     topBar: TopBar
@@ -33,11 +36,13 @@ declare global {
     __getStore: GetStore
     animationStopped: boolean
     notice: (ctx: Ctx) => void
+    __tasks: PureLauncherTask[]
     installResources: (data: Resources) => Promise<void>
     __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
     openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
     startAnimation: () => void
     stopAnimation: () => void
+    __updateTasksView: (() => void) | null
   }
   declare namespace NodeJS {
     interface Global {
@@ -49,11 +54,13 @@ declare global {
       profilesStore: ProfilesStore
       animationStopped: boolean
       notice: (ctx: Ctx) => void
+      __tasks: PureLauncherTask[]
       installResources: (data: Resources) => Promise<void>
       __requestInstallResources: <T extends Resource> (data: Resource, views?: InstallView<T>) => Promise<boolean>
       openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
       startAnimation: () => void
       stopAnimation: () => void
+      __updateTasksView: (() => void) | null
     }
   }
 }

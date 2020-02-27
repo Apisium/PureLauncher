@@ -2,7 +2,7 @@ import { join, dirname, resolve } from 'path'
 import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
 import { serialize, deserialize, TagType } from '@xmcl/nbt'
-import { download, makeTempDir, getJson, DownloadItem, sha1, genId, md5, validPath, replace } from '../../utils/index'
+import { makeTempDir, getJson, sha1, genId, md5, validPath, replace } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH,
   PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,
   RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../../constants'

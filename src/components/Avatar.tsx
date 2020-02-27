@@ -1,15 +1,16 @@
 import './avatar.css'
-import React from 'react'
+import React, { forwardRef } from 'react'
 import Img from 'react-image'
 import { AnimatePresence, motion } from 'framer-motion'
 
 const steve = require('../assets/images/steve.png')
-const Div = motion.div as any
+const Div = motion.div
 
 const Avatar: React.FC<React.HTMLAttributes<HTMLDivElement> & { src: string | string[] }> =
-  ({ src, className = '', ...props }) => <AnimatePresence exitBeforeEnter>
+  forwardRef(({ src, className = '', ...props }, ref) => <AnimatePresence exitBeforeEnter>
     <Div
-      {...props}
+      {...(props as any)}
+      ref={ref as any}
       key={Array.isArray(src) ? src[0] : src}
       className={className + ' avatar'}
       initial={{ opacity: 0 }}
@@ -23,6 +24,6 @@ const Avatar: React.FC<React.HTMLAttributes<HTMLDivElement> & { src: string | st
       />
       <Img src={src} className='cover' />
     </Div>
-  </AnimatePresence>
+  </AnimatePresence>)
 
 export default Avatar

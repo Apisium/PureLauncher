@@ -3,7 +3,7 @@ const ParcelJSPackager = global.JSPackager || require('parcel/lib/packagers/JSPa
 const { minify } = require('terser')
 const { relative, join, dirname, basename } = require('path')
 
-const EXCLUDES = ['downloadPage']
+const EXCLUDES = []
 
 const OPTIONS = { compress: { ecma: 8 }, output: { beautify: false, comments: false, ecma: 8 } }
 global.JSPackager = module.exports = class JSPackager extends ParcelJSPackager {

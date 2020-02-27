@@ -1,8 +1,6 @@
-import fs from 'fs-extra'
 import urlJoin from 'url-join'
-import { download, checkUrl } from '../utils/index'
-import { Downloader } from '@xmcl/installer/cjs/util'
-import { Option } from '@xmcl/installer/cjs/minecraft'
+import { Option } from '@xmcl/installer/minecraft'
+import { setDownloader, DefaultDownloader, DownloadToOption } from '@xmcl/installer/util'
 
 export interface DownloadProvider {
   name (): string
@@ -43,37 +41,32 @@ const DownloadProviders = Object.freeze({
   })
 })
 
-const downloadFileIfAbsent = async ({ url, destination: file }: { url: string, destination: string }) => {
-  if (await fs.pathExists(file)) return
-  if (Array.isArray(url)) {
-    for (const link of url) {
-      if (await checkUrl(link)) {
-        await download({ file, url: link })
-        return file
-      }
+class ProgressDownloader extends DefaultDownloader {
+  public bytes = 0
+  public downloadFile (option: DownloadToOption) {
+    const fn = option.progress
+    option.progress = (c, w, t, u) => {
+      this.bytes += c
+      if (!Number.isSafeInteger(this.bytes)) this.bytes = 0
+      __updateTasksView()
+      if (fn) return fn(c, w, t, u)
     }
-  } else if (await checkUrl(url)) {
-    await download({ file, url })
-    return file
+    return super.downloadFile(option)
   }
-  throw new Error('Can not resolve this file: ' + url)
 }
-const downloader: Downloader = {
-  downloadFileIfAbsent,
-  async downloadFile (obj: { url: string, destination: string }) {
-    if (await fs.pathExists(obj.destination)) await fs.unlink(obj.destination)
-    return downloadFileIfAbsent(obj)
-  }
-} as any
+
+export const downloader = new ProgressDownloader()
+
+setDownloader(downloader)
 
 export const getDownloaders = (): Option => {
   let isOffcical = profilesStore.extraJson.downloadProvider === 'OFFICIAL'
   const provider: DownloadProvider = DownloadProviders[profilesStore.extraJson.downloadProvider]
   if (!provider) isOffcical = true
   return {
+    assetsDownloadConcurrency: profilesStore.extraJson.downloadThreads || 16,
     assetsHost: isOffcical ? undefined : [provider.resources],
-    libraryHost: isOffcical && provider?.libraries ? undefined : lib => urlJoin(provider.libraries, lib.download.path),
-    downloader
+    libraryHost: isOffcical && provider?.libraries ? undefined : lib => urlJoin(provider.libraries, lib.download.path)
   }
 }
 

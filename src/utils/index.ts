@@ -1,8 +1,9 @@
 import fs from 'fs-extra'
 import uuid from 'uuid-by-string'
 import * as resolveP from 'resolve-path'
+import { Task } from '@xmcl/task'
 import { version } from '../../package.json'
-import { remote, ipcRenderer } from 'electron'
+import { remote } from 'electron'
 import { join, resolve, extname } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
@@ -51,32 +52,58 @@ export const genUUIDOrigin = (t?: string) => uuid(t || (Math.random().toString()
 export const genUUID = (t?: string) => genUUIDOrigin(t).replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 
-export interface DownloadItem { url: string, file: string }
-interface DownloadList {
-  item: DownloadItem | DownloadItem[]
-  name?: string
-  resolve: () => void
-  reject: (e: number) => void
+export enum TaskStatus {
+  PENDING = '',
+  FINISHED = 'finished',
+  ERROR = 'error',
+  // PAUSED = 'paused',
+  CANCELED = 'canceled'
 }
-const downloadList: { [id: string]: DownloadList } = { }
-export const download = (item: DownloadList['item'], name?: string) => {
-  const id = genId()
-  let resolve: () => void
-  let reject: (e: number) => void
-  const promise = new Promise<void>((res, rej) => {
-    resolve = res
-    reject = rej
-  })
-  downloadList[id] = { item, name, resolve, reject }
-  ipcRenderer.send('download', id, item, name)
-  return promise
+export interface PureLauncherTask {
+  key: number
+  name: string
+  progress: number
+  status: TaskStatus
+  isDownlaod: boolean
 }
-ipcRenderer.on('download-end', (_, id, type) => {
-  const obj = downloadList[id]
-  if (!obj) return
-  delete downloadList[id]
-  if (type) obj.reject(type); else obj.resolve()
-})
+let taskId = 0
+window.__updateTasksView = () => { }
+const tasks = global.__tasks = []
+export const addTask = <T> (task: Task<T>, name: string, isDownlaod = false) => {
+  const t: PureLauncherTask = { name, isDownlaod, key: taskId++, progress: -1, status: TaskStatus.PENDING }
+  let rootState: any
+  return Task.execute(task)
+    .once('execute', (state, parent) => {
+      if (parent) return
+      rootState = state
+      tasks.push(t)
+      __updateTasksView()
+    })
+    .on('update', (n, state) => {
+      if (state !== rootState) return
+      t.progress = n.progress
+      __updateTasksView()
+    })
+    .once('finish', () => {
+      t.status = TaskStatus.FINISHED
+      __updateTasksView()
+    })
+    .once('fail', () => {
+      t.status = TaskStatus.ERROR
+      __updateTasksView()
+    })
+    .on('cancel', () => {
+      t.status = TaskStatus.CANCELED
+      __updateTasksView()
+    })
+    // .on('pause', () => {
+    //   t.status = TaskStatus.PAUSED
+    // })
+    // .on('resume', () => {
+    //   t.status = TaskStatus.PENDING
+    // })
+  tasks.push(t)
+}
 
 export const makeTempDir = async () => {
   const p = join(remote.app.getPath('temp'), genId())

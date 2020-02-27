@@ -20,7 +20,7 @@
   "Versions List": "游戏版本管理",
   "Add new...": "添加新的版本",
   "Delete": "删除",
-  "Downloads": "下载",
+  "Tasks": "任务",
   "ResourcePacks": "材质包",
   "OFFICIAL": "官方源",
   "Plugins": "插件",
@@ -28,6 +28,7 @@
   "Saves": "地图",
   "Clear": "清理已完成项",
   "Error:": "发生错误:",
+  "Speed": "下载速度",
   "Loading...": "加载中...",
   "Launching...": "启动中...",
   "Downloading...": "下载中...",
@@ -98,6 +99,7 @@
   "DOWNLOAD PROVIDER": "下载源",
   "SHOW OUTPUT LOGS": "显示游戏日志",
   "ENABLE SNAPSHOTS": "启用快照版本",
+  "DOWNLOAD THREADS": "下载线程数",
   "ISOLATION": "隔离模式",
   "NAME": "名字",
   "Unnamed": "未命名",
@@ -150,9 +152,9 @@
   "Currently, the game is launching. Please restart the game manually later to install the plugin!": "当前游戏启动中，请稍后手动重启游戏以进行插件安装!",
   "The plugin cannot be uninstalled because it is dependent on other plugins!": "当前插件由于被其他插件依赖而无法卸载!",
 
-  "FINISHED": "已完成",
-  "CANCELED": "已取消",
-  "ERROR": "发生错误",
+  "finished": "已完成",
+  "canceled": "已取消",
+  "error": "发生错误",
   "CANCEL": "取消",
   "Cancel": "取消",
   "SAVE": "保存",
@@ -183,5 +185,10 @@
   "Telegram Group": "Telegram群组",
 
   "Zip file": "压缩文件 (zip)",
-  "Exporting...": "导出中..."
+  "Exporting...": "导出中...",
+
+  "Ensure version JAR": "检查版本 JAR",
+  "Ensure version files": "检查版本资源文件",
+  "Install Forge": "安装 Forge",
+  "Install Minecraft": "安装 Minecraft"
 }

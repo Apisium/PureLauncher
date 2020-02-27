@@ -6,7 +6,7 @@ import history from '../utils/history'
 import { useLocation, Route } from 'react-router-dom'
 
 import Versions from './manager/Versions'
-import Downloads from './manager/Downloads'
+import Tasks from './manager/Tasks'
 import Profiles from './manager/Profiles'
 import Extensions from './manager/Extensions'
 import Plugins from './manager/Plugins'
@@ -25,9 +25,9 @@ export const getPages = () => [
     component: Profiles
   },
   {
-    name: $('Downloads'),
-    path: '/manager/downloads',
-    component: Downloads
+    name: $('Tasks'),
+    path: '/manager/tasks',
+    component: Tasks
   },
   {
     name: $('Extensions'),

@@ -1,10 +1,10 @@
 import { plugin, Plugin, event } from '../Plugin'
 import { version } from '../../../package.json'
 import { isVersion, ResourceVersion } from '../../protocol/types'
+import { addTask } from '../../utils/index'
 import { GAME_ROOT } from '../../constants'
 import { getDownloaders } from '../../plugin/DownloadProviders'
-import Installer from '@xmcl/installer'
-import Task from '@xmcl/task'
+import Installer from '@xmcl/installer/index'
 
 interface ForgeFile {
   sha1: ''
@@ -42,18 +42,19 @@ export default class ResourceInstaller extends Plugin {
       const { version: v, mcVersion: mv } = r
       r.$forge.installer.path = `/maven/net/minecraftforge/forge/${mv}-${v}/forge-${mv}-${v}-installer.jar`
       r.$forge.universal.path = `/maven/net/minecraftforge/forge/${mv}-${v}/forge-${mv}-${v}-universal.jar`
-      await Task.execute(Installer.ForgeInstaller.installTask({
+      await addTask(Installer.ForgeInstaller.installTask({
         version: v,
         mcversion: mv,
         installer: r.$forge.installer,
         universal: r.$forge.universal
-      }, GAME_ROOT, { versionId: r.id })).wait()
+      }, GAME_ROOT, { versionId: r.id }), $('Install Forge') + ': ' + v).wait()
     } else if (r.$vanilla) {
       obj.notWriteJson = true
       await profilesStore.ensureVersionManifest()
       const data = profilesStore.versionManifest.versions.find(it => it.id === r.mcVersion)
       if (!data) throw new Error('No such version: ' + r.mcVersion)
-      await Task.execute(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders())).wait()
+      await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders()),
+        $('Install Minecraft') + ': ' + r.mcVersion).wait()
     }
   }
 }

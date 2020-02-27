@@ -29,14 +29,25 @@ const Settings: React.FC = () => {
       <div className='group'>
         <label>{$('MAXIMUM MEMORY')}</label>
         <input
+          type='number'
           placeholder={$('<auto>')}
           value={pm.extraJson.memory || ''}
+          onKeyPress={e => !/[\d]/.test(e.key) && e.preventDefault()}
           onChange={e => pm.setMemory(e.target.value)}
         />
       </div>
       <div className='group'>
         <label>{$('JVM ARGUMENTS')}</label>
         <input value={pm.extraJson.javaArgs} onChange={e => pm.setArgs(e.target.value)} />
+      </div>
+      <div className='group'>
+        <label>{$('DOWNLOAD THREADS')}</label>
+        <input
+          type='number'
+          value={pm.extraJson.downloadThreads || 16}
+          onKeyPress={e => !/[\d]/.test(e.key) && e.preventDefault()}
+          onChange={e => pm.setDownloadThreads(parseInt(e.target.value) || 16)}
+        />
       </div>
       <div className='group'>
         <label>{$('LANGUAGE')}</label>

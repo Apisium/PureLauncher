@@ -1,14 +1,13 @@
 import { Store, injectStore } from 'reqwq'
 import { LaunchOption, Version, launch } from '@xmcl/core'
-import { Installer } from '@xmcl/installer'
-import { getVersionTypeText } from '../utils/index'
+import { Installer } from '@xmcl/installer/index'
+import { getVersionTypeText, addTask } from '../utils/index'
 import { GAME_ROOT, LIBRARIES_PATH, RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer } from 'electron'
 import { getDownloaders } from '../plugin/DownloadProviders'
 import { join, dirname, basename } from 'path'
 import fs from 'fs-extra'
-import Task from '@xmcl/task'
 import user from '../utils/analytics'
 import history from '../utils/history'
 import ProfilesStore from './ProfilesStore'
@@ -207,13 +206,13 @@ export default class GameStore extends Store {
       throw e
     }
   }
-  private async ensureMinecraftVersion (version: any /* TODO: need a type */) {
+  private async ensureMinecraftVersion (version: any) {
     const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders())
-    await Task.execute(task).wait()
+    await addTask(task, $('Ensure version JAR') + ': ' + version.id).wait()
   }
   private async ensureLocalVersion (versionId: string) {
     const resolved = await Version.parse(GAME_ROOT, versionId)
     const task = Installer.installDependenciesTask(resolved, getDownloaders())
-    await Task.execute(task).wait()
+    await addTask(task, $('Ensure version files') + ': ' + versionId).wait()
   }
 }

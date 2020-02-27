@@ -55,6 +55,7 @@ export default class ProfilesStore extends Store {
     selectedUser: '',
     loginType: '',
     copyMode: false,
+    downloadThreads: 16,
     downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
       .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICAL',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
@@ -280,6 +281,11 @@ export default class ProfilesStore extends Store {
 
   public async setArgs (args: string) {
     this.extraJson.javaArgs = args
+    await this.saveExtraConfigJson()
+  }
+
+  public async setDownloadThreads (num: number) {
+    this.extraJson.downloadThreads = num
     await this.saveExtraConfigJson()
   }
 
