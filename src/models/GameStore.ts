@@ -29,7 +29,7 @@ export default class GameStore extends Store {
     if (this.status !== STATUS.READY) return
     try {
       this.status = STATUS.PREPARING
-      const { extraJson, getCurrentProfile, selectedVersion, versionManifest, profiles,
+      const { extraJson, getCurrentProfile, selectedVersion, profiles,
         ensureVersionManifest, checkModsDirectoryOfVersion, settings: { showGameLog } } = this.profilesStore
 
       if (version in profiles) version = profiles[version].lastVersionId
@@ -65,16 +65,20 @@ export default class GameStore extends Store {
 
       this.status = STATUS.DOWNLOADING
       switch (version) {
-        case 'latest-release':
+        case 'latest-release': {
           await ensureVersionManifest()
-          versionId = versionManifest.latest.release
-          await this.ensureMinecraftVersion(versionManifest.versions.find(v => v.id === versionId))
+          const { latest, versions } = this.profilesStore.versionManifest
+          versionId = latest.release
+          await this.ensureMinecraftVersion(versions.find(v => v.id === versionId))
           break
-        case 'latest-snapshot':
+        }
+        case 'latest-snapshot': {
           await ensureVersionManifest()
-          versionId = versionManifest.latest.snapshot
-          await this.ensureMinecraftVersion(versionManifest.versions.find(v => v.id === versionId))
+          const { latest, versions } = this.profilesStore.versionManifest
+          versionId = latest.snapshot
+          await this.ensureMinecraftVersion(versions.find(v => v.id === versionId))
           break
+        }
         default:
           versionId = version
           await this.ensureLocalVersion(versionId)
@@ -207,10 +211,12 @@ export default class GameStore extends Store {
     }
   }
   private async ensureMinecraftVersion (version: any) {
-    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders())
+    if (!version) throw new Error('No version provided!')
+    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders(version))
     await addTask(task, $('Ensure version JAR') + ': ' + version.id).wait()
   }
   private async ensureLocalVersion (versionId: string) {
+    if (!versionId) throw new Error('No version provided!')
     const resolved = await Version.parse(GAME_ROOT, versionId)
     const task = Installer.installDependenciesTask(resolved, getDownloaders())
     await addTask(task, $('Ensure version files') + ': ' + versionId).wait()

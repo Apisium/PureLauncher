@@ -1,3 +1,4 @@
+import 'moment/locale/zh-cn'
 import zhCN from '../lang/zh-cn.json'
 import moment from 'moment'
 import forceUpdate from 'react-deep-force-update'

@@ -76,5 +76,8 @@ clickSound.oncanplay = () => document.addEventListener('click', e => {
   }
 })
 
-document.getElementById('close').onclick = () => setTimeout(() => remote.app.quit(), 500)
+document.getElementById('close').onclick = () => setTimeout(() => {
+  remote.app.quit()
+  setTimeout(() => remote.app.exit(), 3000)
+}, 500)
 document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()

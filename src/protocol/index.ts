@@ -12,6 +12,7 @@ const gameStore = P.getStore(GameStore)
 const InterruptedResources = 'interruptedResources'
 const mappings = {
   async Install (r: T.ProtocolInstall, request?: boolean) {
+    console.log(r)
     if (r.plugins) {
       const plugins = Object.keys(r.plugins).filter(it => !(it in pluginMaster.plugins))
       if (plugins.length) {
@@ -28,10 +29,15 @@ const mappings = {
         return
       }
     }
-    await install(r.resource, request)
+    await install(r.resource, request, false)
   },
-  Launch (data: T.ProtocolLaunch) {
-    gameStore.launch(typeof data.version === 'object' ? data.version.id : data.version)
+  async Launch (data: T.ProtocolLaunch) {
+    if (data.secret !== localStorage.getItem('analyticsToken') && !await openConfirmDialog({
+      cancelButton: true,
+      text: $('Received the request to launch the game. Do you want to launch the game') + ': ' +
+        (data.version || profilesStore.selectedVersion.lastVersionId) + '?'
+    })) return
+    gameStore.launch(data.version)
   },
   InstallLocal (data: T.ProtocolInstallLocal) {
     installLocal(data.path)

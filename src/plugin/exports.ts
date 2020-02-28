@@ -51,8 +51,8 @@ export { default as ReactImage } from 'react-image'
 export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin,
-  getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText,
-  removeFormatCodes, autoNotices, readBuffer, addTask } from '../utils/index'
+  getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText, download,
+  removeFormatCodes, autoNotices, readBuffer, addTask, createDownloadTask } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
   constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl }
 

@@ -140,7 +140,7 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
           <select name='version'>{versions.map(it => <option value={it} key={it}>{it}</option>)}</select>
         </div>
         <a role='link' onClick={() => shell.openExternal('https://pl.apisium.cn/versions')}>
-          {$('Install the vanilla game / Forge / Fabric?')}
+          {$('Install the vanilla Minecraft / Forge / Fabric?')}
         </a>
       </form>}
     <IconPicker onClose={it => (setIcon(it), setOpen(false))} open={open} />

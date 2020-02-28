@@ -29,7 +29,6 @@ export default class Tasks extends Component {
     clearInterval(this.timer)
   }
   public render () {
-    console.log((this.bytes - this.prevBytes) * 2)
     const cancel = $('Cancel')
     return <div className='manager-list version-switch manager-versions manager-tasks'>
       <div className='list-top'>
@@ -44,10 +43,10 @@ export default class Tasks extends Component {
         </a>
       </div>
       <ul>{__tasks.map(it => <li key={it.key} className={it.status} style={css}>
-        <div className='text'>{it.name}</div>
+        <div className='text'>{it.name} {it.subName && <span>{it.subName}</span>}</div>
         {it.status === TaskStatus.PENDING && <progress value={it.progress} max={100} />}
         {it.status === TaskStatus.PENDING && <div className='button'>
-          <button onClick={() => {}} className='btn2 danger'>{cancel}</button>
+          <button onClick={it.cancel} className='btn2 danger'>{cancel}</button>
         </div>}
       </li>)}</ul>
     </div>

@@ -1,8 +1,9 @@
 import { join, dirname, resolve } from 'path'
 import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
+import { DownloadToOption } from '@xmcl/installer/index'
 import { serialize, deserialize, TagType } from '@xmcl/nbt'
-import { makeTempDir, getJson, sha1, genId, md5, validPath, replace } from '../../utils/index'
+import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH,
   PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,
   RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../../constants'
@@ -32,14 +33,14 @@ class Servers {
   servers: ServerInfo[] = []
 }
 
-const checkHash = (file: string, hash: string) => sha1(file).then(it => {
-  if (hash.trim() === it) return it.trim()
-  else throw new Error($('Hash is different: {0} -> {1}', it, hash))
+interface MoveDownloadToOption extends DownloadToOption {
+  moveTo: string
+}
+
+const downloadAndGetHash = (options: DownloadToOption | DownloadToOption[]) => download(options).wait().then(() => {
+  const files = Array.isArray(options) ? options : [options]
+  return files[0]?.checksum ? pAll(files.map(it => () => sha1(it.destination)), { concurrency: 8 }) : undefined
 })
-const downloadAndCheckHash = (urls: DownloadItem[], r: T.Resource & { hashes?: string[] }) =>
-  download(urls.length === 1 ? urls[0] : urls, r.title || r.id)
-    .then(() => pAll(urls.map((it, i) => r.hashes ? () => checkHash(it.file, r.hashes[i])
-      : () => sha1(it.file)), { concurrency: 6 }))
 
 @plugin({
   version,
@@ -85,6 +86,7 @@ export default class ResourceInstaller extends Plugin {
   }
 
   public async installServer (r: T.ResourceServer, o: T.InstallView = { }) {
+    if (!T.isServer(r)) throw new TypeError($('Illegal resource type!'))
     const file = o.isolation ? join(VERSIONS_PATH, o.resolvedId, SERVERS_FILE_NAME) : SERVERS_PATH
     let data: Servers
     try {
@@ -103,7 +105,7 @@ export default class ResourceInstaller extends Plugin {
   }
 
   public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
-    if (!T.isVersion(r)) throw new TypeError('Incorrect resource type!')
+    if (!T.isVersion(r)) throw new TypeError($('Illegal resource type!'))
     const id = (r as any).resolvedId = r.useIdAsName ? r.id : `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
     const dir = resolve(VERSIONS_PATH, id)
     const old: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[r.id]
@@ -135,12 +137,19 @@ export default class ResourceInstaller extends Plugin {
     try {
       const arr = typeof r.files === 'object' && Object.entries(r.files)
       if (arr && arr.length) {
-        const urls: Array<{ url: string, file: string, absolute: string }> = arr.map(([name, url], i) =>
-          ({ url: replace(url, r), file: join(p, i.toString()), absolute: validPath(dir, replace(name, r)) }))
-        const hashes = await downloadAndCheckHash(urls, r)
-        await pAll(urls.map(it => () => {
-          const path = it.absolute
-          return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.file, path))
+        if (r.hashes && r.hashes.length !== arr.length) {
+          throw new Error($('The number of files is not equal to the number of hashes provided!'))
+        }
+        const options: MoveDownloadToOption[] = arr.map(([name, url], i) => ({
+          url: replace(url, r),
+          destination: join(p, i.toString()),
+          moveTo: validPath(dir, replace(name, r)),
+          checksum: r.hashes ? { algorithm: 'sha1', hash: r.hashes[i] } : undefined
+        }))
+        const hashes = await downloadAndGetHash(options) || r.hashes
+        await pAll(options.map(it => () => {
+          const path = it.moveTo
+          return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.destination, path))
         }), { concurrency: 8 })
         r.hashes = hashes
       } else {
@@ -182,7 +191,10 @@ export default class ResourceInstaller extends Plugin {
 
   public async installResourcePack (r: T.ResourceResourcePack, o: T.InstallView = { }) {
     if (!r) return
-    if (!T.isResourcePack(r)) throw new TypeError('Incorrect resource type!')
+    if (!T.isResourcePack(r)) throw new TypeError($('Illegal resource type!'))
+    if (r.hashes && r.hashes.length !== r.urls.length) {
+      throw new Error($('The number of files is not equal to the number of hashes provided!'))
+    }
     const dir = o.isolation ? join(VERSIONS_PATH, o.resolvedId, 'resourcepacks') : RESOURCE_PACKS_PATH
     const old: T.ResourceResourcePack = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
       : (await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || { })[r.id]
@@ -192,14 +204,17 @@ export default class ResourceInstaller extends Plugin {
     }
     if (r.extends) await install(r.extends, false, true, T.isResourcePack)
     const p = await makeTempDir()
-    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) =>
-      ({ url: replace(url, r), file: join(p, it.toString()) }))
+    const urls: DownloadToOption[] = r.urls.map((url, i) => ({
+      url: replace(url, r),
+      destination: join(p, i.toString()),
+      checksum: r.hashes ? { algorithm: 'sha1', hash: r.hashes[i] } : undefined
+    }))
     try {
-      const hashes = await downloadAndCheckHash(urls, r)
+      const hashes = await downloadAndGetHash(urls) || r.hashes
       await fs.ensureDir(dir)
       await pAll(urls.map((it, i) => () => {
         const path = join(dir, hashes[i] + '.zip')
-        return fs.pathExists(path).then(t => t && fs.unlink(path)).then(() => fs.move(it.file, path))
+        return fs.pathExists(path).then(t => t && fs.unlink(path)).then(() => fs.move(it.destination, path))
       }), { concurrency: 8 })
       if (!o.isolation) {
         const json = await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || { }
@@ -214,7 +229,10 @@ export default class ResourceInstaller extends Plugin {
 
   public async installMod (r: T.ResourceMod, o: T.InstallView = { }, id?: string, dir?: string) {
     if (!r) return
-    if (!T.isMod(r)) throw new TypeError('Incorrect resource type!')
+    if (!T.isMod(r)) throw new TypeError($('Illegal resource type!'))
+    if (r.hashes && r.hashes.length !== r.urls.length) {
+      throw new Error($('The number of files is not equal to the number of hashes provided!'))
+    }
     if (!dir && o.resolvedDir) dir = join(o.resolvedDir, 'mods')
     if (!id && o.resolvedId) id = o.resolvedId
     if ((!dir || !id) && o.selectedVersion) {
@@ -234,13 +252,16 @@ export default class ResourceInstaller extends Plugin {
     }
     if (r.extends) await install(r.extends, false, true, T.isMod, o)
     const p = await makeTempDir()
-    const urls: Array<{ url: string, file: string }> = r.urls.map((url, it) =>
-      ({ url: replace(url, r), file: join(p, it.toString()) }))
+    const urls: DownloadToOption[] = r.urls.map((url, i) => ({
+      url: replace(url, r),
+      destination: join(p, i.toString()),
+      checksum: r.hashes ? { algorithm: 'sha1', hash: r.hashes[i] } : undefined
+    }))
     try {
-      const hashes = await downloadAndCheckHash(urls, r)
+      const hashes = await downloadAndGetHash(urls) || r.hashes
       await pAll(urls.map((it, i) => () => {
         const path = join(dir, hashes[i] + '.jar')
-        return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.file, path))
+        return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.destination, path))
       }), { concurrency: 8 })
       if (!o.isolation) {
         const json = await fs.readJson(jsonPath, { throws: false }) || { }
@@ -255,7 +276,7 @@ export default class ResourceInstaller extends Plugin {
 
   public async installPlugin (r: T.ResourcePlugin, showDialog = false, o: T.InstallView = { }) {
     if (!r) return
-    if (!T.isPlugin(r)) throw new TypeError('Incorrect resource type!')
+    if (!T.isPlugin(r)) throw new TypeError($('Illegal resource type!'))
     const old: T.ResourcePlugin = (await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { })[r.id]
     if (old) {
       if (gte(old.version, r.version)) return
@@ -280,10 +301,10 @@ export default class ResourceInstaller extends Plugin {
     const p = await makeTempDir()
     try {
       const file = join(p, genId())
-      await download({ url: replace(r.url, r), file }, r.title || r.id)
-      const hash = await checkHash(file, r.hash)
+      await download({ url: replace(r.url, r), destination: file,
+        checksum: { algorithm: 'sha1', hash: r.hash } }, r.title || r.id)
       await fs.ensureDir(PLUGINS_ROOT)
-      const path = join(PLUGINS_ROOT, hash + (r.extension || '.asar'))
+      const path = join(PLUGINS_ROOT, r.hash + (r.extension || '.asar'))
       if (await fs.pathExists(path)) await fs.unlink(path)
       await fs.move(file, path)
       const json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }

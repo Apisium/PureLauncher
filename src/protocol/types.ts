@@ -76,15 +76,26 @@ export const isMod = (r: any): r is ResourceMod => isResourceWithVersionAndUrls(
 export const isPlugin = (r: any): r is ResourcePlugin => isResourceWithVersion(r) &&
   r.type === 'Plugin' && typeof (r as any).url === 'string' && !!(r as any).url &&
   typeof (r as any).hash === 'string' && !!(r as any).hash
-export const isVersion = (r: any): r is ResourceVersion => isResourceWithVersion(r) &&
-  r.type === 'Version' && (typeof (r as any).json === 'object' || typeof (r as any).json === 'string') &&
-  (r as any).json && !!valid((r as any).mcVersion)
+export const isVersion = (r: any): r is ResourceVersion => {
+  const a: any = r
+  if (!isResource(r) || r.type !== 'Version' || typeof a.mcVersion !== 'string' || !a.mcVersion) return false
+  if (a.$vanilla) return true
+  const forge = (r as any).$forge
+  if (forge && typeof forge.version === 'string' && typeof forge.universal === 'string' &&
+    typeof forge.installer === 'string') return true
+  const fabric = (r as any).$fabric
+  if (fabric && typeof fabric.version === 'string' && typeof fabric.loader === 'string') return true
+  if (isResourceWithVersion(r) && (typeof a.json === 'object' || (typeof a.json === 'string' && a.json))) return true
+  return false
+}
 export const isServer = (r: any): r is ResourceServer => isResource(r) &&
   r.type === 'Server' && typeof (r as any).ip === 'string' && !!(r as any).ip
 
 export interface Protocol <T = any> { type: T }
 export interface ProtocolLaunch extends Protocol<'Launch'> {
-  version?: string | ResourceVersion
+  version?: string
+  resource?: ResourceVersion
+  secret?: string
   options?: { ip: string, port?: number }
   autoInstall?: boolean
 }

@@ -376,12 +376,16 @@ export default class ProfilesStore extends Store {
           {
             type: 'tasks',
             name: $('Recent play'),
-            items: versions.map(([id, v]) => ({
+            items: versions.map(([version, v]) => ({
               icon: MC_LOGO,
               type: 'task',
               iconIndex: 0,
               program: process.execPath,
-              args: `{"type":"launch","version":${JSON.stringify(id)}}`,
+              args: ' ' + JSON.stringify(JSON.stringify({
+                version,
+                type: 'Launch',
+                secret: localStorage.getItem('analyticsToken')
+              })),
               title: `${v.type === 'latest-release' ? lastRelease
                 : v.type === 'latest-snapshot' ? lastSnapshot : v.name || noTitle} (${v.lastVersionId})`
             }))
@@ -413,7 +417,13 @@ export default class ProfilesStore extends Store {
     let data: any
     if (t) {
       const d = localStorage.getItem(MINECRAFT_MANIFEST)
-      if (d) try { data = JSON.parse(d) } catch (e) { console.error(e) }
+      if (d) {
+        try {
+          const data = JSON.parse(d)
+          data[NOT_PROXY] = true
+          this.versionManifest = data
+        } catch (e) { console.error(e) }
+      }
     }
     if (!data) await this.refreshVersionManifest().catch(console.error)
   }
@@ -423,7 +433,9 @@ export default class ProfilesStore extends Store {
       this.downloadProvider.launchermeta || DownloadProviders.OFFICIAL.launchermeta,
       'mc/game/version_manifest.json'
     ), { cache: 'no-cache' }).then(it => it.text())
-    this.versionManifest = JSON.parse(str)
+    const json = JSON.parse(str)
+    json[NOT_PROXY] = true
+    this.versionManifest = json
     localStorage.setItem(MINECRAFT_MANIFEST, str)
     localStorage.setItem(MINECRAFT_MANIFEST_UPDATE_TIME, Date.now().toString())
   }

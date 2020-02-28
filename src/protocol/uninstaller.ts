@@ -7,18 +7,18 @@ import { Plugin } from '../plugin/Plugin'
 import { FILE } from '../plugin/index'
 
 export const uninstallVersion = async (id: string) => {
+  const resolvedId = await profilesStore.resolveVersion(id)
   const json = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }
-  if (id in json) {
-    delete json[id]
+  if (resolvedId in json) {
+    delete json[resolvedId]
     await fs.writeJson(RESOURCES_VERSIONS_INDEX_PATH, json)
   }
-  const key = Object.entries(profilesStore.profiles).find(it => it[1].lastVersionId === id)
-  if (key) {
-    delete profilesStore.profiles[key[0]]
+  if (id in profilesStore.profiles) {
+    delete profilesStore.profiles[id]
     await profilesStore.saveLaunchProfileJson()
   }
-  await fs.remove(RESOURCES_VERSIONS_PATH).catch(() => {})
-  await fs.remove(join(VERSIONS_PATH, id)).catch(() => {})
+  await fs.remove(join(RESOURCES_VERSIONS_PATH, resolvedId)).catch(() => {})
+  await fs.remove(join(VERSIONS_PATH, resolvedId)).catch(console.error)
 }
 
 export const uninstallMod = async (version: string, id: string, directly = false) => {

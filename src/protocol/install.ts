@@ -35,7 +35,7 @@ export default (
   if (!throws) {
     p.then(() => notice({ content: $('Successfully installed resources!') }), e => {
       console.error(e)
-      notice({ error: true, content: $('Failed to install resources!') })
+      notice({ error: true, content: $('Failed to install resources') + ': ' + (e?.message || $('Unknown')) })
     })
   }
   return p

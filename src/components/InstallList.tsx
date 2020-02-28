@@ -2,12 +2,12 @@ import './install-list.less'
 import React, { useState, useMemo } from 'react'
 import Dialog from 'rc-dialog'
 import Treebeard from './treebeard/index'
-import { ResourceVersion, Resource, ResourceMod, ResourceServer, InstallView } from '../protocol/types'
+import * as T from '../protocol/types'
 
 let _setRes: any
 let resolve: any
 let reject: any
-let view: InstallView
+let view: T.InstallView
 global.__requestInstallResources = (d: any, _view: any) => {
   if (reject) reject()
   view = _view
@@ -28,31 +28,31 @@ global.__requestInstallResources = (d: any, _view: any) => {
 }
 
 const InstallList: React.FC = () => {
-  const [res, setRes] = useState<Resource>(null)
+  const [res, setRes] = useState<T.Resource>(null)
   _setRes = setRes
-  const [data, setData] = useState({})
+  const [data, setData] = useState<any>({})
   useMemo(() => {
     if (res && res.type === 'Version') {
       const mods = []
       const servers = []
       const resources = []
       const plugins = []
-      Object.values((res as ResourceVersion).resources).forEach(it => {
-        switch (it.type) {
-          case 'Mod':
-            mods.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })
-            break
-          case 'Server':
-            servers.push({ id: it.ip, name: it.title || (it.port ? `${it.ip}:${it.port}` : it.ip) })
-            break
-          case 'ResourcePack':
-            resources.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })
-            break
-          case 'Plugin':
-            plugins.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })
-            break
-        }
-      })
+      const r = res as T.ResourceVersion
+      if (typeof r.resources === 'object') {
+        Object.values(r.resources).forEach(it => {
+          switch (it.type) {
+            case 'Mod':
+              mods.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })
+              break
+            case 'Server':
+              servers.push({ id: it.ip, name: it.title || (it.port ? `${it.ip}:${it.port}` : it.ip) })
+              break
+            case 'ResourcePack':
+              resources.push({ id: it.id, name: `${it.title || it.id}@${it.version}` })
+              break
+          }
+        })
+      }
       const d = {
         id: 'root',
         name: $('Detailed List'),
@@ -61,7 +61,7 @@ const InstallList: React.FC = () => {
       }
       if (mods.length) d.children.push({ id: 'mods', name: $('Mods'), children: mods })
       if (servers.length) d.children.push({ id: 'servers', name: $('Servers'), children: servers })
-      if (resources.length) d.children.push({ id: 'resources', name: $('Resources'), children: resources })
+      if (resources.length) d.children.push({ id: 'resources', name: $('ResourcePacks'), children: resources })
       if (plugins.length) d.children.push({ id: 'plugins', name: $('Plugins'), children: resources })
       setData(d)
     } else setData(res)
@@ -73,23 +73,33 @@ const InstallList: React.FC = () => {
 
   let name: string
   let comp: any
+  let title: string
   switch (res.type) {
-    case 'Version':
+    case 'Version': {
       name = $('Version')
-      comp = <div className='list'><Treebeard
-        data={data} onToggle={(node: any, toggled: any) => {
-          if (cursor) cursor.active = false
-          node.active = true
-          if (node.children) node.toggled = toggled
-          setCursor(node)
-          setData(Object.assign({}, data))
-        }}
-      />
+      const r = res as any
+      if (r.$vanilla) title = $('Vanilla Minecraft')
+      else if (r.$forge) title = 'Forge'
+      else if (r.$fabric) title = 'Fabric'
+      const ver = r.$forge?.version || r.$fabric?.version
+      comp = <div className='list'>
+        {r.mcVersion && <p><span>{$('Minecraft Version')}: </span>{r.mcVersion}</p>}
+        {ver && <p><span>{$('VersionId')}: </span>{ver}</p>}
+        {data?.children?.length ? <Treebeard
+          data={data} onToggle={(node: any, toggled: any) => {
+            if (cursor) cursor.active = false
+            node.active = true
+            if (node.children) node.toggled = toggled
+            setCursor(node)
+            setData(Object.assign({}, data))
+          }}
+        /> : null}
       </div>
       break
+    }
     case 'Mod': {
       name = $('Mods')
-      const r = res as ResourceMod
+      const r = res as T.ResourceMod
       comp = <>
         {r.mcVersion && <p><span>{$('Minecraft Version')}: </span>{r.mcVersion}</p>}
         {r.apis && <p><span>{$('Apis')}: </span>{Object.keys(r.apis).join(', ')}</p>}
@@ -101,7 +111,7 @@ const InstallList: React.FC = () => {
       break
     case 'Server': {
       name = $('Servers')
-      const r = res as ResourceServer
+      const r = res as T.ResourceServer
       comp = <p><span>{$('Host')}: </span>{r.ip}{r.port ? ':' + r.port : null}</p>
       break
     }
@@ -117,7 +127,7 @@ const InstallList: React.FC = () => {
     onClose={reject}
     visible
   >
-    <p><span>{$('Name')}: </span>{res.title || res.id}</p>
+    <p><span>{$('Name')}: </span>{title || res.title || res.id}</p>
     {(res as any).version && <p><span>{$('VersionId')}: </span>{(res as any).version}</p>}
     {res.author && <p><span>{$('Author')}: </span>{res.author}</p>}
     {res.description && <p><span>{$('Description')}: </span>{res.description}</p>}

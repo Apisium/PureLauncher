@@ -160,7 +160,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
   public async changeSkin (key: string, path: string, slim = false) {
     const p = this.getData(key)
     const body = new FormData()
-    if (slim) body.append('model', 'slim')
+    body.append('model', slim ? 'slim' : '')
     body.append('file', new Blob([await fs.readFile(path)]))
     const text = await fetch(`https://api.mojang.com/user/profile/${p.uuid}/skin`, {
       body,
@@ -170,7 +170,7 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
       console.error(e)
       throw new Error($('Network connection failed!'))
     })
-    if (text) {
+    if (text?.startsWith('{')) {
       console.error(JSON.parse(text))
       throw new Error($('Network connection failed!'))
     }

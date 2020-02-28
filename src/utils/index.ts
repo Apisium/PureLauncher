@@ -4,12 +4,14 @@ import * as resolveP from 'resolve-path'
 import { Task } from '@xmcl/task'
 import { version } from '../../package.json'
 import { remote } from 'electron'
-import { join, resolve, extname } from 'path'
+import { join, resolve, extname, basename } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
 import { DEFAULT_EXT_FILTER, SKINS_PATH } from '../constants'
+import { DownloadToOption } from '@xmcl/installer/index'
+import { downloader } from '../plugin/DownloadProviders'
 
 export function getJavaVersion (path: string) {
   const parseVersion = (str: string) => {
@@ -18,7 +20,7 @@ export function getJavaVersion (path: string) {
     return match[1]
   }
   return new Promise<string>(resolve => {
-    exec(`${path} -version`, (_, stdout, serr) => {
+    exec(`${path} -version`, (_, __, serr) => {
       if (!serr) {
         resolve(undefined)
       } else {
@@ -52,6 +54,7 @@ export const genUUIDOrigin = (t?: string) => uuid(t || (Math.random().toString()
 export const genUUID = (t?: string) => genUUIDOrigin(t).replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 
+const NIL = () => { }
 export enum TaskStatus {
   PENDING = '',
   FINISHED = 'finished',
@@ -62,20 +65,23 @@ export enum TaskStatus {
 export interface PureLauncherTask {
   key: number
   name: string
+  subName?: string
   progress: number
   status: TaskStatus
-  isDownlaod: boolean
+  cancel (): void
 }
 let taskId = 0
 window.__updateTasksView = () => { }
 const tasks = global.__tasks = []
-export const addTask = <T> (task: Task<T>, name: string, isDownlaod = false) => {
-  const t: PureLauncherTask = { name, isDownlaod, key: taskId++, progress: -1, status: TaskStatus.PENDING }
+export const addTask = <T> (task: Task<T>, name: string, subName?: string) => {
+  const t: PureLauncherTask = { name, subName, key: taskId++, progress: -1, status: TaskStatus.PENDING, cancel: NIL }
   let rootState: any
-  return Task.execute(task)
+  const ret = Task.execute(task)
+  return ret
     .once('execute', (state, parent) => {
       if (parent) return
       rootState = state
+      t.cancel = () => ret.cancel()
       tasks.push(t)
       __updateTasksView()
     })
@@ -96,14 +102,31 @@ export const addTask = <T> (task: Task<T>, name: string, isDownlaod = false) => 
       t.status = TaskStatus.CANCELED
       __updateTasksView()
     })
-    // .on('pause', () => {
-    //   t.status = TaskStatus.PAUSED
-    // })
-    // .on('resume', () => {
-    //   t.status = TaskStatus.PENDING
-    // })
-  tasks.push(t)
 }
+
+export const createDownloadTask = (option: DownloadToOption | DownloadToOption[]) => Task.create('download', ctx => {
+  if (Array.isArray(option)) {
+    if (option.length > 1) {
+      ctx.update(0, option.length)
+      return Promise.all(option.map((it, i) => ctx.execute(Task.create(
+        'download.' + i, () => downloader.downloadFile(it)), 1))) as any as void
+    } else option = option[0]
+  }
+  if (!option) {
+    ctx.update(1, 0)
+    return
+  }
+  const fn = option.progress
+  option.progress = (a, b, c, d) => {
+    ctx.update(b / c, c, d)
+    if (fn) return fn(a, b, c, d)
+  }
+  return downloader.downloadFile(option)
+})
+
+export const download = (option: DownloadToOption | DownloadToOption[], name = $('Download'), subName?: string) =>
+  addTask(createDownloadTask(option), name, subName ||
+  (Array.isArray(option) ? undefined : basename(option.destination)))
 
 export const makeTempDir = async () => {
   const p = join(remote.app.getPath('temp'), genId())

@@ -32,6 +32,7 @@
   "Loading...": "加载中...",
   "Launching...": "启动中...",
   "Downloading...": "下载中...",
+  "Download": "下载文件",
   "Preparing...": "准备中...",
   "Launched": "游戏运行中",
   "Fail to launch": "启动失败",
@@ -45,7 +46,7 @@
   "News:": "信息:",
   "OK": "确认",
   "Successfully installed resources!": "资源安装成功!",
-  "Failed to install resources!": "资源安装失败!",
+  "Failed to install resources": "资源安装失败",
   "Hash is different: {0} -> {1}": "哈希值不相同: {0} -> {1}",
   "Please select an icon you like:": "请选择一个你喜欢的图标:",
   "Warning!": "警告!",
@@ -66,6 +67,7 @@
     "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
   "Are you sure to delete this mod? Files can be recovered in the recycle bin.":
     "是否确认删除该模组? 文件删除后可在回收站中恢复.",
+  "The number of files is not equal to the number of hashes provided!": "文件数与提供多个哈希数不相同!",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
   "Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}":
@@ -80,13 +82,15 @@
     "该版本（{0}）已经存在！是否删除该版本？警告：删除后将无法复原!",
   "Network connection failed. Do you want to play offline?": "网络连接失败, 是否要离线游玩?",
   "File drag detected, release to install.": "检测到文件拖入，释放后即可安装",
-  "Illegal resource type!": "非法的资源类型!",
+  "Illegal resource type!": "错误的资源类型!",
   "Do you want to export MODS and resource packs?": "是否要导出模组和材质包?",
   "No resources found!": "错误的资源类型!",
   "It has been detected that the file type dragged in is resource package. Do you want to install it?":
     "检测到拖入的文件类型为资源包，请问是否需要安装?",
   "It has been detected that the file type dragged in is mod. Do you want to install it?":
     "检测到拖入的文件类型为模组，请问是否需要安装?",
+  "Received the request to launch the game. Do you want to launch the game":
+    "收到启动游戏请求，是否要启动游戏",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
@@ -111,7 +115,7 @@
   "Click to edit": "点击以进行编辑",
   "Add Version": "添加版本",
   "VERSION": "版本目录",
-  "Install the vanilla game / Forge / Fabric?": "安装 原版游戏/Forge/Fabric?",
+  "Install the vanilla Minecraft / Forge / Fabric?": "安装 原版游戏/Forge/Fabric?",
 
   "Online Login": "正版登录",
   "Offline Login": "离线登录",
@@ -144,7 +148,7 @@
   "Cancel upload": "取消上传",
   "Upload!": "立即上传",
   "No Data": "暂无数据",
-  "Minecraft Skin File (.png)": "我的世界皮肤文件 (.png)",
+  "Minecraft Skin File (.png)": "Minecraft 皮肤文件 (.png)",
   "Incorrect file format!": "文件格式不正确!",
   "Please select the skin file.": "请选择你的皮肤文件",
   "Unavailable": "不可用",
@@ -172,17 +176,19 @@
   "Author": "作者",
   "Description": "描述",
   "INSTALL": "确认安装",
-  "Minecraft Version": "我的世界版本",
+  "Minecraft Version": "Minecraft 版本",
   "Apis": "前置API",
   "Host": "地址",
   "Target Version": "目标版本",
+  "Vanilla Minecraft": "原版 Minecraft",
 
   "$readmeEn": "",
-  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: baleine2000 AkkariinMeiko Fleey",
+  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: baleine2000 Fleey",
   "Official Website": "官网",
   "Source Code": "源代码",
   "Tencent QQ Group": "QQ群",
   "Telegram Group": "Telegram群组",
+  "Server Provider": "下载服务器提供",
 
   "Zip file": "压缩文件 (zip)",
   "Exporting...": "导出中...",

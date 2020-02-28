@@ -38,8 +38,9 @@ const openLaunchingDialog = () => {
 
 const parseArgs = (args: string[]) => {
   if (window) {
-    const data = minimist(args.slice(1))._[0]
-    window.webContents.send('pure-launcher-protocol', data)
+    const arr = minimist(args.slice(1))._
+    const data = arr[arr.length - 1]
+    if (data) window.webContents.send('pure-launcher-protocol', data)
   }
 }
 
