@@ -1,0 +1,12 @@
+name: upload
+description: Upload files.
+inputs:
+  files:
+    description: 'Files to uplad'
+    required: true
+  token:
+    description: 'Github token'
+    required: true
+runs:
+  using: 'node12'
+  main: index.js

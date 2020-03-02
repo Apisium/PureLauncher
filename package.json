@@ -5,8 +5,8 @@
   "description": "An awesome Minecraft Launcher.",
   "main": "dist/src/main.js",
   "scripts": {
-    "lint": "eslint src/ packages/ build/ --ext .js,.ts,.tsx",
-    "fix": "eslint src/ packages/ build/ --fix --ext .js,.ts,.tsx",
+    "lint": "eslint src/ packages/ .github/ --ext .js,.ts,.tsx",
+    "fix": "eslint src/ packages/ .github/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --no-autoinstall  --bundle-node-modules --target electron --public-url .",
     "run": "electron .",
     "pack": "electron-builder",
@@ -45,6 +45,8 @@
   },
   "homepage": "https://github.com/Apisium/PureLauncher#readme",
   "devDependencies": {
+    "@actions/core": "^1.2.2",
+    "@actions/github": "^2.1.1",
     "@babel/core": "^7.8.6",
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/traverse": "^7.8.6",
@@ -54,7 +56,7 @@
     "@types/fs-extra": "^8.1.0",
     "@types/lodash": "^4.14.149",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^13.7.6",
+    "@types/node": "^13.7.7",
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
     "@types/react-router-dom": "^5.1.3",
@@ -144,10 +146,10 @@
     "require(\"three\")": "require('/packages/minimize-three/index.js')"
   },
   "build": {
-    "productName": "pure-launcher",
+    "productName": "PureLauncher",
     "appId": "cn.apisium.purelauncher",
     "copyright": "Copyright © 2020 Apisium",
-    "artifactName": "${productName}-${version}.${ext}",
+    "artifactName": "${productName}.${ext}",
     "directories": {
       "output": "release"
     },

@@ -37,7 +37,7 @@ interface MoveDownloadToOption extends DownloadToOption {
   moveTo: string
 }
 
-const downloadAndGetHash = (options: DownloadToOption | DownloadToOption[]) => download(options).wait().then(() => {
+const downloadAndGetHash = (options: DownloadToOption | DownloadToOption[]) => download(options).then(() => {
   const files = Array.isArray(options) ? options : [options]
   return files[0]?.checksum ? pAll(files.map(it => () => sha1(it.destination)), { concurrency: 8 }) : undefined
 })

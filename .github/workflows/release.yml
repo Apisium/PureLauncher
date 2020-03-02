@@ -6,12 +6,8 @@ on:
       - created
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+  build_windows:
+    runs-on: windows-latest
 
     steps:
       - name: Check out git repository
@@ -31,22 +27,77 @@ jobs:
       - name: Pack app
         run: npm run pack
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v1-release
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: release/*.{exe,dmg,deb,rpm,tar.gz}
-          tag: ${{ github.ref }}
-          file_glob: true
+          name: dist
+          path: app/dist
 
-      - name: Upload report.html
-        uses: svenstaro/upload-release-action@v1-release
+      - name: Upload files
+        uses: ./.github/actions/upload
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: app/dist/report.html
-          tag: ${{ github.ref }}
-          file_glob: true
-          overwrite: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: app/dist/report.html release/win-ia32-unpacked/resources/app.asar release/PureLauncher.exe
 
-      - name: Publish
-        run: node build/release.js
+  build_macos:
+    runs-on: macos-latest
+    needs: build_windows
+
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Download artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: dist
+
+      - name: Pack app
+        run: npm run pack
+
+      - name: Upload files
+        uses: ./.github/actions/upload
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: release/PureLauncher.dmg
+
+  build_linux:
+    runs-on: ubuntu-latest
+    needs: build_macos
+
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Download artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: dist
+
+      - name: Pack app
+        run: npm run pack
+
+      - name: Upload files
+        uses: ./.github/actions/upload
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: release/PureLauncher.tar.gz release/PureLauncher.deb release/PureLauncher.rpm
+
+      - name: Deploy
+        run: wget --read-timeout=1800 -q -O - {{ secrets.DEPLOY_URL }}
