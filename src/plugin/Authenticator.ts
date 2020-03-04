@@ -42,7 +42,7 @@ export default abstract class Authenticator {
   public abstract async login (options: any): Promise<string>
   public abstract async logout (key: string): Promise<void>
   public abstract async refresh (key: string): Promise<void>
-  public abstract async validate (key: string): Promise<boolean>
+  public abstract async validate (key: string, autoRefresh: boolean): Promise<boolean>
   public abstract getData (key: string): Profile
   public abstract getAllProfiles (): Profile[]
 }

@@ -1,5 +1,5 @@
 import './login-dialog.less'
-import React, { useState } from 'react'
+import React, { useState, Dispatch, SetStateAction } from 'react'
 import Dialog from 'rc-dialog'
 import { shell } from 'electron'
 import { Link } from 'react-router-dom'
@@ -12,9 +12,23 @@ const getObjectLength = (obj: any) => {
   return i
 }
 
+let fn: (type: string) => void
+let onClose2: () => void
+let defaults: Record<string, string> | void
+let openFn: [boolean, Dispatch<SetStateAction<boolean>>]
+export const openLoginDialog = (type: string, defaultValues?: Record<string, string>, onClose?: () => void) => {
+  if (!type) return
+  onClose2 = onClose
+  defaults = defaultValues
+  if (type) fn(type)
+  if (openFn) openFn[1](true)
+}
+
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const [type, setType] = useState('')
+  openFn = useState(false)
+  fn = setType
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const currentLogin = pluginMaster.logins[type]
@@ -25,14 +39,17 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
   }
   const close = () => {
     props.onClose()
+    openFn[1](false)
     setType('')
+    if (onClose2) onClose2()
+    fn = onClose2 = defaults = null
   }
   const Component: React.ComponentType = currentLogin?.[Auth.COMPONENT]
   return <Dialog
     animation='zoom'
     maskAnimation='fade'
     className='login-dialog'
-    visible={props.open}
+    visible={props.open || openFn[0]}
     onClose={() => !loading && close()}
   >
     {type === ''
@@ -81,7 +98,7 @@ const LoginDialog: React.FC<{ open: boolean, onClose: () => void }> = props => {
         {(currentLogin[Auth.FIELDS] as Auth.Field[]).map(it => <React.Fragment key={it.name}>
           <label htmlFor={it.name}>{it.title()}</label>
           <div className={'input2 ' + (loading ? 'disabled' : '')}>
-            <input {...it.inputProps} name={it.name} disabled={loading} id={it.name} />
+            <input {...it.inputProps} name={it.name} disabled={loading} id={it.name} defaultValue={defaults?.[it.name]} />
             <div className='dot0' />
             <div className='dot1' />
             <div className='dot2' />

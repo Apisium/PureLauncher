@@ -4,6 +4,7 @@ import { isVersion, ResourceVersion } from '../../protocol/types'
 import { addTask } from '../../utils/index'
 import { GAME_ROOT } from '../../constants'
 import { getDownloaders } from '../../plugin/DownloadProviders'
+import installLocal, { installMod } from '../../protocol/install-local'
 import * as Installer from '@xmcl/installer/index'
 
 interface Forge {
@@ -57,5 +58,27 @@ export default class ResourceInstaller extends Plugin {
       await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders(data)),
         $('Install Minecraft') + ': ' + r.mcVersion).wait()
     }
+  }
+
+  @event()
+  public zipDragIn (file: string) {
+    notice({ content: $('Installing resources...') })
+    installLocal(file, true)
+      .then(success => {
+        if (success) notice({ content: $('Success!') })
+        else notice({ content: $('Failed!') })
+      })
+      .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
+  }
+
+  @event()
+  public fileDragIn (file: File) {
+    notice({ content: $('Installing resources...') })
+    installMod(file.path)
+      .then(success => {
+        if (success) notice({ content: $('Success!') })
+        else notice({ content: $('Failed!') })
+      })
+      .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
   }
 }

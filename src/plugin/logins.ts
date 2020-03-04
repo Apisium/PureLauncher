@@ -104,22 +104,23 @@ export class Yggdrasil extends Authenticator implements SkinChangeable {
     p2.profiles[d.selectedProfile.id].displayName = d.selectedProfile.name
     await saveFile()
   }
-  public async validate (key: string) {
+  public async validate (key: string, autoRefresh: boolean) {
     const m = profilesStore
     const p = m.authenticationDatabase[key]
     if (!p) throw new Error($('Account does not exists!'))
     const d = await fetchJson(BASE_URL + 'validate', true, { clientToken: m.clientToken, accessToken: p.accessToken })
       .catch(e => {
         console.error(e)
-        throw new Error($('Network connection failed!'))
+        const err: any = new Error($('Network connection failed!'))
+        err.connectFailed = true
+        throw err
       })
-    if (d && d.error) {
-      console.error(d)
+    if (d && d.error && (!autoRefresh || !await this.refresh(key).then(() => true, () => false))) {
       delete m.authenticationDatabase[key]
+      notice({ content: d.error, error: true })
       await saveFile()
       return false
-    }
-    return true
+    } else return true
   }
   public getData (key: string) {
     const m = profilesStore

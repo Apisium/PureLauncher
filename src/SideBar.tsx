@@ -112,8 +112,8 @@ const SideBar: React.FC = () => {
         onClick={() => logged ? gs.launch() : pm.setLoginDialogVisible()}
         disabled={gs.status !== STATUS.READY}
       >
-        <i className='iconfont icon-icons-minecraft_pic' />
-        <span style={{ fontSize }}>{btnText}</span>
+        <i data-sound className='iconfont icon-icons-minecraft_pic' />
+        <span data-sound style={{ fontSize }}>{btnText}</span>
       </button>
       <a className='version' role='button' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span>

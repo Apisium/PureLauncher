@@ -1,5 +1,5 @@
 import { Store, injectStore } from 'reqwq'
-import { LaunchOption, Version, launch } from '@xmcl/core'
+import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core'
 import { Installer } from '@xmcl/installer/index'
 import { getVersionTypeText, addTask } from '../utils/index'
 import { GAME_ROOT, LIBRARIES_PATH, RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
@@ -52,9 +52,11 @@ export default class GameStore extends Store {
       if (!profile) throw new Error('No selected profile!')
       const authenticator = pluginMaster.logins[profile.type]
       try {
-        if (!await authenticator.validate(profile.key)) await authenticator.refresh(profile.key)
+        if (!await authenticator.validate(profile.key, true)) {
+          throw new Error($('Current account is invalid, please re-login!'))
+        }
       } catch (e) {
-        if (!e || !e.message.includes('Failed to fetch') || !await openConfirmDialog({
+        if (!e || !e.connectFailed || !await openConfirmDialog({
           text: $('Network connection failed. Do you want to play offline?'),
           cancelButton: true
         })) throw e
@@ -113,7 +115,7 @@ export default class GameStore extends Store {
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
       const javaPath = jp || 'javaw'
-      const option: LaunchOption = {
+      const option: LaunchOption & { prechecks?: LaunchPrecheck[] } = {
         launcherBrand,
         properties: {},
         version: versionId,
@@ -123,6 +125,7 @@ export default class GameStore extends Store {
         versionType: getVersionTypeText(),
         extraJVMArgs: javaArgs.split(' '),
         accessToken: profile.accessToken || '',
+        prechecks: extraJson.noChecker ? [] : undefined,
         gameProfile: { id: profile.uuid, name: profile.username },
         gamePath: json?.isolation ? join(VERSIONS_PATH, versionId) : GAME_ROOT,
         javaPath: showGameLog ? join(dirname(javaPath), basename(javaPath).replace('javaw', 'java')) : javaPath,

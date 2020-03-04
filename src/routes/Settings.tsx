@@ -84,6 +84,11 @@ const Settings: React.FC = () => {
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.showGameLog} onChange={pm.toggleShowLog} />
         <label>{$('SHOW OUTPUT LOGS')}</label>
       </div>
+      <div className='group' style={{ paddingTop: 28 }}>
+        <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.noChecker} onChange={pm.toggleNoChecker} />
+        <label>{$('FORCE LAUNCH')}</label>
+      </div>
+      {React.createElement(React.Fragment, null, ...pluginMaster.settings)}
     </form>
     <ShowMore>
       <div style={{ textAlign: 'center' }}>

@@ -104,7 +104,7 @@
   "SHOW OUTPUT LOGS": "显示游戏日志",
   "ENABLE SNAPSHOTS": "启用快照版本",
   "DOWNLOAD THREADS": "下载线程数",
-  "ISOLATION": "隔离模式",
+  "FORCE LAUNCH": "强行启动",
   "NAME": "名字",
   "Unnamed": "未命名",
   "Recommend": "推荐",

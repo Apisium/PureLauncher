@@ -15,10 +15,12 @@ import { PLUGINS_ROOT, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../constant
 const AUTHENTICATORS = Symbol('Authenticators')
 const EXTENSION_BUTTONS = Symbol('ExtensionsButton')
 const ROUTES = Symbol('Pages')
+const SETTINGS = Symbol('Settings')
 export const FILE = Symbol('File')
 
 export default class Master extends EventBus {
   public routes = new Set<JSX.Element>()
+  public settings = new Set<JSX.Element>()
   public extensionsButtons = new Set<ExtensionsButton>()
   public plugins: Record<string, Plugin> = { }
   public logins: Record<string, Authenticator> = { [YGGDRASIL]: new Yggdrasil(), [OFFLINE]: new Offline() }
@@ -167,6 +169,12 @@ export default class Master extends EventBus {
     this.extensionsButtons.add(opt)
     const u = (window as any).__extensionsUpdater
     if (u) u[1](!u[0])
+    return this
+  }
+
+  public addSetting (element: JSX.Element, plugin: Plugin) {
+    (plugin[SETTINGS] || (plugin[SETTINGS] = new Set())).add(element)
+    this.settings.add(element)
     return this
   }
 

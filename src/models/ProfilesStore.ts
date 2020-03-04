@@ -55,6 +55,7 @@ export default class ProfilesStore extends Store {
     selectedUser: '',
     loginType: '',
     copyMode: false,
+    noChecker: false,
     downloadThreads: 16,
     downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
       .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICAL',
@@ -227,7 +228,7 @@ export default class ProfilesStore extends Store {
   public async setSelectedProfile (key: string, type?: Auth.default | string) {
     if (typeof type === 'string') type = pluginMaster.logins[type]
     if (!type) type = pluginMaster.logins[pluginMaster.getAllProfiles().find(it => it.key === key).type]
-    await type.validate(key).catch(console.error)
+    await type.validate(key, true).catch(console.error)
     const name = type[Auth.NAME]
     if (name === YGGDRASIL) {
       this.selectedUser.account = key
@@ -325,6 +326,11 @@ export default class ProfilesStore extends Store {
   public async toggleSnapshots () {
     this.settings.enableSnapshots = !this.settings.enableSnapshots
     await this.saveLaunchProfileJson()
+  }
+
+  public async toggleNoChecker () {
+    this.extraJson.noChecker = !this.extraJson.noChecker
+    await this.saveExtraConfigJson()
   }
 
   public async checkModsDirectory () {

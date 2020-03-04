@@ -22,6 +22,7 @@ import * as Yauzl from 'yauzl'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
+export { openLoginDialog } from '../components/LoginDialog'
 export { default as types } from '../protocol/types'
 export { default as fitText } from '../utils/fit-text'
 export { default as requestReload } from '../utils/request-reload'

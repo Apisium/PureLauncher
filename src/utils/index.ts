@@ -126,7 +126,7 @@ export const createDownloadTask = (option: DownloadToOption | DownloadToOption[]
 
 export const download = (option: DownloadToOption | DownloadToOption[], name = $('Download'), subName?: string) =>
   addTask(createDownloadTask(option), name, subName ||
-  (Array.isArray(option) ? undefined : basename(option.destination))).wait()
+  (Array.isArray(option) || !option.destination ? undefined : basename(option.destination))).wait()
 
 export const makeTempDir = async () => {
   const p = join(remote.app.getPath('temp'), genId())

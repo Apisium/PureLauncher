@@ -1,5 +1,4 @@
 import React, { createRef, useState, useEffect } from 'react'
-import installLocal, { installMod } from './protocol/install-local'
 import Dialog from 'rc-dialog'
 import isDev from './utils/isDev'
 import history from './utils/history'
@@ -35,28 +34,15 @@ const Drag: React.FC = () => {
     document.ondrop = e => {
       e.preventDefault()
       setShow(false)
+      pluginMaster.emitSync('dragIn', e.dataTransfer)
       const files = e.dataTransfer.files
-      if (!files || !files.length) return
-      const file = files.item(0)
-      if (!file || !file.size) return
-      console.log(file)
-      if (file.name.endsWith('.zip')) {
-        notice({ content: $('Installing resources...') })
-        installLocal(file.path, true)
-          .then(success => {
-            if (success) notice({ content: $('Success!') })
-            else notice({ content: $('Failed!') })
-          })
-          .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
-      } else if (file.name.endsWith('.jar')) {
-        notice({ content: $('Installing resources...') })
-        installMod(file.path)
-          .then(success => {
-            if (success) notice({ content: $('Success!') })
-            else notice({ content: $('Failed!') })
-          })
-          .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
-      } else notice({ content: $('No resources found!'), error: true })
+      if (files && !files.length) {
+        const file = files.item(0)
+        if (file && file.size) {
+          if (file.name.endsWith('.zip')) pluginMaster.emitSync('zipDragIn', file.path)
+          else pluginMaster.emitSync('fileDiagIn', file)
+        }
+      }
     }
     document.ondragover = e => {
       e.preventDefault()
