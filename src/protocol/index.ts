@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, remote } from 'electron'
 import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import install from './install'
@@ -8,6 +8,7 @@ import GameStore from '../models/GameStore'
 import requestReload from '../utils/request-reload'
 
 const gameStore = P.getStore(GameStore)
+const currentWindow = remote.getCurrentWindow()
 
 const InterruptedResources = 'interruptedResources'
 const mappings = {
@@ -52,11 +53,25 @@ if (rs.length) {
   })
 }
 
-ipcRenderer.on('pure-launcher-protocol', (_, args: any) => {
+ipcRenderer.on('pure-launcher-protocol', (_, args: any, argv: any) => {
   try {
-    const data: T.Protocol = typeof args === 'string' ? JSON.parse(args) : args
+    const str = typeof args === 'string'
+    if (str) {
+      if (args.includes('://')) {
+        if (args.startsWith('pure-launcher://')) args = args.replace(/^pure-launcher:\/+/, '')
+        else {
+          pluginMaster.emit('customProtocol', args, argv)
+          return
+        }
+      }
+      if (!args.startsWith('{') || !args.endsWith('}')) return
+    }
+    const data: T.Protocol = str ? JSON.parse(args) : args
     if (!data || typeof data !== 'object') return
-    if (data.type in mappings) mappings[data.type](data)
+    if (data.type in mappings) {
+      mappings[data.type](data)
+      currentWindow.flashFrame(true)
+    }
   } catch (e) {
     console.error(e)
   }

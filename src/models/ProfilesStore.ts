@@ -117,7 +117,6 @@ export default class ProfilesStore extends Store {
       this.onLoadExtraConfigFailed(e)
     }
 
-    this.cacheSkins().catch(console.error)
     this.checkModsDirectory().catch(console.error)
     this.syncVersions().catch(console.error)
     // this.ensureVersionManifest().catch(console.error)
@@ -257,6 +256,8 @@ export default class ProfilesStore extends Store {
       type: 'custom'
     }
     if (save) await this.saveLaunchProfileJson()
+    localStorage.delItem('skinCacheTime')
+    this.cacheSkins().catch(console.error)
     return key
   }
 

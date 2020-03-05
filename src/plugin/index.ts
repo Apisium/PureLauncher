@@ -43,7 +43,7 @@ export default class Master extends EventBus {
         })
       }
     }
-    p.finally(() => pluginMaster.emit('loaded'))
+    p.finally(() => pluginMaster.emit('loaded')).then(() => profilesStore.cacheSkins()).catch(console.error)
   }
 
   public getAllProfiles () {

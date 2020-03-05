@@ -8,6 +8,7 @@ import { render, unmountComponentAtNode } from 'react-dom'
 import { Router, Redirect, Route } from 'react-router-dom'
 
 import Provider from './models/index'
+import installLocal from './protocol/install-local'
 
 import Home from './routes/Home'
 import Settings from './routes/Settings'
@@ -36,11 +37,18 @@ const Drag: React.FC = () => {
       setShow(false)
       pluginMaster.emitSync('dragIn', e.dataTransfer)
       const files = e.dataTransfer.files
-      if (files && !files.length) {
+      if (files && files.length) {
         const file = files.item(0)
         if (file && file.size) {
-          if (file.name.endsWith('.zip')) pluginMaster.emitSync('zipDragIn', file.path)
-          else pluginMaster.emitSync('fileDiagIn', file)
+          if (file.type === 'application/x-zip-compressed') {
+            notice({ content: $('Installing resources...') })
+            installLocal(file.path, true, true)
+              .then(success => {
+                if (success) notice({ content: $('Success!') })
+                else notice({ content: $('Failed!') })
+              })
+              .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
+          } else pluginMaster.emitSync('fileDiagIn', file)
         }
       }
     }

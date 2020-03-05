@@ -10,7 +10,7 @@ import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
 import { DEFAULT_EXT_FILTER, SKINS_PATH } from '../constants'
-import { DownloadToOption } from '@xmcl/installer/index'
+import { DownloadToOption } from '@xmcl/installer'
 import { downloader } from '../plugin/DownloadProviders'
 
 export function getJavaVersion (path: string) {
@@ -87,18 +87,21 @@ export const addTask = <T> (task: Task<T>, name: string, subName?: string) => {
     })
     .on('update', (n, state) => {
       if (state !== rootState) return
-      t.progress = n.progress
+      t.progress = n.total == null ? -1 : (n.progress / n.total * 100) | 0
       __updateTasksView()
     })
-    .once('finish', () => {
+    .on('finish', (_, state) => {
+      if (state !== rootState) return
       t.status = TaskStatus.FINISHED
       __updateTasksView()
     })
-    .once('fail', () => {
+    .on('fail', (_, state) => {
+      if (state !== rootState) return
       t.status = TaskStatus.ERROR
       __updateTasksView()
     })
-    .on('cancel', () => {
+    .on('cancel', (state) => {
+      if (state !== rootState) return
       t.status = TaskStatus.CANCELED
       __updateTasksView()
     })
@@ -113,12 +116,12 @@ export const createDownloadTask = (option: DownloadToOption | DownloadToOption[]
     } else option = option[0]
   }
   if (!option) {
-    ctx.update(1, 0)
+    ctx.update(0, 0)
     return
   }
   const fn = option.progress
   option.progress = (a, b, c, d) => {
-    ctx.update(b / c, c, d)
+    ctx.update(b, c, d)
     if (fn) return fn(a, b, c, d)
   }
   return downloader.downloadFile(option)

@@ -1,7 +1,7 @@
 /* eslint-disable node/no-deprecated-api */
 import { join } from 'path'
 import { exists } from 'fs'
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
 import createServer from './createServer'
@@ -40,7 +40,7 @@ const parseArgs = (args: string[]) => {
   if (window) {
     const arr = minimist(args.slice(1))._
     const data = arr[arr.length - 1]
-    if (data) window.webContents.send('pure-launcher-protocol', data)
+    if (data) window.webContents.send('pure-launcher-protocol', data, arr)
   }
 }
 
@@ -69,7 +69,7 @@ const create = () => {
     resizable: false,
     maximizable: false,
     fullscreenable: false,
-    transparent: true,
+    transparent: process.platform !== 'win32' || systemPreferences.isAeroGlassEnabled(),
     frame: false,
     show: false,
     webPreferences: { webviewTag: true, nodeIntegration: true, nodeIntegrationInWorker: true }

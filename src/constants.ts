@@ -18,6 +18,7 @@ export const LAUNCH_PROFILE_PATH = join(GAME_ROOT, LAUNCH_PROFILE_FILE_NAME)
 export const EXTRA_CONFIG_FILE_NAME = 'config.json'
 export const EXTRA_CONFIG_PATH = join(APP_PATH, EXTRA_CONFIG_FILE_NAME)
 export const MODS_PATH = join(GAME_ROOT, 'mods')
+export const WORLDS_PATH = join(GAME_ROOT, 'saves')
 export const VERSIONS_PATH = join(GAME_ROOT, 'versions')
 export const RESOURCE_PACKS_PATH = join(GAME_ROOT, 'resourcepacks')
 export const LIBRARIES_PATH = join(GAME_ROOT, 'libraries')

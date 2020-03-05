@@ -73,7 +73,7 @@ export const installMod = async (path: string) => {
   return false
 }
 
-export default async (path: string, autoInstallResourcePack = false) => {
+export default async (path: string, autoInstallResourcePack = false, emitEvent = false) => {
   if (!path.endsWith('.zip')) throw new Error($('Illegal resource type!'))
   const zip = await open(path)
   let file = zip.entries['local-resource.json']
@@ -114,6 +114,8 @@ export default async (path: string, autoInstallResourcePack = false) => {
     zip.close()
     return true
   }
-  if (autoInstallResourcePack) return installResourcePack(path, zip)
-  return false
+  if (autoInstallResourcePack && await installResourcePack(path, zip)) return true
+  if (!emitEvent) return false
+  await pluginMaster.emitSync('zipDragIn', zip, path)
+  return true
 }

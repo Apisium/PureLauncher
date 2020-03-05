@@ -1,7 +1,7 @@
 import { join, dirname, resolve } from 'path'
 import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
-import { DownloadToOption } from '@xmcl/installer/index'
+import { DownloadToOption } from '@xmcl/installer'
 import { serialize, deserialize, TagType } from '@xmcl/nbt'
 import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH,
@@ -163,7 +163,7 @@ export default class ResourceInstaller extends Plugin {
         let json = r.json
         if (!json) json = { }
         else if (typeof json === 'string') json = await getJson<Record<string | number, any>>(replace(json, r))
-        if (r.extends) json.extends = obj.resolvedId
+        if (r.extends) json.inhertFrom = obj.resolvedId
         o.resolvedId = json.id = id
         await pluginMaster.emitSync('processResourceVersionJson', json)
         await fs.writeJson(jsonPath, json)

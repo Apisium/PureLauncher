@@ -33,6 +33,9 @@ pluginMaster.once('loaded', () => {
   ReactDOM.render(<App />, document.getElementById('root'), () => {
     let full = true
     const content = document.getElementById('main-content')
+    if (process.platform === 'win32' && !remote.systemPreferences.isAeroGlassEnabled()) {
+      notice({ content: $('Aero is not enabled in the current system, resulting in abnormal GUI!'), error: true })
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onclick = () => {
       if (full) {

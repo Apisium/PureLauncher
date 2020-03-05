@@ -5,75 +5,49 @@ import user from '../utils/analytics'
 import React, { useEffect, useState } from 'react'
 import { shell } from 'electron'
 
+interface News {
+  slides: Array<{ url: string, title: string, img: string }>
+  news: Array<{ time: string, title: string, classify: string, link: string }>
+}
+
+const NIL = { slides: [], news: [] }
+
 const openUrl = (url: string) => {
   shell.openExternal(url)
   user.event('external url', 'open').catch(console.error)
 }
 const Home: React.FC = () => {
-  const [slides, setSlides] = useState<Array<{ text: string, url: string, img: string }>>([])
-  const [news, setNews] = useState<Array<{ title: string, classify: string, link: string, time: string }>>([])
+  const [data, setData] = useState<News>(NIL)
   useEffect(() => {
-    let time = +localStorage.getItem('slidesTime') || 0
+    const time = +localStorage.getItem('newsTime') || 0
     let promise = Promise.resolve()
     if (Date.now() - time > 12 * 60 * 60 * 1000) {
-      localStorage.removeItem('slides')
-      promise = fetch('https://www.mcbbs.net/forum.php')
+      localStorage.removeItem('news')
+      promise = fetch('https://xmcl.blob.core.windows.net/integration/mcbbsData.json', { cache: 'no-cache' })
         .then(it => it.text())
         .then(it => {
-          localStorage.setItem('slides', JSON.stringify(Array.from(new DOMParser()
-            .parseFromString(it, 'text/html')
-            .getElementsByClassName('slideshow')[0]
-            .children
-          )
-            .map(({ childNodes: n }) => ({
-              text: (n[1] as HTMLSpanElement).innerText,
-              url: (n[0] as HTMLAnchorElement).getAttribute('href'),
-              img: (n[0].childNodes[0] as HTMLImageElement).getAttribute('src')
-            }))))
-          localStorage.setItem('slidesTime', Date.now().toString())
-        })
-        .catch(console.error)
-    }
-    promise.then(() => {
-      const v = localStorage.getItem('slides')
-      if (!v) return
-      const arr = JSON.parse(v)
-      Promise.all(arr.map(i => new Promise(resolve => {
-        const img = new Image()
-        img.onload = img.onerror = resolve
-        img.src = i.img
-      }))).then(() => setSlides(arr))
-    })
-
-    time = +localStorage.getItem('newsTime') || 0
-    promise = Promise.resolve()
-    if (Date.now() - time > 12 * 60 * 60 * 1000) {
-      localStorage.removeItem('news')
-      promise = fetch('https://authentication.x-speed.cc/mcbbsNews/')
-        .then(it => it.json())
-        .then(it => {
-          localStorage.setItem('news', JSON.stringify(it.slice(0, 6)))
+          localStorage.setItem('news', it)
           localStorage.setItem('newsTime', Date.now().toString())
         })
         .catch(console.error)
     }
     promise.then(() => {
       const v = localStorage.getItem('news')
-      if (v) setNews(JSON.parse(v))
+      if (v) setData(JSON.parse(v))
     })
   }, [])
   return (
     <div className='home'>
-      <div className='slider' style={{ opacity: slides.length ? 1 : 0 }}>
-        <Slider key={slides} fade infinite autoplay pauseOnHover
+      <div className='slider' style={{ opacity: data.slides.length ? 1 : 0 }}>
+        <Slider key={data.slides} fade infinite autoplay pauseOnHover
           autoplaySpeed={5000} slidesToShow={1} slidesToScroll={1}>
-          {slides.map(it => <div className='cover' key={it.url} role='button' onClick={() => openUrl(it.url)}>
-            <img src={it.img} alt={it.text} /><span>{it.text}</span>
+          {data.slides.map(it => <div className='cover' key={it.url} role='button' onClick={() => openUrl(it.url)}>
+            <img src={it.img} alt={it.title} /><span>{it.title}</span>
           </div>)}
         </Slider>
       </div>
-      <div className='news' style={{ opacity: news.length ? null : 0 }}>{news.map(it => <p key={it.link}>
-        <span className='classify'>{it.classify}</span>
+      <div className='news' style={{ opacity: data.news.length ? null : 0 }}>{data.news.map(it => <p key={it.link}>
+        <span className='classify'>[{it.classify}]</span>
         <a role='button' onClick={() => openUrl(it.link)}> {it.title} </a>
       </p>)}
       </div>

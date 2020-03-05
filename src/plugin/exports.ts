@@ -19,11 +19,11 @@ import * as TextComponent from '@xmcl/text-component'
 import * as Authenticator from './Authenticator'
 import * as Yazl from 'yazl'
 import * as Yauzl from 'yauzl'
+import * as types from '../protocol/types'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
 export { openLoginDialog } from '../components/LoginDialog'
-export { default as types } from '../protocol/types'
 export { default as fitText } from '../utils/fit-text'
 export { default as requestReload } from '../utils/request-reload'
 export { default as Avatar } from '../components/Avatar'
@@ -55,7 +55,7 @@ export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSk
   getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText, download,
   removeFormatCodes, autoNotices, readBuffer, addTask, createDownloadTask } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
-  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl }
+  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types }
 
 export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
@@ -63,6 +63,7 @@ export const profilesStore: ProfilesStore = window.profilesStore
 export const notice: (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => void = null
 export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
   Promise<boolean> = null
+export const requestInstallResources: (data: types.Resource, views?: types.InstallView) => Promise<boolean> = null
 export const xmcl = {
   Nbt,
   Core,
@@ -79,3 +80,4 @@ export const launch = gs.launch
 export const getLaunchStatus = () => gs.status
 Object.defineProperty(module.exports, 'notice', { get: () => window.notice })
 Object.defineProperty(module.exports, 'openConfirmDialog', { get: () => window.openConfirmDialog })
+Object.defineProperty(module.exports, 'requestInstallResources', { get: () => window.__requestInstallResources })

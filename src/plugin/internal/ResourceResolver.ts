@@ -4,8 +4,8 @@ import { isVersion, ResourceVersion } from '../../protocol/types'
 import { addTask } from '../../utils/index'
 import { GAME_ROOT } from '../../constants'
 import { getDownloaders } from '../../plugin/DownloadProviders'
-import installLocal, { installMod } from '../../protocol/install-local'
-import * as Installer from '@xmcl/installer/index'
+import { installMod } from '../../protocol/install-local'
+import * as Installer from '@xmcl/installer'
 
 interface Forge {
   version: string
@@ -48,7 +48,11 @@ export default class ResourceInstaller extends Plugin {
           sha1: r.$forge.universal,
           path: `/maven/net/minecraftforge/forge/${mv}-${v}/forge-${mv}-${v}-universal.jar`
         }
-      }, GAME_ROOT, { versionId: r.id }), $('Install Forge') + ': ' + v).wait()
+      }, GAME_ROOT, {
+        versionId: r.id,
+        java: profilesStore.extraJson.javaPath,
+        maven: profilesStore.downloadProvider.forge
+      }), $('Install Forge') + ': ' + v).wait()
     } else if (r.$vanilla) {
       obj.notWriteJson = true
       r.version = '0.0.0'
@@ -58,17 +62,6 @@ export default class ResourceInstaller extends Plugin {
       await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders(data)),
         $('Install Minecraft') + ': ' + r.mcVersion).wait()
     }
-  }
-
-  @event()
-  public zipDragIn (file: string) {
-    notice({ content: $('Installing resources...') })
-    installLocal(file, true)
-      .then(success => {
-        if (success) notice({ content: $('Success!') })
-        else notice({ content: $('Failed!') })
-      })
-      .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
   }
 
   @event()

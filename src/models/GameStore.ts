@@ -1,6 +1,6 @@
 import { Store, injectStore } from 'reqwq'
 import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core'
-import { Installer } from '@xmcl/installer/index'
+import { Installer } from '@xmcl/installer'
 import { getVersionTypeText, addTask } from '../utils/index'
 import { GAME_ROOT, LIBRARIES_PATH, RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
@@ -115,6 +115,7 @@ export default class GameStore extends Store {
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
       const javaPath = jp || 'javaw'
+      const versionDir = join(VERSIONS_PATH, versionId)
       const option: LaunchOption & { prechecks?: LaunchPrecheck[] } = {
         launcherBrand,
         properties: {},
@@ -127,8 +128,9 @@ export default class GameStore extends Store {
         accessToken: profile.accessToken || '',
         prechecks: extraJson.noChecker ? [] : undefined,
         gameProfile: { id: profile.uuid, name: profile.username },
-        gamePath: json?.isolation ? join(VERSIONS_PATH, versionId) : GAME_ROOT,
         javaPath: showGameLog ? join(dirname(javaPath), basename(javaPath).replace('javaw', 'java')) : javaPath,
+        gamePath: json?.isolation || (await fs.readJson(join(versionDir, versionId + '.json'),
+          { throws: false }))?.isolation ? versionDir : GAME_ROOT,
         extraExecOption: {
           detached: true,
           shell: showGameLog

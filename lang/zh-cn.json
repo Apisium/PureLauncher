@@ -16,7 +16,7 @@
   "Versions": "版本",
   "Accounts": "帐号",
   "Click here to switch versions": "点击这里以切换游戏版本",
-  "Mods": "模组管理",
+  "Mods": "模组",
   "Versions List": "游戏版本管理",
   "Add new...": "添加新的版本",
   "Delete": "删除",
@@ -89,8 +89,8 @@
     "检测到拖入的文件类型为资源包，请问是否需要安装?",
   "It has been detected that the file type dragged in is mod. Do you want to install it?":
     "检测到拖入的文件类型为模组，请问是否需要安装?",
-  "Received the request to launch the game. Do you want to launch the game":
-    "收到启动游戏请求，是否要启动游戏",
+  "Received the request to launch the game. Do you want to launch the game": "收到启动游戏请求，是否要启动游戏",
+  "Aero is not enabled in the current system, resulting in abnormal GUI!": "当前系统没有启用Aero, 导致界面显示异常!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
