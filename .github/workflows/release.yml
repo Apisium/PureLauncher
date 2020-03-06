@@ -100,4 +100,4 @@ jobs:
           files: release/PureLauncher.tar.gz release/PureLauncher.deb release/PureLauncher.rpm
 
       - name: Deploy
-        run: wget --read-timeout=1800 -q -O - {{ secrets.DEPLOY_URL }}
+        run: wget --read-timeout=1800 -q -O - {{ secrets.DEPLOY_URL }}&ref=${{ github.ref }}

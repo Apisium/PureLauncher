@@ -1,4 +1,4 @@
-# PureLauncher ![GitHub package.json version](https://img.shields.io/github/package-json/v/Apisium/PureLauncher) [![codebeat badge](https://codebeat.co/badges/2afd1913-119b-4b47-acb8-dbac54259a4e)](https://codebeat.co/projects/github-com-apisium-purelauncher-master) ![GitHub](https://img.shields.io/github/license/Apisium/PureLauncher) ![dependencies](https://david-dm.org/Apisium/PureLauncher/dev-status.svg) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+# PureLauncher ![GitHub package.json version](https://img.shields.io/github/package-json/v/Apisium/PureLauncher) ![release](https://github.com/Apisium/PureLauncher/workflows/release/badge.svg) [![codebeat badge](https://codebeat.co/badges/2afd1913-119b-4b47-acb8-dbac54259a4e)](https://codebeat.co/projects/github-com-apisium-purelauncher-master) ![GitHub](https://img.shields.io/github/license/Apisium/PureLauncher) ![dependencies](https://david-dm.org/Apisium/PureLauncher/dev-status.svg) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 An awesome Minecraft Launcher.
 
@@ -52,7 +52,7 @@ Use taobao registry:
 set REGISTRY=https://registry.npm.taobao.org/
 set dist-url=http://npm.taobao.org/mirrors/atom-shell
 set ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
-set ELECTRON_CUSTOM_DIR=8.0.3
+set ELECTRON_CUSTOM_DIR=8.1.0
 ```
 
 ### Development
