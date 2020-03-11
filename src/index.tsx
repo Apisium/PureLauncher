@@ -1,3 +1,4 @@
+/* eslint-disable node/no-deprecated-api */
 import './index.css'
 import './utils/hacks'
 import './utils/isDev'
@@ -7,7 +8,12 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import Notification from 'rc-notification'
 import './protocol/index'
+import fs from 'fs-extra'
+import { join } from 'path'
+import { exists } from 'fs'
 import { remote, shell } from 'electron'
+import { LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL, DEFAULT_LOCATE, TEMP_PATH } from './constants'
+import { download, genId } from './utils/index'
 
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
@@ -31,6 +37,22 @@ window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boo
 pluginMaster.once('loaded', () => {
   document.getElementsByTagName('html')[0].style.opacity = '1'
   ReactDOM.render(<App />, document.getElementById('root'), () => {
+    exists(LAUNCHING_IMAGE, e => {
+      if (e) return
+      const destination = join(TEMP_PATH, genId())
+      fetch(LAUNCHER_MANIFEST_URL, { cache: 'no-cache' })
+        .then(it => it.json())
+        .then(it => download({
+          destination,
+          url: it.launchingImage[+(DEFAULT_LOCATE !== 'zh-cn')],
+          checksum: { algorithm: 'sha1', hash: it.launchingImageSha1 }
+        }, $('Launching Animation'), 'launching.webp'))
+        .then(() => fs.move(destination, LAUNCHING_IMAGE))
+        .catch(console.error)
+        .then(() => fs.pathExists(destination))
+        .then(ex => ex && fs.unlink(destination))
+        .catch(console.error)
+    })
     let full = true
     const content = document.getElementById('main-content')
     if (process.platform === 'win32' && !remote.systemPreferences.isAeroGlassEnabled()) {

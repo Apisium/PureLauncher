@@ -19,15 +19,22 @@ const mappings = {
       if (plugins.length) {
         if (r.notInstallPlugins) return
         if (!await install(r.resource, true, false, null, null, true)) return
+        let needReload = false
+        let safePluginHashes: string[]
         for (const key of plugins) {
           const p = r.plugins[key]
-          await install(p, false, true, T.isPlugin)
+          const obj: T.InstallView = { safePluginHashes }
+          await install(p, false, true, T.isPlugin, obj)
+          if (obj.noDependency) needReload = true
+          safePluginHashes = obj.safePluginHashes
         }
-        const rs = JSON.parse(localStorage.getItem(InterruptedResources) || '[]')
-        rs.push(r)
-        localStorage.set(InterruptedResources, JSON.stringify(rs))
-        requestReload()
-        return
+        if (needReload) {
+          const rs = JSON.parse(localStorage.getItem(InterruptedResources) || '[]')
+          rs.push(r)
+          localStorage.set(InterruptedResources, JSON.stringify(rs))
+          requestReload()
+          return
+        }
       }
     }
     await install(r.resource, request, false)
@@ -44,6 +51,8 @@ const mappings = {
     installLocal(data.path)
   }
 }
+
+export default mappings
 
 const rs = JSON.parse(localStorage.getItem(InterruptedResources) || '[]')
 localStorage.removeItem(InterruptedResources)

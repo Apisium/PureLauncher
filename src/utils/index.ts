@@ -3,14 +3,13 @@ import uuid from 'uuid-by-string'
 import * as resolveP from 'resolve-path'
 import { Task } from '@xmcl/task'
 import { version } from '../../package.json'
-import { remote } from 'electron'
 import { join, resolve, extname, basename } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
-import { DEFAULT_EXT_FILTER, SKINS_PATH } from '../constants'
-import { DownloadToOption } from '@xmcl/installer'
+import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH } from '../constants'
+import { DownloadOption } from '@xmcl/installer'
 import { downloader } from '../plugin/DownloadProviders'
 
 export function getJavaVersion (path: string) {
@@ -107,7 +106,7 @@ export const addTask = <T> (task: Task<T>, name: string, subName?: string) => {
     })
 }
 
-export const createDownloadTask = (option: DownloadToOption | DownloadToOption[]) => Task.create('download', ctx => {
+export const createDownloadTask = (option: DownloadOption | DownloadOption[]) => Task.create('download', ctx => {
   if (Array.isArray(option)) {
     if (option.length > 1) {
       ctx.update(0, option.length)
@@ -127,12 +126,12 @@ export const createDownloadTask = (option: DownloadToOption | DownloadToOption[]
   return downloader.downloadFile(option)
 })
 
-export const download = (option: DownloadToOption | DownloadToOption[], name = $('Download'), subName?: string) =>
+export const download = (option: DownloadOption | DownloadOption[], name = $('Download'), subName?: string) =>
   addTask(createDownloadTask(option), name, subName ||
   (Array.isArray(option) || !option.destination ? undefined : basename(option.destination))).wait()
 
 export const makeTempDir = async () => {
-  const p = join(remote.app.getPath('temp'), genId())
+  const p = join(TEMP_PATH, genId())
   await fs.mkdir(p)
   return p
 }

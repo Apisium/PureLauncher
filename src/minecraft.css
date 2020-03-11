@@ -192,7 +192,7 @@
   background-color: inherit;
 }
 
-input, select {
+input, select, textarea {
   outline: none;
   border: 2px solid #a0a0a0;
   padding: 6px;
@@ -200,7 +200,7 @@ input, select {
   background: var(--input-color);
   color: var(--text-color-0);
 }
-input::-webkit-input-placeholder {
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   color: var(--text-color-2);
 }
 option, select {

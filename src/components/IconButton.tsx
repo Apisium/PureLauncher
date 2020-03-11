@@ -12,8 +12,11 @@ const IconButton: React.FC<Props> = forwardRef(({ icon, title, hideFirst, ...pro
   const t = title[0].toUpperCase()
   const c = t.charCodeAt(0)
   return <a ref={ref as any} {...props} className={'icon-button ' + (props.className || '')}>
-    <img alt={title} src={src} />
-    {(!hideFirst || !icon) && <span className={(c >= 65 && c <= 90) || (c >= 48 && c <= 57) ? 'offset' : undefined}>
+    <img data-sound alt={title} src={src} />
+    {(!hideFirst || !icon) && <span
+      data-sound
+      className={(c >= 65 && c <= 90) || (c >= 48 && c <= 57) ? 'offset' : undefined}
+    >
       {t}</span>}
     <p>{title}</p>
   </a>

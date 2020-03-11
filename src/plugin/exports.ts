@@ -20,6 +20,7 @@ import * as Authenticator from './Authenticator'
 import * as Yazl from 'yazl'
 import * as Yauzl from 'yauzl'
 import * as types from '../protocol/types'
+import * as ReactRouter from 'react-router-dom'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
@@ -27,6 +28,7 @@ export { openLoginDialog } from '../components/LoginDialog'
 export { default as fitText } from '../utils/fit-text'
 export { default as requestReload } from '../utils/request-reload'
 export { default as Avatar } from '../components/Avatar'
+export { default as Loading } from '../components/Loading'
 export { default as Dots } from '../components/Dots'
 export { default as locates } from '../utils/locates'
 export { default as Dropdown } from '../components/Dropdown'
@@ -39,7 +41,7 @@ export { default as createVersionSelector } from '../components/VersionSelector'
 export { default as IconButton } from '../components/IconButton'
 export { default as ErrorHandler } from '../components/ErrorHandler'
 export { default as LiveRoute } from '../components/LiveRoute'
-export { default as installResource } from '../protocol/index'
+export { default as protocolFunctions } from '../protocol/index'
 export { default as isDev } from '../utils/isDev'
 export { default as history } from '../utils/history'
 export { default as React } from 'react'
@@ -49,13 +51,12 @@ export { default as Dialog } from 'rc-dialog'
 export { default as Notification } from 'rc-notification'
 export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
-export { default as ReactRouter } from 'react-router-dom'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin,
   getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText, download,
   removeFormatCodes, autoNotices, readBuffer, addTask, createDownloadTask } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
-  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types }
+  constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types, ReactRouter }
 
 export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0
 export const pluginMaster: PluginMaster = window.pluginMaster
@@ -63,7 +64,8 @@ export const profilesStore: ProfilesStore = window.profilesStore
 export const notice: (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => void = null
 export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
   Promise<boolean> = null
-export const requestInstallResources: (data: types.Resource, views?: types.InstallView) => Promise<boolean> = null
+export const requestInstallResources: <T extends types.Resource> (data: T, views?: types.InstallView) =>
+  Promise<boolean> = null
 export const xmcl = {
   Nbt,
   Core,

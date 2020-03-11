@@ -7,6 +7,7 @@ const current = platform()
 export const GAME_ROOT = join(current === 'linux' ? remote.app.getPath('home') : remote.app.getPath('appData'),
   current === 'darwin' ? 'minecraft' : '.minecraft')
 export const APP_PATH = remote.app.getPath('userData')
+export const TEMP_PATH = remote.app.getPath('temp')
 export const SKINS_PATH = join(APP_PATH, 'skins')
 export const PLUGINS_ROOT = join(APP_PATH, 'plugins')
 export const DELETES_FILE = join(PLUGINS_ROOT, 'deletes.json')
@@ -28,6 +29,7 @@ export const SERVERS_PATH = join(GAME_ROOT, SERVERS_FILE_NAME)
 export const RESOURCES_PATH = join(APP_PATH, 'resources')
 export const RESOURCES_VERSIONS_PATH = join(RESOURCES_PATH, 'versions')
 export const RESOURCES_VERSIONS_INDEX_PATH = join(RESOURCES_PATH, 'versions-index.json')
+export const RESOURCES_WORLDS_INDEX_PATH = join(RESOURCES_PATH, 'worlds-index.json')
 export const RESOURCES_RESOURCE_PACKS_INDEX_PATH = join(RESOURCES_PATH, 'resource-packs-index.json')
 export const RESOURCES_PLUGINS_INDEX = join(RESOURCES_PATH, 'plugins-index.json')
 export const RESOURCES_MODS_INDEX_FILE_NAME = 'mods-index.json'
@@ -38,3 +40,7 @@ export const DEFAULT_EXT_FILTER = ['exe', 'com']
 export const ALLOW_PLUGIN_EXTENSIONS = ['.js', '.mjs', '.asar']
 
 export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
+
+export const LAUNCHING_IMAGE = join(APP_PATH, 'launching.webp')
+export const LAUNCHER_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'
+export const MCBBS_DATA_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'

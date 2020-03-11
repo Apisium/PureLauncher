@@ -4,8 +4,8 @@ import { getJson } from '../utils/index'
 import { remote } from 'electron'
 
 const win = remote.getCurrentWindow()
-export default (
-  r: T.Resource | string,
+export default <R extends T.Resource> (
+  r: R | string,
   request = true,
   throws = true,
   checker: (r: any) => boolean = T.isResource,
@@ -14,7 +14,7 @@ export default (
 ) => {
   const p = (async () => {
     const f = r === 'http://acode.apisium.cn/libraries/version.json'
-    if (typeof r === 'string') r = await getJson(r) as T.Resource
+    if (typeof r === 'string') r = await getJson(r) as R
     if (f) r.id = 'ACode'
     if (!checker(r)) return
     obj.request = request

@@ -198,6 +198,16 @@ export default class Master extends EventBus {
       return false
     }
   }
+
+  public loadPluginFromPath (path: string) {
+    const plugin = require(path)
+    const info: PluginInfo = plugin[PLUGIN_INFO]
+    if (!info || !info.id) throw new Error('This file is not a plugin!')
+    plugin[FILE] = path
+    const p = new ((plugin as any).default || plugin)()
+    p[FILE] = path
+    this.loadPlugin(p)
+  }
 }
 
 Object.defineProperty(window, 'pluginMaster', { value: new Master() })

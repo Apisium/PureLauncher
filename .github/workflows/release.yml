@@ -93,11 +93,16 @@ jobs:
       - name: Pack app
         run: npm run pack
 
-      - name: Upload files
+      - name: Upload files to Github release
         uses: ./.github/actions/upload
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: release/PureLauncher.tar.gz release/PureLauncher.deb release/PureLauncher.rpm
+
+      - name: Upload manifest
+        uses: ./.github/actions/upload-manifest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy
         run: wget --read-timeout=1800 -q -O - {{ secrets.DEPLOY_URL }}&ref=${{ github.ref }}

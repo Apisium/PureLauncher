@@ -1,3 +1,9 @@
+body, input, select, textarea {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
 :root {
   --top-color: #6ead3c;
   --top-border: #fff483c7;
@@ -9,9 +15,9 @@
   --scroll-color: var(--main-color);
 
   --text-color-0: #000000e0;
-  --text-color-1: rgba(29, 30, 30, 0.88);
+  --text-color-1: #1d1e1ee0;
   --text-color-2: #00000080;
-  --text-color-2: #000000c0;
+  --text-color-3: #000000c0;
   --link-color: #6ead3c;
   --link-hover-color: #578830;
 
@@ -34,7 +40,7 @@
   --scroll-color: url(./assets/images/bg-wool-white.png);
 
   --text-color-0: #ffffffe0;
-  --text-color-1: rgba(255, 255, 255, 0.88);
+  --text-color-1: #ffffffe0;
   --text-color-2: #ffffff80;
   --text-color-3: #ffffffc0;
 

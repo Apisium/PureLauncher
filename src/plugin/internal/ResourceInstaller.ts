@@ -1,12 +1,14 @@
+import { extract } from '@xmcl/unzip'
 import { join, dirname, resolve } from 'path'
 import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
-import { DownloadToOption } from '@xmcl/installer'
+import { DownloadOption } from '@xmcl/installer'
 import { serialize, deserialize, TagType } from '@xmcl/nbt'
 import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download } from '../../utils/index'
-import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH,
+import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, WORLDS_PATH,
   PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,
-  RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../../constants'
+  RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS, TEMP_PATH, LAUNCHER_MANIFEST_URL,
+  RESOURCES_WORLDS_INDEX_PATH } from '../../constants'
 import pAll from 'p-all'
 import fs from 'fs-extra'
 import gte from 'semver/functions/gte'
@@ -33,11 +35,11 @@ class Servers {
   servers: ServerInfo[] = []
 }
 
-interface MoveDownloadToOption extends DownloadToOption {
+interface DownloadAndMoveOption extends DownloadOption {
   moveTo: string
 }
 
-const downloadAndGetHash = (options: DownloadToOption | DownloadToOption[]) => download(options).then(() => {
+const downloadAndGetHash = (options: DownloadOption | DownloadOption[]) => download(options).then(() => {
   const files = Array.isArray(options) ? options : [options]
   return files[0]?.checksum ? pAll(files.map(it => () => sha1(it.destination)), { concurrency: 8 }) : undefined
 })
@@ -82,6 +84,37 @@ export default class ResourceInstaller extends Plugin {
       case 'Version':
         await this.installVersion(r, o)
         break
+      case 'World':
+        await this.installWorld(r, o)
+    }
+  }
+
+  public async installWorld (r: T.ResourceWorld, o: T.InstallView = { }) {
+    if (!T.isWorld(r)) throw new TypeError($('Illegal resource type!'))
+    const dir = o.isolation ? join(VERSIONS_PATH, o.resolvedId, 'worlds') : WORLDS_PATH
+    const old: T.ResourceWorld = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
+      : (await fs.readJson(RESOURCES_WORLDS_INDEX_PATH, { throws: false }) || { })[r.id]
+    if (old) {
+      if (gte(old.version, r.version)) return
+      // if (old.h) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.zip')).catch(() => {})))
+    }
+    const destination = join(TEMP_PATH, genId())
+    try {
+      const hash: string = await downloadAndGetHash({
+        destination,
+        url: replace(r.url, r),
+        checksum: r.hash ? { algorithm: 'sha1', hash: r.hash } : undefined
+      })[0] || r.hash
+      await fs.ensureDir(dir)
+      await extract(destination, dir, { replaceExisted: true })
+      if (!o.isolation) {
+        const json = await fs.readJson(RESOURCES_WORLDS_INDEX_PATH, { throws: false }) || { }
+        r.hash = hash
+        json[r.id] = r
+        await fs.outputJson(RESOURCES_WORLDS_INDEX_PATH, json)
+      }
+    } finally {
+      await fs.remove(destination).catch(console.error)
     }
   }
 
@@ -140,7 +173,7 @@ export default class ResourceInstaller extends Plugin {
         if (r.hashes && r.hashes.length !== arr.length) {
           throw new Error($('The number of files is not equal to the number of hashes provided!'))
         }
-        const options: MoveDownloadToOption[] = arr.map(([name, url], i) => ({
+        const options: DownloadAndMoveOption[] = arr.map(([name, url], i) => ({
           url: replace(url, r),
           destination: join(p, i.toString()),
           moveTo: validPath(dir, replace(name, r)),
@@ -190,7 +223,6 @@ export default class ResourceInstaller extends Plugin {
   }
 
   public async installResourcePack (r: T.ResourceResourcePack, o: T.InstallView = { }) {
-    if (!r) return
     if (!T.isResourcePack(r)) throw new TypeError($('Illegal resource type!'))
     if (r.hashes && r.hashes.length !== r.urls.length) {
       throw new Error($('The number of files is not equal to the number of hashes provided!'))
@@ -204,7 +236,7 @@ export default class ResourceInstaller extends Plugin {
     }
     if (r.extends) await install(r.extends, false, true, T.isResourcePack)
     const p = await makeTempDir()
-    const urls: DownloadToOption[] = r.urls.map((url, i) => ({
+    const urls: DownloadOption[] = r.urls.map((url, i) => ({
       url: replace(url, r),
       destination: join(p, i.toString()),
       checksum: r.hashes ? { algorithm: 'sha1', hash: r.hashes[i] } : undefined
@@ -252,7 +284,7 @@ export default class ResourceInstaller extends Plugin {
     }
     if (r.extends) await install(r.extends, false, true, T.isMod, o)
     const p = await makeTempDir()
-    const urls: DownloadToOption[] = r.urls.map((url, i) => ({
+    const urls: DownloadOption[] = r.urls.map((url, i) => ({
       url: replace(url, r),
       destination: join(p, i.toString()),
       checksum: r.hashes ? { algorithm: 'sha1', hash: r.hashes[i] } : undefined
@@ -289,15 +321,19 @@ export default class ResourceInstaller extends Plugin {
     if (r.extension && !ALLOW_PLUGIN_EXTENSIONS.includes(r.extension)) {
       throw new Error(`The extension: ${r.extension} is not allowed`)
     }
-    if (!o.confirmed && showDialog && !await openConfirmDialog({
+    if (!o.safePluginHashes) o.safePluginHashes = (await getJson(LAUNCHER_MANIFEST_URL) || {}).pluginHashes
+    if (!o.safePluginHashes.includes(r.hash) && !o.confirmed && showDialog && !await openConfirmDialog({
       cancelButton: true,
       text: $('Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}',
         r.id, r.title || $('Unknown'))
     })) throw new Error('Canceled install plugin!')
     o.confirmed = true
-    if (typeof r.dependencies === 'object' && r.dependencies) {
+    let noDependency = true
+    if (typeof r.dependencies === 'object' && r.dependencies && Object.keys(r.dependencies).length) {
+      noDependency = false
       await Promise.all(Object.values(r.dependencies).map(it => install(it, false, true, T.isPlugin, o)))
     }
+    if (!('noDependency' in o)) o.noDependency = noDependency
     const p = await makeTempDir()
     try {
       const file = join(p, genId())
@@ -310,6 +346,7 @@ export default class ResourceInstaller extends Plugin {
       const json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
       json[r.id] = r
       await fs.outputJson(RESOURCES_PLUGINS_INDEX, json)
+      if (noDependency) pluginMaster.loadPluginFromPath(path)
     } finally {
       await fs.remove(p).catch(console.error)
     }

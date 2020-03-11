@@ -24,14 +24,15 @@
   filter: brightness(1.3);
 }
 .icon-button span {
-  position: absolute;
   left: 0;
   right: 0;
   top: 32px;
   font-size: 26px;
-  transform: translateY(-50%);
+  position: absolute;
+  color: #ffffffe0;
   text-align: center;
   font-family: minecraft;
+  transform: translateY(-50%);
 }
 .icon-button span.offset {
   left: 4px;
