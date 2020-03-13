@@ -1,3 +1,7 @@
+import { ProgressDownloader } from '../plugin/DownloadProviders'
+
+require('@xmcl/installer').DefaultDownloader = ProgressDownloader
+
 const fs = require('fs-extra')
 const installer = require('@xmcl/installer')
 

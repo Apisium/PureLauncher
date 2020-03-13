@@ -14,7 +14,7 @@ const core = require('@actions/core')
   const buffer = Buffer.from(json)
   await octokit.repos.uploadReleaseAsset({
     data: buffer,
-    name: 'manifest.json',
+    name: 'latestManifest.json',
     url: data.upload_url,
     headers: {
       'content-type': 'application/json',

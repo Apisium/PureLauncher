@@ -6,14 +6,15 @@ import './plugin/index'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
+import fs from 'fs-extra'
 import Notification from 'rc-notification'
 import './protocol/index'
-import fs from 'fs-extra'
 import { join } from 'path'
 import { exists } from 'fs'
 import { remote, shell } from 'electron'
-import { LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL, DEFAULT_LOCATE, TEMP_PATH } from './constants'
-import { download, genId } from './utils/index'
+import { update } from './protocol/check-update'
+import { download, genId, getJson } from './utils/index'
+import { TEMP_PATH, DEFAULT_LOCATE, LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL } from './constants'
 
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
@@ -37,22 +38,7 @@ window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boo
 pluginMaster.once('loaded', () => {
   document.getElementsByTagName('html')[0].style.opacity = '1'
   ReactDOM.render(<App />, document.getElementById('root'), () => {
-    exists(LAUNCHING_IMAGE, e => {
-      if (e) return
-      const destination = join(TEMP_PATH, genId())
-      fetch(LAUNCHER_MANIFEST_URL, { cache: 'no-cache' })
-        .then(it => it.json())
-        .then(it => download({
-          destination,
-          url: it.launchingImage[+(DEFAULT_LOCATE !== 'zh-cn')],
-          checksum: { algorithm: 'sha1', hash: it.launchingImageSha1 }
-        }, $('Launching Animation'), 'launching.webp'))
-        .then(() => fs.move(destination, LAUNCHING_IMAGE))
-        .catch(console.error)
-        .then(() => fs.pathExists(destination))
-        .then(ex => ex && fs.unlink(destination))
-        .catch(console.error)
-    })
+    pluginMaster.emit('rendered')
     let full = true
     const content = document.getElementById('main-content')
     if (process.platform === 'win32' && !remote.systemPreferences.isAeroGlassEnabled()) {
@@ -96,13 +82,34 @@ const clickSound = new Audio(require('./assets/sounds/click.ogg'))
 clickSound.oncanplay = () => document.addEventListener('click', e => {
   if (!window.profilesStore?.settings?.soundOn) return
   const t = e.target as HTMLElement
-  if (t.tagName === 'BUTTON' || t.tagName === 'A' || t.dataset.sound) {
+  if (t.tagName === 'BUTTON' || t.tagName === 'A' || t.dataset.sound || t.parentElement?.dataset.sound) {
     clickSound.play().catch(() => {})
   }
 })
 
-document.getElementById('close').onclick = () => setTimeout(() => {
-  remote.app.quit()
-  setTimeout(() => remote.app.exit(), 3000)
-}, 500)
+document.getElementById('close').onclick = () => setTimeout(() => remote.app.quit(), 1000)
 document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
+
+pluginMaster.once('rendered', () => {
+  exists(LAUNCHING_IMAGE, e => {
+    if (e) return
+    const destination = join(TEMP_PATH, genId())
+    getJson(LAUNCHER_MANIFEST_URL)
+      .then(it => download({
+        destination,
+        url: it.launchingImage[+(DEFAULT_LOCATE !== 'zh-cn')],
+        checksum: { algorithm: 'sha1', hash: it.launchingImageSha1 }
+      }, $('Launching Animation'), 'launching.webp'))
+      .then(() => fs.move(destination, LAUNCHING_IMAGE))
+      .catch(console.error)
+      .then(() => fs.pathExists(destination))
+      .then(ex => ex && fs.unlink(destination))
+      .catch(console.error)
+  })
+  if (!navigator.onLine) return
+  const now = Date.now()
+  const updateCheckTime = parseInt(localStorage.getItem('updateCheckTime'))
+  if (updateCheckTime && updateCheckTime + 12 * 60 * 60 * 1024 >= now) return
+  return update()
+})
+setInterval(update, 12 * 60 * 60 * 1024)

@@ -1,38 +1,37 @@
-import fs from 'fs-extra'
+import arch from 'arch'
+import fs, { pathExists } from 'fs-extra'
+import Unzip from '@xmcl/unzip'
 import uuid from 'uuid-by-string'
+import which from 'which'
 import * as resolveP from 'resolve-path'
+import locateJava from 'locate-java-home/js/es5/index'
+import { freemem, totalmem } from 'os'
 import { Task } from '@xmcl/task'
+import { promisify } from 'util'
 import { version } from '../../package.json'
 import { join, resolve, extname, basename } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
-import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH } from '../constants'
+import { ILocateJavaHomeOptions, IJavaHomeInfo } from 'locate-java-home/js/es5/lib/interfaces'
+import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH, LAUNCHER_MANIFEST_URL,
+  DEFAULT_LOCATE, APP_PATH, GAME_ROOT } from '../constants'
 import { DownloadOption } from '@xmcl/installer'
 import { downloader } from '../plugin/DownloadProviders'
 
-export function getJavaVersion (path: string) {
-  const parseVersion = (str: string) => {
-    const match = /(\d+\.\d+\.\d+)(_(\d+))?/.exec(str)
-    if (match === null) return undefined
-    return match[1]
-  }
-  return new Promise<string>(resolve => {
-    exec(`${path} -version`, (_, __, serr) => {
-      if (!serr) {
-        resolve(undefined)
-      } else {
-        const version = parseVersion(serr)
-        if (version !== undefined) {
-          resolve(version)
-        } else {
-          resolve(undefined)
-        }
+export const getJavaVersion = (path: string) => new Promise<[string, boolean] | undefined>(resolve =>
+  exec(`${path} -version`, (_, sout, serr) => {
+    const output = sout + serr
+    if (output) {
+      const version = /\d+\.\d+\.\d+/.exec(output)
+      if (version) {
+        resolve([version[0], output.includes('64-Bit')])
+        return
       }
-    })
-  })
-}
+    }
+    resolve()
+  }))
 
 export const cacheSkin = (p: Profile) => fetch(p.skinUrl)
   .then(it => it.arrayBuffer())
@@ -173,3 +172,97 @@ export const readBuffer = (stream: Readable) => new Promise<Buffer>((resolve, re
   const arr = []
   stream.on('data', d => arr.push(d)).on('end', () => resolve(Buffer.from(arr))).on('error', reject)
 })
+
+let _isX64 = null
+export const isX64 = (): boolean => _isX64 === null ? (_isX64 = arch() === 'x64') : _isX64
+const getSelfInstalledJavaPath = () => join(APP_PATH, 'java', isX64() ? 'x64' : 'x86')
+
+export const installJava = () => {
+  const destination = join(TEMP_PATH, genId())
+  const dir = getSelfInstalledJavaPath()
+  const x64 = isX64()
+  return getJson(LAUNCHER_MANIFEST_URL)
+    .then(it => {
+      const java = it.java.windows[x64 ? 'x64' : 'x86']
+      return download({
+        destination,
+        url: java.urls[+(DEFAULT_LOCATE !== 'zh-cn')],
+        checksum: { algorithm: 'sha1', hash: java.hash }
+      }, 'Java', 'java1.8.0_51-win32-x64.zip')
+    })
+    .then(() => Unzip.extract(destination, dir))
+    .then(() => {
+      const file = join(dir, 'bin/javaw.exe')
+      localStorage.setItem('javaPath', file)
+      const arches = JSON.parse(localStorage.getItem('javaArches') || '{}')
+      arches[file] = x64
+      localStorage.setItem('javaArches', JSON.stringify(arches))
+      return file
+    })
+    .finally(() => fs.unlink(destination).catch(() => {}))
+}
+
+export const getSuitableMemory = (isX64: boolean) => {
+  const mem = freemem() / 1024 / 1024 | 0
+  const total = totalmem() / 1024 / 1024 | 0
+  if (isX64) {
+    if (mem < 512) return 512
+    if (mem < 1024) return mem
+    if (mem > 4096) return mem > total - 2048 ? 1024 * 8 : total - 2048
+    else return mem > total - 1024 ? 4096 : mem
+  } else {
+    if (mem > 2048) return 2048
+    if (mem < 512) return 512
+    return mem > total - 512 ? mem : total - 512
+  }
+}
+
+export const vertifyJava = async (version: [string, boolean], dialog = false) => {
+  if (!version[0].startsWith('1.8') && (!dialog || !await openConfirmDialog({
+    ignore: true,
+    cancelButton: true,
+    text: $('The version of Java you selected is {0}, which may cause the game to fail to be launched. Java 8 (1.8.0) is recommended.', version[0])
+  }))) return false
+  const x64 = isX64()
+  if ((version[1] && !x64) || (!dialog || !openConfirmDialog({
+    ignore: true,
+    cancelButton: true,
+    text: $('The Java you selected is 64-bit, but the system supports 32-bit, which will cause the game to fail to be launched.')
+  }))) return false
+  if ((!version[1] && x64) || (!dialog || !openConfirmDialog({
+    ignore: true,
+    cancelButton: true,
+    text: $('The Java you selected is 32-bit, but the system supports 64-bit, which will not be able to take full advantage of computer performance.')
+  }))) return false
+  return true
+}
+
+const locateJavaAsync: (options: ILocateJavaHomeOptions) => Promise<IJavaHomeInfo[] | null> = promisify(locateJava)
+export const findJavaPath = async () => {
+  const ext = process.platform === 'win32' ? '.exe' : ''
+  const name = 'bin/javaw' + ext
+  let path = join(getSelfInstalledJavaPath(), name)
+  if (await pathExists(path)) return path
+  const arch = isX64() ? '64' : '86'
+  switch (process.platform) {
+    case 'win32':
+      path = join('C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x' + arch, name)
+      break
+    case 'darwin':
+      path = join(GAME_ROOT, 'runtime/jre-x' + arch, 'jre.bundle/Contents/Home', name)
+      break
+    default:
+      break
+  }
+  if (await pathExists(path)) return path
+  const version = await getJavaVersion('javaw' + ext)
+  if (version && await vertifyJava(version)) {
+    path = await which('javaw' + ext).catch(console.error)
+    if (path) return path
+  }
+  const java = await locateJavaAsync({ version: '~1.8', mustBe64Bit: isX64(), paranoid: true }).catch(console.error)
+  if (java && java.length) {
+    path = join(java[0].path, name)
+    if (await pathExists(path)) return path
+  }
+}

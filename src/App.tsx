@@ -100,7 +100,7 @@ const App: React.FC = () => {
   }
 }
 
-interface Ctx { text: string, title?: string, cancelButton?: boolean, component?: React.ComponentType }
+interface Ctx { text: string, title?: string, cancelButton?: boolean, component?: React.ComponentType, ignore?: boolean }
 global.openConfirmDialog = (data: Ctx) => new Promise(r => {
   const elm = document.createElement('div')
   const E = () => {
@@ -110,6 +110,8 @@ global.openConfirmDialog = (data: Ctx) => new Promise(r => {
       setOpen(false)
       setTimeout(unmountComponentAtNode, 1000, elm)
     }
+    let text = data.text
+    if (data.ignore) text += '\n' + $('If you want to ignore the warning, please click the ok button.')
     return <Dialog
       visible={open}
       animation='zoom'
@@ -117,7 +119,7 @@ global.openConfirmDialog = (data: Ctx) => new Promise(r => {
       maskAnimation='fade'
       onClose={() => fn(false)}
       title={data.title || $('News:')}
-      children={data.component ? <>{data.text}<data.component /></> : data.text}
+      children={data.component ? <>{text}<data.component /></> : text}
       bodyStyle={{ whiteSpace: 'pre-wrap' }}
       footer={[
         <button key='ok' className='btn btn-primary' onClick={() => fn(true)}>{$('OK')}</button>,

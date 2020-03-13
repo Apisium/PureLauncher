@@ -1,6 +1,7 @@
 /* eslint-disable node/no-deprecated-api */
 import { join } from 'path'
 import { exists } from 'fs'
+import { spawn } from 'child_process'
 import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
@@ -59,10 +60,12 @@ if (app.requestSingleInstanceLock()) {
 
 app.setAsDefaultProtocolClient('pure-launcher')
 
+let runBeforeQuit: any
 const create = () => {
   ipcMain
     .on('open-launching-dialog', openLaunchingDialog)
     .on('close-launching-dialog', closeLaunchingDialog)
+    .on('run-before-quit', (...args: any[]) => (runBeforeQuit = args))
   window = new BrowserWindow({
     width: 816,
     height: 586,
@@ -110,5 +113,8 @@ const create = () => {
 
 app
   .on('ready', create)
+  .on('before-quit', () => runBeforeQuit && runBeforeQuit.length && spawn.apply(null, runBeforeQuit)
+    .once('error', console.error).unref())
+  .on('quit', () => setTimeout(() => app.exit(), 1500))
   .on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
   .on('activate', () => window == null && create())

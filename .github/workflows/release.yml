@@ -103,6 +103,3 @@ jobs:
         uses: ./.github/actions/upload-manifest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy
-        run: wget --read-timeout=1800 -q -O - {{ secrets.DEPLOY_URL }}&ref=${{ github.ref }}

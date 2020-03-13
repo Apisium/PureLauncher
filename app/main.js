@@ -1,9 +1,9 @@
-const { join } = require('path')
-
-const dir = require('electron').app.getPath('userData')
 const r = require
+const { join } = r('path')
+
+const dir = r('electron').app.getPath('userData')
 try {
-  r(join(dir, 'updates', require(join(dir, 'entry-point.json')).filename))
-} catch (e) {
-  r('./dist/src/main')
-}
+  const json = r(join(dir, 'updates/entry-point.json'))
+  if (json.version === r('./package.json').version) throw new Error()
+  r(join(dir, 'updates/asar', json.file))
+} catch (e) { r('./dist/src/main') }

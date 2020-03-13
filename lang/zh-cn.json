@@ -15,6 +15,7 @@
   "Version": "版本",
   "Versions": "版本",
   "Accounts": "帐号",
+  "Update Package": "更新包",
   "Click here to switch versions": "点击这里以切换游戏版本",
   "Mods": "模组",
   "Versions List": "游戏版本管理",
@@ -61,6 +62,22 @@
   "Missing libraries": "缺少支持库",
   "Bad libraries": "错误的支持库",
   "Abnormal exit detected, exit code:": "检测到异常退出，退出代码:",
+  "No Java available!": "找不到可用的 Java!",
+  "Failed to install Java!": "安装 Java 失败!",
+  "Update failed": "更新失败",
+  "A new version has been released, PureLauncher will restart in five seconds for installation.":
+    "检测到版本更新, 将在五秒后自动重启以便安装.",
+  "A new version has been released, but the game is running now. Please manually exit the launcher and game to upgrade.":
+    "检测到版本更新, 但当前游戏在运行中, 请稍后手动关闭启动器及游戏以完成升级.",
+  "A new version has been released, but the current system does not support automatic update. Please install the new version manually and click OK to enter the download page.":
+    "检测到版本更新, 但当前系统不支持自动更新, 请手动更新版本, 点击确认以进入下载地址.",
+  "The version of Java you selected is {0}, which may cause the game to fail to be launched. Java 8 (1.8.0) is recommended.":
+    "你选择的 Java 版本为 {0}, 可能会导致游戏无法启动, 建议使用 Java 8 (1.8.0).",
+  "The Java you selected is 64-bit, but the system supports 32-bit, which will cause the game to fail to be launched.":
+    "你当前选择的 Java 为 64 位, 而系统只支持 32 位的 Java, 会导致无法启动游戏.",
+  "The Java you selected is 32-bit, but the system supports 64-bit, which will not be able to take full advantage of computer performance.":
+    "你当前选择的 Java 为 32 位, 而系统只支持 64 位的 Java, 这样会导致无法充分利用计算机的性能.",
+  "If you want to ignore the warning, please click the ok button.": "忽略警告请点击下方的确认按钮.",
   "Unable to find the Java, do you want to install Java automatically?":
     "无法找到合适的java，是否要需要帮您安装java?",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
@@ -155,7 +172,7 @@
   "Please select the skin file.": "请选择你的皮肤文件",
   "Unavailable": "不可用",
   "Plugins installed! Restarting...": "插件安装完成! 正在重启启动器...",
-  "Currently, the game is launching. Please restart the game manually later to install the plugin!": "当前游戏启动中，请稍后手动重启游戏以进行插件安装!",
+  "Currently, the game is launching. Please restart manually later to install the plugins!": "当前游戏启动中，请稍后手动重启启动器以进行插件安装!",
   "The plugin cannot be uninstalled because it is dependent on other plugins!": "当前插件由于被其他插件依赖而无法卸载!",
 
   "finished": "已完成",

@@ -72,11 +72,11 @@ const Settings: React.FC = () => {
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.soundOn} onChange={pm.toggleSound} />
         <label>{$('ENABLE SOUND')}</label>
       </div>
-      <div className='group' style={{ paddingTop: 18 }}>
+      <div className='group' style={{ paddingTop: 24 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.copyMode} onChange={pm.toggleCopyMode} />
         <label>{$('COPY URL MODE')}</label>
       </div>
-      <div className='group' style={{ paddingTop: 28 }}>
+      <div className='group' style={{ paddingTop: 24 }}>
         <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.enableSnapshots} onChange={pm.toggleSnapshots} />
         <label>{$('ENABLE SNAPSHOTS')}</label>
       </div>

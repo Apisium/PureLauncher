@@ -1,17 +1,18 @@
 import { join } from 'path'
 import { ensureDirSync } from 'fs-extra'
-import { platform } from 'os'
 import { remote } from 'electron'
 
-const current = platform()
-export const GAME_ROOT = join(current === 'linux' ? remote.app.getPath('home') : remote.app.getPath('appData'),
-  current === 'darwin' ? 'minecraft' : '.minecraft')
+export const GAME_ROOT = join(process.platform === 'linux' ? remote.app.getPath('home') : remote.app.getPath('appData'),
+  process.platform === 'darwin' ? 'minecraft' : '.minecraft')
 export const APP_PATH = remote.app.getPath('userData')
 export const TEMP_PATH = remote.app.getPath('temp')
 export const SKINS_PATH = join(APP_PATH, 'skins')
 export const PLUGINS_ROOT = join(APP_PATH, 'plugins')
 export const DELETES_FILE = join(PLUGINS_ROOT, 'deletes.json')
 export const OFFLINE_ACCOUNTS_FILE = join(APP_PATH, 'offline.json')
+export const UPDATES_PATH = join(APP_PATH, 'updates')
+export const ASAR_PATH = join(UPDATES_PATH, 'asar')
+export const ENTRY_POINT_PATH = join(UPDATES_PATH, 'entry-point.json')
 ensureDirSync(SKINS_PATH, 1)
 
 export const LAUNCH_PROFILE_FILE_NAME = 'launcher_profiles.json'
@@ -44,3 +45,4 @@ export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
 export const LAUNCHING_IMAGE = join(APP_PATH, 'launching.webp')
 export const LAUNCHER_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'
 export const MCBBS_DATA_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'
+export const LATEST_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/latestManifest.json'

@@ -52,8 +52,8 @@ export { default as Notification } from 'rc-notification'
 export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
-export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin,
-  getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText, download,
+export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, isX64,
+  getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText, download, getSuitableMemory,
   removeFormatCodes, autoNotices, readBuffer, addTask, createDownloadTask } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
   constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types, ReactRouter }
@@ -62,7 +62,7 @@ export const $: (name: string, ...args: string[]) => string = (window as any).__
 export const pluginMaster: PluginMaster = window.pluginMaster
 export const profilesStore: ProfilesStore = window.profilesStore
 export const notice: (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => void = null
-export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean }) =>
+export const openConfirmDialog: (data: { text: string, title?: string, cancelButton?: boolean, ignore?: boolean }) =>
   Promise<boolean> = null
 export const requestInstallResources: <T extends types.Resource> (data: T, views?: types.InstallView) =>
   Promise<boolean> = null

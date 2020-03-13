@@ -1,18 +1,18 @@
 import { Store, injectStore } from 'reqwq'
 import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core'
 import { Installer } from '@xmcl/installer'
-import { getVersionTypeText, addTask } from '../utils/index'
+import { getVersionTypeText, addTask, installJava, findJavaPath, getSuitableMemory, isX64 } from '../utils/index'
 import { GAME_ROOT, LIBRARIES_PATH, RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer } from 'electron'
 import { getDownloaders } from '../plugin/DownloadProviders'
 import { join, dirname, basename } from 'path'
+import { ResourceVersion } from '../protocol/types'
 import fs from 'fs-extra'
 import user from '../utils/analytics'
 import history from '../utils/history'
 import ProfilesStore from './ProfilesStore'
 import updateResources from '../protocol/check-update'
-import { ResourceVersion } from '../protocol/types'
 
 export enum STATUS {
   READY, PREPARING, LAUNCHING, LAUNCHED, DOWNLOADING
@@ -114,11 +114,30 @@ export default class GameStore extends Store {
       await checkModsDirectoryOfVersion(versionId, ret)
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
-      const javaPath = jp || 'javaw'
+      let javaPath = jp
+      if (!jp && !(javaPath = localStorage.getItem('javaPath')) && (javaPath = await findJavaPath())) {
+        localStorage.setItem('javaPath', javaPath)
+        const arches = JSON.parse(localStorage.getItem('javaArches') || '{}')
+        arches[javaPath] = isX64()
+        localStorage.setItem('javaArches', JSON.stringify(arches))
+      }
+      if (!javaPath || !await fs.pathExists(javaPath)) {
+        localStorage.removeItem('javaPath')
+        if (process.platform === 'win32' && await openConfirmDialog({
+          text: $('Unable to find the Java, do you want to install Java automatically?'),
+          cancelButton: true
+        })) {
+          javaPath = await installJava().catch(e => {
+            console.error(e)
+            throw new Error($('Failed to install Java!'))
+          })
+        } else throw new Error($('No Java available!'))
+      }
       const versionDir = join(VERSIONS_PATH, versionId)
       const option: LaunchOption & { prechecks?: LaunchPrecheck[] } = {
         launcherBrand,
         properties: {},
+        minMemory: 512,
         version: versionId,
         resourcePath: GAME_ROOT,
         userType: 'mojang' as any,
@@ -128,6 +147,7 @@ export default class GameStore extends Store {
         accessToken: profile.accessToken || '',
         prechecks: extraJson.noChecker ? [] : undefined,
         gameProfile: { id: profile.uuid, name: profile.username },
+        maxMemory: getSuitableMemory(!!JSON.parse(localStorage.getItem('javaArches') || '{}')[javaPath]),
         javaPath: showGameLog ? join(dirname(javaPath), basename(javaPath).replace('javaw', 'java')) : javaPath,
         gamePath: json?.isolation || (await fs.readJson(join(versionDir, versionId + '.json'),
           { throws: false }))?.isolation ? versionDir : GAME_ROOT,
@@ -148,26 +168,25 @@ export default class GameStore extends Store {
       const launch2 = async () => {
         try {
           const p = await launch({ ...option })
-          p.once('close', (code, signal) => {
-            if (code !== 0) notice({ content: $('Abnormal exit detected, exit code:') + ' ' + code, error: true })
-            ipcRenderer.send('close-launching-dialog')
-            if (this.profilesStore.extraJson.animation) startAnimation()
-            if (currentWindow.isMinimized()) {
-              currentWindow.restore()
-              currentWindow.setSize(816, 586)
-            }
-            this.status = STATUS.READY
-            console.log('exit', code, signal)
-          }).once('error', async e => {
-            console.error(e)
-            notice({ content: $('Fail to launch') + ': ' + ((e ? e.message : e) || $('Unknown')), error: true })
-            if (e?.message?.includes('ENOENT') && await openConfirmDialog({
-              text: $('Unable to find the Java, do you want to install Java automatically?'),
-              cancelButton: true
-            })) { /* TODO: */ }
+          await new Promise((resolve, reject) => {
+            p.once('close', (code, signal) => {
+              if (code !== 0) notice({ content: $('Abnormal exit detected, exit code:') + ' ' + code, error: true })
+              ipcRenderer.send('close-launching-dialog')
+              if (this.profilesStore.extraJson.animation) startAnimation()
+              if (currentWindow.isMinimized()) {
+                currentWindow.restore()
+                currentWindow.setSize(816, 586)
+              }
+              this.status = STATUS.READY
+              console.log('exit', code, signal)
+            }).once('error', reject)
+            p.stdout.once('data', () => resolve())
           })
           await pluginMaster.emit('postLaunch', p, versionId, option)
         } catch (e) {
+          if (e?.message?.includes('ENOENT')) {
+
+          } else notice({ content: $('Fail to launch') + ': ' + ((e ? e.message : e) || $('Unknown')), error: true })
           if (typeof e === 'object' && e.error) {
             switch (e.error) {
               case 'MissingLibs':

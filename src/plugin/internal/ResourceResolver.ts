@@ -3,7 +3,7 @@ import { version } from '../../../package.json'
 import { isVersion, ResourceVersion } from '../../protocol/types'
 import { addTask } from '../../utils/index'
 import { GAME_ROOT } from '../../constants'
-import { getDownloaders } from '../../plugin/DownloadProviders'
+import { getDownloaders, downloader } from '../../plugin/DownloadProviders'
 import { installMod } from '../../protocol/install-local'
 import * as Installer from '@xmcl/installer'
 
@@ -49,9 +49,10 @@ export default class ResourceInstaller extends Plugin {
           path: `/maven/net/minecraftforge/forge/${mv}-${v}/forge-${mv}-${v}-universal.jar`
         }
       }, GAME_ROOT, {
+        downloader,
         versionId: r.id,
         java: profilesStore.extraJson.javaPath,
-        maven: profilesStore.downloadProvider.forge
+        mavenHost: profilesStore.downloadProvider.forge
       }), $('Install Forge') + ': ' + v).wait()
     } else if (r.$vanilla) {
       obj.notWriteJson = true

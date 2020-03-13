@@ -1,6 +1,5 @@
 import urlJoin from 'url-join'
-import { Option } from '@xmcl/installer/minecraft'
-import { DefaultDownloader, DownloadOption } from '@xmcl/installer/util'
+import { DefaultDownloader, DownloadOption, Installer } from '@xmcl/installer'
 import { NOT_PROXY } from 'reqwq'
 
 export interface DownloadProvider {
@@ -48,7 +47,7 @@ const DownloadProviders = {
   }
 }
 
-class ProgressDownloader extends DefaultDownloader {
+export class ProgressDownloader extends DefaultDownloader {
   public bytes = 0
   public downloadFile (option: DownloadOption) {
     const fn = option.progress
@@ -64,13 +63,12 @@ class ProgressDownloader extends DefaultDownloader {
 
 export const downloader = new ProgressDownloader()
 
-// setDownloader(downloader)
-
-export const getDownloaders = (client?: any): Option => {
+export const getDownloaders = (client?: any): Installer.Option => {
   let isOffcical = profilesStore.extraJson.downloadProvider === 'OFFICIAL'
   const provider: DownloadProvider = DownloadProviders[profilesStore.extraJson.downloadProvider]
   if (!provider) isOffcical = true
   return {
+    downloader,
     client: client && provider.client ? provider.client(client) : undefined,
     assetsDownloadConcurrency: profilesStore.extraJson.downloadThreads || 16,
     maxConcurrency: profilesStore.extraJson.downloadThreads || 16,

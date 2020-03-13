@@ -1,11 +1,10 @@
-import { Store, NOT_PROXY } from 'reqwq'
 import { join } from 'path'
-import { getJavaVersion, cacheSkin, genUUID } from '../utils/index'
 import { remote } from 'electron'
-import { platform } from 'os'
+import { Store, NOT_PROXY } from 'reqwq'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import { ResourceVersion } from '../protocol/types'
+import { getJavaVersion, cacheSkin, genUUID, vertifyJava } from '../utils/index'
 import { LAUNCH_PROFILE_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH, LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH,
   GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
 import fs from 'fs-extra'
@@ -154,15 +153,19 @@ export default class ProfilesStore extends Store {
       title: $('Locate Java'),
       message: $('Locate the path of Java 8'),
       filters: [
-        { name: $('Executable File (Javaw)'), extensions: platform() === 'win32' ? ['exe'] : [] }
+        { name: $('Executable File (Javaw)'), extensions: process.platform === 'win32' ? ['exe'] : [] }
       ]
     })
     if (ret.canceled) return
     const file = ret.filePaths[0]
-    const version = getJavaVersion(file)
+    const version = await getJavaVersion(file)
     if (version) {
+      if (!await vertifyJava(version, true)) return
       this.extraJson.javaPath = file
       this.saveExtraConfigJsonSync()
+      const arches = JSON.parse(localStorage.getItem('javaArches') || '{}')
+      arches[file] = version[1]
+      localStorage.setItem('javaArches', JSON.stringify(arches))
     } else notice({ content: $('Incorrect java version!'), error: true })
   }
 

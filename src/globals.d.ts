@@ -9,7 +9,7 @@ import { Resources, Resource, InstallView } from './protocol/types'
 type Keys = keyof typeof Lang
 type $ = (name: Keys, ...args: string[]) => string
 interface Ctx { content: React.ReactNode, duration?: number, error?: boolean }
-interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean, component?: ComponentType }
+interface ConfirmCtx { text: string, title?: string, cancelButton?: boolean, component?: ComponentType, ignore?: boolean }
 interface TopBar { blocks: Array<HTMLDivElement[]>, colors: Array<string[]>, containers: HTMLDivElement[] }
 declare global {
   declare const topBar: TopBar
