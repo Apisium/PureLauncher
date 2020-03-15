@@ -213,7 +213,5 @@
   "Exporting...": "导出中...",
 
   "Ensure version JAR": "检查版本 JAR",
-  "Ensure version files": "检查版本资源文件",
-  "Install Forge": "安装 Forge",
-  "Install Minecraft": "安装 Minecraft"
+  "Ensure version files": "检查版本资源文件"
 }

@@ -1,15 +1,16 @@
 import { Store, injectStore } from 'reqwq'
-import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core'
-import { Installer } from '@xmcl/installer'
+import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core/index'
+import { Installer } from '@xmcl/installer/index'
 import { getVersionTypeText, addTask, installJava, findJavaPath, getSuitableMemory, isX64 } from '../utils/index'
-import { GAME_ROOT, LIBRARIES_PATH, RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH } from '../constants'
+import { GAME_ROOT, LIBRARIES_PATH, VERSIONS_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
-import { remote, ipcRenderer } from 'electron'
+import { remote, ipcRenderer, BrowserView } from 'electron'
 import { getDownloaders } from '../plugin/DownloadProviders'
-import { join, dirname, basename } from 'path'
-import { ResourceVersion } from '../protocol/types'
+import { totalmem, freemem, release } from 'os'
+import { join } from 'path'
 import fs from 'fs-extra'
 import user from '../utils/analytics'
+import prettyBytes from 'pretty-bytes'
 import history from '../utils/history'
 import ProfilesStore from './ProfilesStore'
 import updateResources from '../protocol/check-update'
@@ -17,6 +18,8 @@ import updateResources from '../protocol/check-update'
 export enum STATUS {
   READY, PREPARING, LAUNCHING, LAUNCHED, DOWNLOADING
 }
+
+let logWindow: BrowserView
 
 const currentWindow = remote.getCurrentWindow()
 export default class GameStore extends Store {
@@ -92,11 +95,9 @@ export default class GameStore extends Store {
       versionId = v.version
 
       await pluginMaster.emit('launchPreUpdate', v.version)
-      const ret = await updateResources(versionId)
+      const json = await updateResources(versionId)
       await pluginMaster.emit('launchPostUpdate', v.version)
 
-      const json: ResourceVersion =
-        (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[versionId]
       const url = json?.serverHome
       if (url && typeof url === 'string') {
         if (url.startsWith('/serverHome?')) history.push(url)
@@ -111,52 +112,33 @@ export default class GameStore extends Store {
         }
       }
 
-      await checkModsDirectoryOfVersion(versionId, ret)
+      await checkModsDirectoryOfVersion(versionId, json)
       await pluginMaster.emit('launchEnsureFiles', versionId)
 
-      let javaPath = jp
-      if (!jp && !(javaPath = localStorage.getItem('javaPath')) && (javaPath = await findJavaPath())) {
-        localStorage.setItem('javaPath', javaPath)
-        const arches = JSON.parse(localStorage.getItem('javaArches') || '{}')
-        arches[javaPath] = isX64()
-        localStorage.setItem('javaArches', JSON.stringify(arches))
-      }
-      if (!javaPath || !await fs.pathExists(javaPath)) {
-        localStorage.removeItem('javaPath')
-        if (process.platform === 'win32' && await openConfirmDialog({
-          text: $('Unable to find the Java, do you want to install Java automatically?'),
-          cancelButton: true
-        })) {
-          javaPath = await installJava().catch(e => {
-            console.error(e)
-            throw new Error($('Failed to install Java!'))
-          })
-        } else throw new Error($('No Java available!'))
-      }
+      const javaPath = await this.resolveJavaPath(jp)
       const versionDir = join(VERSIONS_PATH, versionId)
+      const isX64 = !!JSON.parse(localStorage.getItem('javaArches') || '{}')[javaPath]
+      const maxMemory = getSuitableMemory(isX64)
       const option: LaunchOption & { prechecks?: LaunchPrecheck[] } = {
+        javaPath,
+        maxMemory,
         launcherBrand,
         properties: {},
         minMemory: 512,
+        userType: 'mojang',
         version: versionId,
         resourcePath: GAME_ROOT,
-        userType: 'mojang' as any,
         launcherName: 'pure-launcher',
         versionType: getVersionTypeText(),
         extraJVMArgs: javaArgs.split(' '),
         accessToken: profile.accessToken || '',
         prechecks: extraJson.noChecker ? [] : undefined,
         gameProfile: { id: profile.uuid, name: profile.username },
-        maxMemory: getSuitableMemory(!!JSON.parse(localStorage.getItem('javaArches') || '{}')[javaPath]),
-        javaPath: showGameLog ? join(dirname(javaPath), basename(javaPath).replace('javaw', 'java')) : javaPath,
         gamePath: json?.isolation || (await fs.readJson(join(versionDir, versionId + '.json'),
           { throws: false }))?.isolation ? versionDir : GAME_ROOT,
-        extraExecOption: {
-          detached: true,
-          shell: showGameLog
-        }
+        extraExecOption: { detached: true }
       }
-      await pluginMaster.emitSync('preLaunch', versionId, option)
+      await pluginMaster.emitSync('preLaunch', versionId, option, profile)
       this.status = STATUS.LAUNCHING
       remote.getCurrentWindow().minimize()
       if (extraJson.animation) {
@@ -167,9 +149,38 @@ export default class GameStore extends Store {
       let launched = false
       const launch2 = async () => {
         try {
-          const p = await launch({ ...option })
+          const p = await launch(option)
+          if (logWindow) {
+            if (showGameLog) await logWindow.webContents.executeJavaScript('document.body.innerText=""')
+            else {
+              logWindow.destroy()
+              logWindow = null
+            }
+          } else if (showGameLog) {
+            logWindow = new remote.BrowserWindow({ title: 'PureLauncher - Game Log' }) as any
+            logWindow.webContents.loadURL('about:blank')
+            logWindow.webContents.once('destroyed', () => (logWindow = null))
+          }
+          if (showGameLog) {
+            await logWindow.webContents.insertCSS(`body {
+              white-space: pre;
+              letter-spacing: 1px;
+              font-size: 0.9rem;
+              background-color: #282a36;
+              color: #f8f8f2;
+              font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+                'Segoe UI Emoji', 'Segoe UI Symbol';
+            }
+            .r { color: #ff5555 }
+            .y { color: #f1fa8c }
+            .g { color: #50fa7b }
+            .b { color: #8be9fd }
+            .n { margin: 0 }
+          `)
+          }
           await new Promise((resolve, reject) => {
-            p.once('close', (code, signal) => {
+            p.once('close', code => {
               if (code !== 0) notice({ content: $('Abnormal exit detected, exit code:') + ' ' + code, error: true })
               ipcRenderer.send('close-launching-dialog')
               if (this.profilesStore.extraJson.animation) startAnimation()
@@ -178,15 +189,36 @@ export default class GameStore extends Store {
                 currentWindow.setSize(816, 586)
               }
               this.status = STATUS.READY
-              console.log('exit', code, signal)
             }).once('error', reject)
             p.stdout.once('data', () => resolve())
+            if (showGameLog) {
+              const write = (text: string, color) => logWindow &&
+                logWindow.webContents.executeJavaScript(`;(() => {
+                  const elm = document.createElement('p')
+                  elm.innerText = ${JSON.stringify(text.toString())}
+                  elm.className = '${color}'
+                  document.body.appendChild(elm)
+                })()`)
+              write(`Laucnher: PureLauncher v${launcherBrand}
+Electron version: ${process.versions.electron}
+Nodejs version: ${process.versions.node}
+Chrome version: ${process.versions.chrome}
+Game id: ${versionId}
+Game root: ${versionDir}
+Java path: ${javaPath}, X64: ${isX64 || false}
+Authenticator: ${profile.type}
+User - Name: ${profile.username}, UUID: ${profile.uuid}
+Memory - Game: ${maxMemory} Mb, System: ${prettyBytes(totalmem())}, Free: ${prettyBytes(freemem())}
+System: ${process.platform} ${release()}, Arch: ${process.arch}`, 'b')
+              write('Process launched - Pid: ' + p.pid, 'g')
+              p.stderr.on('data', data => write(data, 'r'))
+              p.stdout.on('data', data => write(data, 'n'))
+              p.once('close', (code, signal) => write(`Process exited - ExitCode: ${code}, Signal: ${signal}`, 'y'))
+            }
           })
           await pluginMaster.emit('postLaunch', p, versionId, option)
         } catch (e) {
-          if (e?.message?.includes('ENOENT')) {
-
-          } else notice({ content: $('Fail to launch') + ': ' + ((e ? e.message : e) || $('Unknown')), error: true })
+          notice({ content: $('Fail to launch') + ': ' + ((e ? e.message : e) || $('Unknown')), error: true })
           if (typeof e === 'object' && e.error) {
             switch (e.error) {
               case 'MissingLibs':
@@ -244,5 +276,27 @@ export default class GameStore extends Store {
     const resolved = await Version.parse(GAME_ROOT, versionId)
     const task = Installer.installDependenciesTask(resolved, getDownloaders())
     await addTask(task, $('Ensure version files') + ': ' + versionId).wait()
+  }
+
+  public async resolveJavaPath (javaPath: string) {
+    if (!javaPath && !(javaPath = localStorage.getItem('javaPath')) && (javaPath = await findJavaPath())) {
+      localStorage.setItem('javaPath', javaPath)
+      const arches = JSON.parse(localStorage.getItem('javaArches') || '{}')
+      arches[javaPath] = isX64()
+      localStorage.setItem('javaArches', JSON.stringify(arches))
+    }
+    if (!javaPath || !await fs.pathExists(javaPath)) {
+      localStorage.removeItem('javaPath')
+      if (process.platform === 'win32' && await openConfirmDialog({
+        text: $('Unable to find the Java, do you want to install Java automatically?'),
+        cancelButton: true
+      })) {
+        javaPath = await installJava().catch(e => {
+          console.error(e)
+          throw new Error($('Failed to install Java!'))
+        })
+      } else throw new Error($('No Java available!'))
+    }
+    return javaPath
   }
 }

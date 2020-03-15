@@ -1,12 +1,12 @@
 import arch from 'arch'
 import fs, { pathExists } from 'fs-extra'
-import Unzip from '@xmcl/unzip'
+import Unzip from '@xmcl/unzip/index'
 import uuid from 'uuid-by-string'
 import which from 'which'
 import * as resolveP from 'resolve-path'
 import locateJava from 'locate-java-home/js/es5/index'
 import { freemem, totalmem } from 'os'
-import { Task } from '@xmcl/task'
+import { Task } from '@xmcl/task/index'
 import { promisify } from 'util'
 import { version } from '../../package.json'
 import { join, resolve, extname, basename } from 'path'
@@ -17,7 +17,7 @@ import { Readable } from 'stream'
 import { ILocateJavaHomeOptions, IJavaHomeInfo } from 'locate-java-home/js/es5/lib/interfaces'
 import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH, LAUNCHER_MANIFEST_URL,
   DEFAULT_LOCATE, APP_PATH, GAME_ROOT } from '../constants'
-import { DownloadOption } from '@xmcl/installer'
+import { DownloadOption } from '@xmcl/installer/index'
 import { downloader } from '../plugin/DownloadProviders'
 
 export const getJavaVersion = (path: string) => new Promise<[string, boolean] | undefined>(resolve =>
@@ -164,10 +164,6 @@ export const autoNotices = <T> (p: Promise<T>) => p.then(r => {
   notice({ content: $('Failed!'), error: true })
 }) as any as Promise<T>
 
-export const checkUrl = (url: string) => fetch(url, { method: 'HEAD', cache: 'no-cache' })
-  // eslint-disable-next-line no-throw-literal
-  .then(it => { if (it.ok) return true; else throw null }).catch(() => false)
-
 export const readBuffer = (stream: Readable) => new Promise<Buffer>((resolve, reject) => {
   const arr = []
   stream.on('data', d => arr.push(d)).on('end', () => resolve(Buffer.from(arr))).on('error', reject)
@@ -203,13 +199,15 @@ export const installJava = () => {
 }
 
 export const getSuitableMemory = (isX64: boolean) => {
-  const mem = freemem() / 1024 / 1024 | 0
+  let mem = freemem() / 1024 / 1024 | 0
   const total = totalmem() / 1024 / 1024 | 0
   if (isX64) {
     if (mem < 512) return 512
     if (mem < 1024) return mem
-    if (mem > 4096) return mem > total - 2048 ? 1024 * 8 : total - 2048
+    if (mem > 4096) mem = mem > total - 2048 ? 1024 * 8 : total - 2048
     else return mem > total - 1024 ? 4096 : mem
+    mem = Math.min(freemem() / 1024 / 1024 | 0, mem)
+    return mem > 1024 * 8 ? 1024 * 8 : mem
   } else {
     if (mem > 2048) return 2048
     if (mem < 512) return 512

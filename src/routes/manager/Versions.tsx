@@ -66,7 +66,7 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void, installed: R
         }}>{$('Delete')}</button>
     ]}
   >
-    <form className='pl-form' ref={ref}>
+    <form className='pl-form' ref={ref} key={p.version} onSubmit={e => e.preventDefault()}>
       <ToolTip placement='right' overlay={$('Click to edit')} overlayStyle={{ zIndex: 1100 }}>
         <img alt={ver.icon} src={resolveIcon(ver.icon)} className='version-icon' onClick={() => setOpen(true)} />
       </ToolTip>

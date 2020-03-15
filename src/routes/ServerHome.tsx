@@ -7,7 +7,7 @@ import { parse } from 'querystring'
 import { useLocation } from 'react-router-dom'
 import { queryStatus } from '@xmcl/client/status'
 import { createResource, OneCache } from 'react-cache-enhance'
-import { fromFormattedString, render } from '@xmcl/text-component'
+import { fromFormattedString, render } from '@xmcl/text-component/index'
 
 const Div = motion.div as any
 

@@ -8,14 +8,14 @@ import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
 import * as constants from '../constants'
 import * as Reqwq from 'reqwq'
-import * as Nbt from '@xmcl/nbt'
-import * as Core from '@xmcl/core'
-import * as Task from '@xmcl/task'
-import * as Unzip from '@xmcl/unzip'
-import * as Client from '@xmcl/client'
-import * as Installer from '@xmcl/installer'
-import * as ResourcePack from '@xmcl/resourcepack'
-import * as TextComponent from '@xmcl/text-component'
+import * as Nbt from '@xmcl/nbt/index'
+import * as Core from '@xmcl/core/index'
+import * as Task from '@xmcl/task/index'
+import * as Unzip from '@xmcl/unzip/index'
+import * as Client from '@xmcl/client/index'
+import * as Installer from '@xmcl/installer/index'
+import * as ResourcePack from '@xmcl/resourcepack/index'
+import * as TextComponent from '@xmcl/text-component/index'
 import * as Authenticator from './Authenticator'
 import * as Yazl from 'yazl'
 import * as Yauzl from 'yauzl'
@@ -53,7 +53,7 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, isX64,
-  getJavaVersion, checkUrl, validPath, sha1, md5, replace, getVersionTypeText, download, getSuitableMemory,
+  getJavaVersion, validPath, sha1, md5, replace, getVersionTypeText, download, getSuitableMemory,
   removeFormatCodes, autoNotices, readBuffer, addTask, createDownloadTask } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
   constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types, ReactRouter }
@@ -79,6 +79,7 @@ export const xmcl = {
 
 const gs = P.getStore(GameStore)
 export const launch = gs.launch
+export const resolveJavaPath = gs.resolveJavaPath
 export const getLaunchStatus = () => gs.status
 Object.defineProperty(module.exports, 'notice', { get: () => window.notice })
 Object.defineProperty(module.exports, 'openConfirmDialog', { get: () => window.openConfirmDialog })

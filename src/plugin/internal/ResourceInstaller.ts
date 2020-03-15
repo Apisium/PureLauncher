@@ -1,9 +1,9 @@
-import { extract } from '@xmcl/unzip'
+import { extract } from '@xmcl/unzip/index'
 import { join, dirname, resolve } from 'path'
 import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
-import { DownloadOption } from '@xmcl/installer'
-import { serialize, deserialize, TagType } from '@xmcl/nbt'
+import { DownloadOption } from '@xmcl/installer/index'
+import { serialize, deserialize, TagType } from '@xmcl/nbt/index'
 import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, WORLDS_PATH,
   PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,

@@ -30,7 +30,7 @@ export default async (version: string) => {
 }
 
 export const updatePlugins = async () => {
-  const list: Record<string, T.ResourcePlugin> = await fs.readJson(RESOURCES_PLUGINS_INDEX) || { }
+  const list: Record<string, T.ResourcePlugin> = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
   let needReload = false
   await Promise.all(Object.values(list).filter(it => it.updateUrl).map(it => {
     const obj: T.InstallView = { }

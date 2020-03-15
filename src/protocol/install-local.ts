@@ -1,6 +1,6 @@
 import { sha1 } from '../utils'
 import { join, basename } from 'path'
-import { open, CachedZipFile, Entry } from '@xmcl/unzip'
+import { open, CachedZipFile, Entry } from '@xmcl/unzip/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH } from '../constants'
 import * as T from './types'
 import fs from 'fs-extra'

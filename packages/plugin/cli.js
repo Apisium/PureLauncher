@@ -26,8 +26,9 @@ const MESSAGES = {
     c.bgGreenBright.black(' DEV=true ')),
   NOT_RUNNING: '❌  ' + c.redBright('PureLauncher has not been ran yet. Please set environment variable ' +
     c.bgGreenBright.black(' DEV=true ') + ' Then run PureLauncher.'),
-  UNKNOWN_COMMAND: '❌  ' + c.redBright('Unknown command, please ' + c.bgGreenBright.black('') +
-   ' To get more information.'),
+  UNKNOWN_COMMAND: '❌  ' + c.redBright('Unknown command, please ' +
+    c.bgGreenBright.black(' https://github.com/Apisium/PureLauncher/wiki/Tools_Plugin_Development ') +
+    ' To get more information.'),
   REMOVED: '🍀  ' + c.greenBright('Removed files:'),
   PACKING: '📦  ' + c.blueBright('Packing...'),
   PACKED: '📦  ' + c.greenBright('Packed successfully:'),
@@ -117,7 +118,7 @@ switch (argv._[0]) {
     }
     if (await fs.pathExists(file)) await fs.unlink(file)
     await fs.ensureDir(dirname(file))
-    await fs.rename(temp, file)
+    await fs.move(temp, file)
     console.log(MESSAGES.PACKED, file)
   }
 })().catch(e => {

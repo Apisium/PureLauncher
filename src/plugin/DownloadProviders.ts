@@ -1,18 +1,21 @@
 import urlJoin from 'url-join'
-import { DefaultDownloader, DownloadOption, Installer } from '@xmcl/installer'
+import { DefaultDownloader, DownloadOption, Installer } from '@xmcl/installer/index'
 import { NOT_PROXY } from 'reqwq'
 
 export interface DownloadProvider {
   name (): string
   locales?: string[]
-  launchermeta?: string
-  launcher?: string
-  resources?: string
-  libraries?: string
-  forge?: string
+  launchermeta: string
+  launcher: string
+  resources: string
+  libraries: string
+  forge: string
   client?: (version: { id: string, url: string }) => string
+  optifine?: (mcVersion: string, type: string, version: string) => Promise<string> | string
 }
 
+export const optifine = (mcVersion: string, type: string, version: string) =>
+  `https://bmclapi2.bangbang93.com/optifine/${mcVersion}/${type}/${version}`
 const DownloadProviders = {
   BMCLAPI: {
     [NOT_PROXY]: true,
@@ -23,7 +26,8 @@ const DownloadProviders = {
     resources: 'https://bmclapi2.bangbang93.com/assets',
     libraries: 'https://bmclapi2.bangbang93.com/maven',
     forge: 'https://bmclapi2.bangbang93.com/maven',
-    client: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/client`
+    client: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/client`,
+    optifine
   },
   MCBBSAPI: {
     [NOT_PROXY]: true,
@@ -34,7 +38,9 @@ const DownloadProviders = {
     resources: 'https://download.mcbbs.net/assets',
     libraries: 'https://download.mcbbs.net/maven',
     forge: 'https://download.mcbbs.net/maven',
-    client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`
+    client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`,
+    optifine: (mcVersion: string, type: string, version: string) =>
+      `https://download.mcbbs.net/optifine/${mcVersion}/${type}/${version}`
   },
   OFFICIAL: {
     [NOT_PROXY]: true,
@@ -43,7 +49,18 @@ const DownloadProviders = {
     launcher: 'https://launcher.mojang.com',
     resources: 'http://resources.download.minecraft.net',
     libraries: 'https://libraries.minecraft.net',
-    forge: 'https://files.minecraftforge.net/maven'
+    forge: 'https://files.minecraftforge.net/maven',
+    async optifine (mcVersion: string, type: string, version: string) {
+      const text = await fetch(`https://optifine.net/adloadx?f=${version.includes('pre') ? 'preview_' : ''}OptiFine_${mcVersion}_${type}_${version}.jar`)
+        .then(it => it.text())
+      if (text) {
+        const ret = /<a href='downloadx\?(.+?)'/.exec(text)
+        if (ret && ret[1]) {
+          return 'https://optifine.net/downloadx?' + ret[1]
+        }
+      }
+      return optifine(mcVersion, type, version)
+    }
   }
 }
 

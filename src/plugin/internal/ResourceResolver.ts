@@ -3,15 +3,9 @@ import { version } from '../../../package.json'
 import { isVersion, ResourceVersion } from '../../protocol/types'
 import { addTask } from '../../utils/index'
 import { GAME_ROOT } from '../../constants'
-import { getDownloaders, downloader } from '../../plugin/DownloadProviders'
+import { getDownloaders, downloader, optifine } from '../../plugin/DownloadProviders'
 import { installMod } from '../../protocol/install-local'
-import * as Installer from '@xmcl/installer'
-
-interface Forge {
-  version: string
-  universal: string
-  installer: string
-}
+import * as Installer from '@xmcl/installer/index'
 
 @plugin({
   version,
@@ -24,36 +18,43 @@ export default class ResourceInstaller extends Plugin {
   public async processResourceInstallVersion (res: any, obj: { notWriteJson: boolean }) {
     if (!isVersion(res) || !res.mcVersion) return
     const r: ResourceVersion & {
-      $fabric?: { version: string, loader: string }
-      $forge?: Forge
+      $fabric?: [string, string]
+      $forge?: string
+      $optifine?: [string, string]
       $vanilla?: boolean
     } = res
-    if (typeof r.$fabric === 'object') {
+    if (Array.isArray(r.$fabric)) {
       obj.notWriteJson = true
       r.version = '0.0.0'
-      await Installer.FabricInstaller.install(r.$fabric.version, r.$fabric.loader, GAME_ROOT, { versionId: r.id })
-    } else if (typeof r.$forge === 'object') {
+      await Installer.FabricInstaller.install(r.$fabric[0], r.$fabric[1], GAME_ROOT, { versionId: r.id })
+    } else if (Array.isArray(r.$optifine)) {
+      obj.notWriteJson = true
+      r.version = '0.0.0'
+      await addTask(Installer.OptifineInstaller.installOptifineTask(
+        await (profilesStore.downloadProvider.optifine || optifine)(r.mcVersion, r.$optifine[0], r.$optifine[1]),
+        GAME_ROOT,
+        { versionId: r.id }
+      ), $('Install') + ' Optifine', r.mcVersion + '-' + r.$optifine[0] + '-' + r.$optifine[1]).wait()
+    } else if (typeof r.$forge === 'string') {
       obj.notWriteJson = true
       const mv = r.mcVersion
-      const v = r.$forge.version
+      const version = r.$forge
       r.version = '0.0.0'
       await addTask(Installer.ForgeInstaller.installTask({
-        version: v,
+        version,
         mcversion: mv,
         installer: {
-          sha1: r.$forge.installer,
-          path: `/maven/net/minecraftforge/forge/${mv}-${v}/forge-${mv}-${v}-installer.jar`
+          path: `/maven/net/minecraftforge/forge/${mv}-${version}/forge-${mv}-${version}-installer.jar`
         },
         universal: {
-          sha1: r.$forge.universal,
-          path: `/maven/net/minecraftforge/forge/${mv}-${v}/forge-${mv}-${v}-universal.jar`
+          path: `/maven/net/minecraftforge/forge/${mv}-${version}/forge-${mv}-${version}-universal.jar`
         }
       }, GAME_ROOT, {
         downloader,
         versionId: r.id,
         java: profilesStore.extraJson.javaPath,
         mavenHost: profilesStore.downloadProvider.forge
-      }), $('Install Forge') + ': ' + v).wait()
+      }), $('Install') + ' Forge', mv + '-' + version).wait()
     } else if (r.$vanilla) {
       obj.notWriteJson = true
       r.version = '0.0.0'
@@ -61,7 +62,7 @@ export default class ResourceInstaller extends Plugin {
       const data = profilesStore.versionManifest.versions.find(it => it.id === r.mcVersion)
       if (!data) throw new Error('No such version: ' + r.mcVersion)
       await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders(data)),
-        $('Install Minecraft') + ': ' + r.mcVersion).wait()
+        $('Install') + ' Minecraft', r.mcVersion).wait()
     }
   }
 

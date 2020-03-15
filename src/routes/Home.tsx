@@ -23,7 +23,7 @@ const Home: React.FC = () => {
     let promise = Promise.resolve()
     if (Date.now() - time > 12 * 60 * 60 * 1000) {
       localStorage.removeItem('news')
-      promise = fetch('https://xmcl.blob.core.windows.net/pure-launcher/mcbbsData.json', { cache: 'no-cache' })
+      promise = fetch('https://xmcl.blob.core.windows.net/pure-launcher/mcbbsData.json')
         .then(it => it.text())
         .then(it => {
           localStorage.setItem('news', it)
