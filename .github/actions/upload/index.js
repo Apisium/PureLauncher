@@ -34,8 +34,8 @@ const { createHash } = require('crypto')
   core.info('Uploaded files!')
 
   core.info('Uploading hash...')
-  await octokit.repos.updateRelease({ ...github.context.repo, body, release_id: data.id }) // eslint-disable-line
+  await octokit.repos.updateRelease({ ...github.context.repo, body: JSON.stringify(json, null, 2), release_id: data.id }) // eslint-disable-line
   core.info('Hash uploaded!')
 })().catch(e => {
-  core.setFailed(e)
+  core.setFailed(e.stack)
 })

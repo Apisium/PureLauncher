@@ -27,5 +27,5 @@ const core = require('@actions/core')
   await octokit.repos.updateRelease({ ...github.context.repo, body: JSON.stringify(json, null, 2), release_id: data.id }) // eslint-disable-line
   core.info('Hash uploaded!')
 })().catch(e => {
-  core.setFailed(e)
+  core.setFailed(e.stack)
 })
