@@ -12,6 +12,7 @@ import Extensions from './manager/Extensions'
 import Plugins from './manager/Plugins'
 import Mods from './manager/Mods'
 import ResourcePacks from './manager/ResourcePacks'
+import Worlds from './manager/Worlds'
 
 export const getPages = () => [
   {
@@ -47,6 +48,7 @@ const Manager: React.FC = () => {
       <LiveRoute exact component={Plugins} path='/manager/plugins' />
       <Route component={Mods} path='/manager/mods/:version' />
       <Route component={ResourcePacks} path='/manager/resourcePacks' />
+      <Route component={Worlds} path='/manager/worlds' />
     </div>
     <Dots
       count={pages.length}

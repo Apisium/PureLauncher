@@ -55,7 +55,10 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void, installed: R
           openConfirmDialog({
             cancelButton: true,
             title: $('Warning!'),
-            text: $('Are you sure to delete this version? This is a dangerous operation and cannot be recovered after deletion!')
+            text: $(
+              'Are you sure to delete this {0}? This is a dangerous operation and cannot be recovered after deletion!',
+              $('version')
+            )
           }).then(ok => {
             if (ok) {
               p.onClose()

@@ -11,7 +11,7 @@ import { fromFormattedString, render } from '@xmcl/text-component/index'
 
 const Div = motion.div as any
 
-const LOGO = require('../assets/images/unknown_server.png')
+const LOGO = require('../assets/images/unknown-server.png')
 
 const cache = new OneCache()
 

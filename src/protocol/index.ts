@@ -3,42 +3,14 @@ import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import install from './install'
 import P from '../models/index'
-import installLocal from './install-local'
 import GameStore from '../models/GameStore'
 import requestReload from '../utils/request-reload'
 
 const gameStore = P.getStore(GameStore)
 const currentWindow = remote.getCurrentWindow()
 
-const InterruptedResources = 'interruptedResources'
 const mappings = {
-  async Install (r: T.ProtocolInstall, request?: boolean) {
-    console.log(r)
-    if (r.plugins) {
-      const plugins = Object.keys(r.plugins).filter(it => !(it in pluginMaster.plugins))
-      if (plugins.length) {
-        if (r.notInstallPlugins) return
-        if (!await install(r.resource, true, false, null, null, true)) return
-        let needReload = false
-        let safePluginHashes: string[]
-        for (const key of plugins) {
-          const p = r.plugins[key]
-          const obj: T.InstallView = { safePluginHashes }
-          await install(p, false, true, T.isPlugin, obj)
-          if (obj.noDependency) needReload = true
-          safePluginHashes = obj.safePluginHashes
-        }
-        if (needReload) {
-          const rs = JSON.parse(localStorage.getItem(InterruptedResources) || '[]')
-          rs.push(r)
-          localStorage.set(InterruptedResources, JSON.stringify(rs))
-          requestReload()
-          return
-        }
-      }
-    }
-    await install(r.resource, request, false)
-  },
+  Install: (r: T.ProtocolInstall, request?: boolean) => install(r.resource, request, false),
   async Launch (data: T.ProtocolLaunch) {
     if (data.secret !== localStorage.getItem('analyticsToken') && !await openConfirmDialog({
       cancelButton: true,
@@ -46,37 +18,36 @@ const mappings = {
         (data.version || profilesStore.selectedVersion.lastVersionId) + '?'
     })) return
     gameStore.launch(data.version)
-  },
-  InstallLocal (data: T.ProtocolInstallLocal) {
-    installLocal(data.path)
   }
 }
 
 export default mappings
 
-const rs = JSON.parse(localStorage.getItem(InterruptedResources) || '[]')
-localStorage.removeItem(InterruptedResources)
-if (rs.length) {
-  pluginMaster.once('loaded', async () => {
-    for (const r of rs) await mappings.Install(r, false)
-  })
-}
-
-ipcRenderer.on('pure-launcher-protocol', (_, args: any, argv: any) => {
+const INTERRUPTED_MESSAGE = 'interruptedMessage'
+const handleMessage = async (data: T.Protocol) => {
+  if (!data || typeof data !== 'object') return
   try {
-    const str = typeof args === 'string'
-    if (str) {
-      if (args.includes('://')) {
-        if (args.startsWith('pure-launcher://')) args = args.replace(/^pure-launcher:\/+/, '')
-        else {
-          pluginMaster.emit('customProtocol', args, argv)
+    if (data.plugins) {
+      const plugins = Object.keys(data.plugins).filter(it => !(it in pluginMaster.plugins))
+      if (plugins.length) {
+        let needReload = false
+        let safePluginHashes: string[]
+        for (const key of plugins) {
+          const p = data.plugins[key]
+          const obj: T.InstallView = { safePluginHashes }
+          await install(p, false, true, T.isPlugin, obj)
+          if (obj.noDependency) needReload = true
+          safePluginHashes = obj.safePluginHashes
+        }
+        if (needReload) {
+          const rs = JSON.parse(localStorage.getItem(INTERRUPTED_MESSAGE) || '[]')
+          rs.push(data)
+          localStorage.set(INTERRUPTED_MESSAGE, JSON.stringify(rs))
+          requestReload()
           return
         }
       }
-      if (!args.startsWith('{') || !args.endsWith('}')) return
     }
-    const data: T.Protocol = str ? JSON.parse(args) : args
-    if (!data || typeof data !== 'object') return
     if (data.type in mappings) {
       mappings[data.type](data)
       currentWindow.flashFrame(true)
@@ -84,6 +55,28 @@ ipcRenderer.on('pure-launcher-protocol', (_, args: any, argv: any) => {
   } catch (e) {
     console.error(e)
   }
+}
+ipcRenderer.on('pure-launcher-protocol', (_, args: any, argv: any) => {
+  const str = typeof args === 'string'
+  if (str) {
+    if (args.includes('://')) {
+      if (args.startsWith('pure-launcher://')) args = args.replace(/^pure-launcher:\/+/, '')
+      else {
+        pluginMaster.emit('customProtocol', args, argv)
+        return
+      }
+    }
+    if (!args.startsWith('{') || !args.endsWith('}')) return
+  }
+  handleMessage(str ? JSON.parse(args) : args)
 })
+
+const rs = JSON.parse(localStorage.getItem(INTERRUPTED_MESSAGE) || '[]')
+localStorage.removeItem(INTERRUPTED_MESSAGE)
+if (rs.length) {
+  pluginMaster.once('loaded', async () => {
+    for (const r of rs) await handleMessage(r)
+  })
+}
 const data: T.ProtocolInstall = { type: 'Install', resource: 'http://acode.apisium.cn/libraries/version.json' }
 ;(window as any).h = () => protocol(data).then(console.log, console.error)

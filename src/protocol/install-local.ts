@@ -1,7 +1,8 @@
-import { sha1 } from '../utils'
+import { sha1, genId } from '../utils'
 import { join, basename } from 'path'
+// import { extract } from '@xmcl/unzip'
 import { open, CachedZipFile, Entry } from '@xmcl/unzip/index'
-import { VERSIONS_PATH, RESOURCE_PACKS_PATH } from '../constants'
+import { VERSIONS_PATH, RESOURCE_PACKS_PATH, WORLDS_PATH } from '../constants'
 import * as T from './types'
 import fs from 'fs-extra'
 import install from './install'
@@ -43,7 +44,10 @@ export const installResourcePack = async (path: string, zip?: CachedZipFile) => 
   if ('pack.mcmeta' in zip.entries) {
     if (await openConfirmDialog({
       cancelButton: true,
-      text: $('It has been detected that the file type dragged in is resource package. Do you want to install it?')
+      text: $(
+        'It has been detected that the file type dragged in is {0}. Do you want to install it?',
+        $('resource pack')
+      )
     })) {
       zip.close()
       await fs.ensureDir(RESOURCE_PACKS_PATH)
@@ -58,7 +62,7 @@ export const installMod = async (path: string) => {
   const obj = { selectedVersion: '' }
   if (await openConfirmDialog({
     cancelButton: true,
-    text: $('It has been detected that the file type dragged in is mod. Do you want to install it?'),
+    text: $('It has been detected that the file type dragged in is {0}. Do you want to install it?', $('mod')),
     component: versionSelector(obj, profilesStore)
   })) {
     let id = obj.selectedVersion
@@ -66,14 +70,33 @@ export const installMod = async (path: string) => {
     const dir = join(VERSIONS_PATH, id, 'mods')
     await fs.ensureDir(dir)
     const p2 = join(dir, basename(path))
-    console.log(path, p2)
     await fs.copyFile(path, p2)
     return true
   }
   return false
 }
 
-export default async (path: string, autoInstallResourcePack = false, emitEvent = false) => {
+export const installWorld = async (zip: CachedZipFile) => {
+  const file = Object.keys(zip.entries).find(it => it.includes('/level.dat'))
+  if (!file) return false
+  let dir = file.slice(0, -10)
+  if (dir.includes('/')) return false
+  if (!await openConfirmDialog({
+    cancelButton: true,
+    text: $(
+      'It has been detected that the file type dragged in is {0}. Do you want to install it?',
+      $('world') + ' (' + dir + ')'
+    )
+  })) return false
+  const dest = join(WORLDS_PATH, dir)
+  dir += '/'
+  await zip.extractEntries(await fs.pathExists(dest) ? dest + '-' + genId() : dest, {
+    entryHandler: (_, entry) => entry.fileName.startsWith(dir) ? entry.fileName.slice(dir.length) : null
+  })
+  return true
+}
+
+export default async (path: string, autoInstallOthers = false, emitEvent = false) => {
   if (!path.endsWith('.zip')) throw new Error($('Illegal resource type!'))
   const zip = await open(path)
   let file = zip.entries['local-resource.json']
@@ -114,7 +137,7 @@ export default async (path: string, autoInstallResourcePack = false, emitEvent =
     zip.close()
     return true
   }
-  if (autoInstallResourcePack && await installResourcePack(path, zip)) return true
+  if (autoInstallOthers && (await installResourcePack(path, zip) || await installWorld(zip))) return true
   if (!emitEvent) return false
   await pluginMaster.emitSync('zipDragIn', zip, path)
   return true

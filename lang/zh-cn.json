@@ -12,21 +12,25 @@
   "last-release": "最新版本",
   "last-snapshot": "最新快照",
   "Avatar": "头像",
+  "version": "版本",
   "Version": "版本",
   "Versions": "版本",
   "Accounts": "帐号",
   "Update Package": "更新包",
   "Click here to switch versions": "点击这里以切换游戏版本",
+  "mod": "模组",
   "Mods": "模组",
   "Versions List": "游戏版本管理",
   "Add new...": "添加新的版本",
   "Delete": "删除",
   "Tasks": "任务",
   "ResourcePacks": "材质包",
+  "resource pack": "材质包",
   "OFFICIAL": "官方源",
   "Plugins": "插件",
   "Servers": "服务器",
-  "Saves": "地图",
+  "Worlds": "地图",
+  "world": "地图",
   "Clear": "清理已完成项",
   "Error:": "发生错误:",
   "Speed": "下载速度",
@@ -82,21 +86,15 @@
     "无法找到合适的java，是否要需要帮您安装java?",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
     "发生未知错误，请点击上方苦力怕图标以刷新页面!",
-  "Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!":
-    "是否确认删除该模组? 这是一个危险的操作且删除后无法恢复!",
-  "Are you sure to delete this mod? Files can be recovered in the recycle bin.":
-    "是否确认删除该模组? 文件删除后可在回收站中恢复.",
   "The number of files is not equal to the number of hashes provided!": "文件数与提供多个哈希数不相同!",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",
   "Warning! Installing plugins, please confirm whether the plugin is safe! If the extension is a malicious plugin, it may cause damage to your computer!\n\nPlugin ID: {0}\nName: {1}":
     "警告! 当前正在安装扩展插件, 请确认插件来源是否安全! 若扩展插件为恶意插件可能会对您的计算机造成破坏!\n\n插件ID: {0}\n插件名字: {1}",
-  "Are you sure to delete this version? This is a dangerous operation and cannot be recovered after deletion!":
-    "是否确认删除该版本? 这是一个危险的操作且删除后无法恢复!",
-  "Are you sure to delete this resource pack? This is a dangerous operation and cannot be recovered after deletion!":
-    "是否确认删除该资源包? 这是一个危险的操作且删除后无法恢复!",
-  "Are you sure to delete this resource pack? Files can be recovered in the recycle bin.":
-    "是否确认删除该资源包? 文件删除后可在回收站中恢复.",
+  "Are you sure to delete this {0}? This is a dangerous operation and cannot be recovered after deletion!":
+    "是否确认删除该{0}? 这是一个危险的操作且删除后无法恢复!",
+  "Are you sure to delete this {0}? Files can be recovered in the recycle bin.":
+    "是否确认删除该{0}? 文件删除后可在回收站中恢复.",
   "This version ({0}) already exists! Delete this version? Warning: cannot recover after deletion!":
     "该版本（{0}）已经存在！是否删除该版本？警告：删除后将无法复原!",
   "Network connection failed. Do you want to play offline?": "网络连接失败, 是否要离线游玩?",
@@ -104,12 +102,12 @@
   "Illegal resource type!": "错误的资源类型!",
   "Do you want to export MODS and resource packs?": "是否要导出模组和材质包?",
   "No resources found!": "错误的资源类型!",
-  "It has been detected that the file type dragged in is resource package. Do you want to install it?":
-    "检测到拖入的文件类型为资源包，请问是否需要安装?",
-  "It has been detected that the file type dragged in is mod. Do you want to install it?":
-    "检测到拖入的文件类型为模组，请问是否需要安装?",
+  "It has been detected that the file type dragged in is {0}. Do you want to install it?":
+    "检测到拖入的文件类型为{0}，请问是否需要安装?",
   "Received the request to launch the game. Do you want to launch the game": "收到启动游戏请求，是否要启动游戏",
   "Aero is not enabled in the current system, resulting in abnormal GUI!": "当前系统没有启用Aero, 导致界面显示异常!",
+  "The game launched successfully, but the game has exited abnormally. Game crash is not a problem of PureLauncher, but may be caused by incompatible mods. So please DO NOT report this log to PureLauncher!":
+    "游戏已经成功启动, 但目前游戏已经异常退出. 游戏崩溃并不是 PureLauncher 的问题, 而可能是由于模组不兼容所导致, 因此请不要将此日志报告给 PureLauncher!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",
@@ -210,6 +208,7 @@
   "Server Provider": "下载服务器提供",
 
   "Zip file": "压缩文件 (zip)",
+  "Extracting": "解压文件",
   "Exporting...": "导出中...",
 
   "Ensure version JAR": "检查版本 JAR",

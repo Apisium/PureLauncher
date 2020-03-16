@@ -1,14 +1,13 @@
-import { extract } from '@xmcl/unzip/index'
 import { join, dirname, resolve } from 'path'
 import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
 import { DownloadOption } from '@xmcl/installer/index'
 import { serialize, deserialize, TagType } from '@xmcl/nbt/index'
-import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download } from '../../utils/index'
+import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download, unzip } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, WORLDS_PATH,
   PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,
-  RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS, TEMP_PATH, LAUNCHER_MANIFEST_URL,
-  RESOURCES_WORLDS_INDEX_PATH } from '../../constants'
+  RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS, TEMP_PATH,
+  LAUNCHER_MANIFEST_URL } from '../../constants'
 import pAll from 'p-all'
 import fs from 'fs-extra'
 import gte from 'semver/functions/gte'
@@ -92,27 +91,27 @@ export default class ResourceInstaller extends Plugin {
   public async installWorld (r: T.ResourceWorld, o: T.InstallView = { }) {
     if (!T.isWorld(r)) throw new TypeError($('Illegal resource type!'))
     const dir = o.isolation ? join(VERSIONS_PATH, o.resolvedId, 'worlds') : WORLDS_PATH
-    const old: T.ResourceWorld = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
-      : (await fs.readJson(RESOURCES_WORLDS_INDEX_PATH, { throws: false }) || { })[r.id]
-    if (old) {
-      if (gte(old.version, r.version)) return
-      // if (old.h) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.zip')).catch(() => {})))
-    }
+    // const old: T.ResourceWorld = o.oldResourceVersion ? o.oldResourceVersion.resources?.[r.id]
+    //   : (await fs.readJson(RESOURCES_WORLDS_INDEX_PATH, { throws: false }) || { })[r.id]
+    // if (old) {
+    // if (gte(old.version, r.version)) return
+    // if (old.h) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.zip')).catch(() => {})))
+    // }
     const destination = join(TEMP_PATH, genId())
     try {
-      const hash: string = await downloadAndGetHash({
+      await download({
         destination,
         url: replace(r.url, r),
         checksum: r.hash ? { algorithm: 'sha1', hash: r.hash } : undefined
-      })[0] || r.hash
+      })
       await fs.ensureDir(dir)
-      await extract(destination, dir, { replaceExisted: true })
-      if (!o.isolation) {
-        const json = await fs.readJson(RESOURCES_WORLDS_INDEX_PATH, { throws: false }) || { }
-        r.hash = hash
-        json[r.id] = r
-        await fs.outputJson(RESOURCES_WORLDS_INDEX_PATH, json)
-      }
+      await unzip(destination, dir, { replaceExisted: true })
+      // if (!o.isolation) {
+      //   const json = await fs.readJson(RESOURCES_WORLDS_INDEX_PATH, { throws: false }) || { }
+      //   r.hash = hash
+      //   json[r.id] = r
+      //   await fs.outputJson(RESOURCES_WORLDS_INDEX_PATH, json)
+      // }
     } finally {
       await fs.remove(destination).catch(console.error)
     }

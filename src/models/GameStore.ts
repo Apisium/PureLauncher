@@ -94,9 +94,9 @@ export default class GameStore extends Store {
       await pluginMaster.emitSync('launchPostResolvedVersion', v)
       versionId = v.version
 
-      await pluginMaster.emit('launchPreUpdate', v.version)
+      await pluginMaster.emit('launchPreUpdate', v.version, profile)
       const json = await updateResources(versionId)
-      await pluginMaster.emit('launchPostUpdate', v.version)
+      await pluginMaster.emit('launchPostUpdate', v.version, profile, json)
 
       const url = json?.serverHome
       if (url && typeof url === 'string') {
@@ -213,7 +213,14 @@ System: ${process.platform} ${release()}, Arch: ${process.arch}`, 'b')
               write('Process launched - Pid: ' + p.pid, 'g')
               p.stderr.on('data', data => write(data, 'r'))
               p.stdout.on('data', data => write(data, 'n'))
-              p.once('close', (code, signal) => write(`Process exited - ExitCode: ${code}, Signal: ${signal}`, 'y'))
+              p.once('close', (code, signal) => {
+                write(`Process exited - ExitCode: ${code}, Signal: ${signal}`, 'y')
+                if (code) {
+                  write($(
+                    'The game launched successfully, but the game has exited abnormally. Game crash is not a problem of PureLauncher, but may be caused by incompatible mods. So please DO NOT report this log to PureLauncher!'
+                  ), 'b')
+                }
+              })
             }
           })
           await pluginMaster.emit('postLaunch', p, versionId, option)

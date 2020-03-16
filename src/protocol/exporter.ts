@@ -1,30 +1,13 @@
 import fs from 'fs-extra'
 import { ZipFile } from 'yazl'
 import { Stream } from 'stream'
-import { sha1 } from '../utils'
 import { remote } from 'electron'
 import { join, basename, extname } from 'path'
+import { sha1, addDirectoryToZipFile } from '../utils'
 import { ResourceVersion, ResourceMod, ResourceResourcePack, Resource } from './types'
 import { RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH, RESOURCE_PACKS_PATH } from '../constants'
 
 const waitEnd = (stream: Stream) => new Promise((resolve, reject) => stream.once('end', resolve).once('error', reject))
-
-const html = Buffer.from(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>PureLauncher Installer</title>
-</head>
-<body>
-  Loading...
-  <script>
-    location.href = 'https://pl.apisium.com/install-local.html?' + encodeURIComponent(location.href)
-  </script>
-</body>
-</html>`)
 
 const requestPath = (name?: string) => remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
   defaultPath: name ? name + '.zip' : undefined,
@@ -43,7 +26,6 @@ export const exportVersion = async (key: string, path?: string) => {
   const json: ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[ver]
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(path))
-  zip.addBuffer(html, 'install - 安装.html')
   const verRoot = join(VERSIONS_PATH, ver)
   if (json) {
     if (json.source) zip.addBuffer(Buffer.from(json.source), 'resource-manifest')
@@ -105,7 +87,6 @@ export const exportResource = async (r: ResourceMod | ResourceResourcePack, path
   if (!path) return
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(path))
-  zip.addBuffer(html, 'install - 安装.html')
   if (r.source) zip.addBuffer(Buffer.from(r.source), 'resource-manifest')
   else zip.addBuffer(Buffer.from(JSON.stringify(r)), 'resource-manifest.json')
   zip.end()
@@ -118,10 +99,21 @@ export const exportUnidentified = async (file: string, type: string, ext: any = 
   if (!path) return
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(path))
-  zip.addBuffer(html, 'install - 安装.html')
   const hash = await sha1(file)
   zip.addFile(file, 'files/' + hash)
   zip.addBuffer(Buffer.from(JSON.stringify({ ...ext, id: name, type, hash })), 'local-resource.json')
+  zip.end()
+  await waitEnd(zip.outputStream)
+}
+
+export const exportWorld = async (path: string, file?: string) => {
+  const name = basename(path)
+  if (!file) file = await requestPath(name)
+  if (!file) return
+  const zip = new ZipFile()
+  zip.outputStream.pipe(fs.createWriteStream(file))
+  zip.addBuffer(Buffer.from(name), 'world-manifest')
+  await addDirectoryToZipFile(zip, path)
   zip.end()
   await waitEnd(zip.outputStream)
 }

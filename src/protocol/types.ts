@@ -100,7 +100,10 @@ export const isVersion = (r: any): r is ResourceVersion => {
 export const isServer = (r: any): r is ResourceServer => isResource(r) &&
   r.type === 'Server' && typeof (r as any).ip === 'string' && !!(r as any).ip
 
-export interface Protocol <T = any> { type: T }
+export interface Protocol <T = any> {
+  type: T
+  plugins?: Record<string, string | ResourcePlugin>
+}
 export interface ProtocolLaunch extends Protocol<'Launch'> {
   version?: string
   resource?: ResourceVersion
@@ -110,11 +113,6 @@ export interface ProtocolLaunch extends Protocol<'Launch'> {
 }
 export interface ProtocolInstall extends Protocol<'Install'> {
   resource: string | AllResources | ResourceVersion | ResourcePlugin
-  plugins?: Record<string, string | ResourcePlugin>
-  notInstallPlugins?: boolean
-}
-export interface ProtocolInstallLocal extends Protocol<'InstallLocal'> {
-  path: string
 }
 export interface InstallView {
   [key: string]: any

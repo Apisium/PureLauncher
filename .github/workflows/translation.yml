@@ -1,23 +1,22 @@
 name: release
 
-on:
-  pull_request:
+on: [pull_request]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
 
-  steps:
-    - name: Check out git repository
-      uses: actions/checkout@v1
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v1
 
-    - name: Install Node.js and npm
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
 
-    - name: Install dependencies
-      run: npm install --production
+      - name: Install dependencies
+        run: npm install --production
 
-    - name: Lint translation
-      run: node packages/translation-tools/cli.js lint $(curl https://api.github.com/repos/Apisium/PureLauncher/pulls/${{ github.event.pull_request.number }}/files | grep '"filename":' | sed -e 's#.*"lang/\(.*\)",\?#"\1"#g')
+      - name: Lint translation
+        run: node packages/translation-tools/cli.js lint $(curl https://api.github.com/repos/Apisium/PureLauncher/pulls/${{ github.event.pull_request.number }}/files | grep '"filename":' | sed -e 's#.*"lang/\(.*\)",\?#"\1"#g')

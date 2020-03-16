@@ -33,7 +33,6 @@ const useResourcePack = createResource(async (): Promise<Ret> => {
     let files = (await fs.readdir(RESOURCE_PACKS_PATH)).filter(it => it.endsWith('.zip'))
     const stats = await Promise.all(files.map(it => fs.stat(join(RESOURCE_PACKS_PATH, it)).catch(() => null)))
     files = files.filter((_, i) => stats[i]?.isFile())
-    console.log(files, stats)
     const json: Record<string, ResourceResourcePack> =
       await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH, { throws: false }) || { }
     const hashes = new Set<string>()
@@ -61,15 +60,18 @@ const ResourcePack: React.FC = () => {
   const requestUninstall = (id: string, d?: boolean) => !loading && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
-    text: $(d ? 'Are you sure to delete this resource pack? Files can be recovered in the recycle bin.'
-      : 'Are you sure to delete this resource pack? This is a dangerous operation and cannot be recovered after deletion!')
+    text: $(
+      d ? 'Are you sure to delete this {0}? Files can be recovered in the recycle bin.'
+        : 'Are you sure to delete this {0}? This is a dangerous operation and cannot be recovered after deletion!',
+      $('resource pack')
+    )
   }).then(ok => {
     if (ok) {
       setLoading(true)
       notice({ content: $('Deleting...') })
       autoNotices(uninstallResourcePack(id, d)).finally(() => {
         cache.delete(cache.key)
-        setLoading(false)
+        setTimeout(setLoading, 500, false)
       })
     }
   })
@@ -97,12 +99,11 @@ const ResourcePack: React.FC = () => {
       draggable='true'
       onDragStart={e => {
         e.preventDefault()
-        console.log(2333)
         remote.getCurrentWebContents().startDrag({ file: it[0], icon: it[1] })
       }}
     >
       {it[1] && <img src={it[1]} alt={it[0]} />}
-      {it[2] ? <>{it[0]} <span>({it[2]})</span></> : it[0]}
+      {it[2] ? <div>{it[0]}<div>{it[2]}</div></div> : it[0]}
       <div className='buttons'>
         {!ps.extraJson.copyMode &&
           <button

@@ -51,8 +51,11 @@ const Version: React.FC<{ version: string }> = p => {
   const requestUninstall = (id: string, d?: boolean) => !loading && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
-    text: $(d ? 'Are you sure to delete this mod? Files can be recovered in the recycle bin.'
-      : 'Are you sure to delete this mod? This is a dangerous operation and cannot be recovered after deletion!')
+    text: $(
+      d ? 'Are you sure to delete this {0}? Files can be recovered in the recycle bin.'
+        : 'Are you sure to delete this {0}? This is a dangerous operation and cannot be recovered after deletion!',
+      $('mod')
+    )
   }).then(ok => {
     if (ok) {
       setLoading(true)

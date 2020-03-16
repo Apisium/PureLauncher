@@ -8,12 +8,14 @@ import locateJava from 'locate-java-home/js/es5/index'
 import { freemem, totalmem } from 'os'
 import { Task } from '@xmcl/task/index'
 import { promisify } from 'util'
+import { ZipFile } from 'yazl'
 import { version } from '../../package.json'
 import { join, resolve, extname, basename } from 'path'
 import { createHash, BinaryLike } from 'crypto'
 import { exec } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
+import { extractTaskFunction } from '@xmcl/unzip/task/index'
 import { ILocateJavaHomeOptions, IJavaHomeInfo } from 'locate-java-home/js/es5/lib/interfaces'
 import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH, LAUNCHER_MANIFEST_URL,
   DEFAULT_LOCATE, APP_PATH, GAME_ROOT } from '../constants'
@@ -105,6 +107,22 @@ export const addTask = <T> (task: Task<T>, name: string, subName?: string) => {
     })
 }
 
+export const createUnzipTask = (openFile: Unzip.OpenTarget, dest: string, options?: Unzip.ExtractOptions) =>
+  Task.create('unzip', extractTaskFunction(openFile, dest, options))
+
+export const unzip = (
+  openFile: Unzip.OpenTarget,
+  dest: string,
+  options?: Unzip.ExtractOptions & { name?: string, subName?: string }
+) => {
+  const {
+    name = $('Extracting'),
+    subName = typeof openFile === 'string' ? basename(openFile) : undefined,
+    ...opts
+  } = options || { }
+  return addTask(createUnzipTask(openFile, dest, opts), name, subName).wait()
+}
+
 export const createDownloadTask = (option: DownloadOption | DownloadOption[]) => Task.create('download', ctx => {
   if (Array.isArray(option)) {
     if (option.length > 1) {
@@ -186,7 +204,7 @@ export const installJava = () => {
         checksum: { algorithm: 'sha1', hash: java.hash }
       }, 'Java', 'java1.8.0_51-win32-x64.zip')
     })
-    .then(() => Unzip.extract(destination, dir))
+    .then(() => unzip(destination, dir))
     .then(() => {
       const file = join(dir, 'bin/javaw.exe')
       localStorage.setItem('javaPath', file)
@@ -263,4 +281,14 @@ export const findJavaPath = async () => {
     path = join(java[0].path, name)
     if (await pathExists(path)) return path
   }
+}
+
+export const addDirectoryToZipFile = async (zip: ZipFile, realPath: string, path = basename(realPath)) => {
+  await Promise.all((await fs.readdir(realPath)).map(async it => {
+    const f = join(realPath, it)
+    const p = path + '/' + it
+    const stat = await fs.stat(f)
+    if (stat.isFile()) zip.addFile(f, p)
+    else if (stat.isDirectory()) await addDirectoryToZipFile(zip, f, p)
+  }))
 }

@@ -7,6 +7,7 @@ module.exports = (cmd, langName = '') => {
   const commands = ['lint', 'sync']
 
   langName = basename(langName, '.json')
+  if (langName === 'zh-cn') return
   if (!commands.includes(cmd) || !langName) {
     console.error('❌  ' + c.redBright('Unknown command ' + c.bgYellowBright.black(' ' + cmd + ' ') + ', please ' +
       c.bgGreenBright.black(' https://github.com/Apisium/PureLauncher/wiki/Tools_Translation ') +
