@@ -10,8 +10,9 @@ const core = require('@actions/core')
   const json = JSON.parse(data.body)
   json.version = tag
 
+  const body = JSON.stringify(json, null, 2)
   core.info('Uploading files...')
-  const buffer = Buffer.from(json)
+  const buffer = Buffer.from(body)
   await octokit.repos.uploadReleaseAsset({
     data: buffer,
     name: 'latestManifest.json',
@@ -24,7 +25,7 @@ const core = require('@actions/core')
   core.info('Uploaded files!')
 
   core.info('Uploading hash...')
-  await octokit.repos.updateRelease({ ...github.context.repo, body: JSON.stringify(json, null, 2), release_id: data.id }) // eslint-disable-line
+  await octokit.repos.updateRelease({ ...github.context.repo, body, release_id: data.id }) // eslint-disable-line
   core.info('Hash uploaded!')
 })().catch(e => {
   core.setFailed(e.stack)
