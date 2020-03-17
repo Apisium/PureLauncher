@@ -187,6 +187,8 @@ export default class GameStore extends Store {
               if (currentWindow.isMinimized()) {
                 currentWindow.restore()
                 currentWindow.setSize(816, 586)
+                currentWindow.setAlwaysOnTop(true)
+                currentWindow.setAlwaysOnTop(false)
               }
               this.status = STATUS.READY
             }).once('error', reject)

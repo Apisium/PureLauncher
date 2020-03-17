@@ -44,10 +44,19 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void, installed: R
           if (!ref.current) return
           const data = new FormData(ref.current)
           analytics.event('profile', 'edit')
-          autoNotices(profilesStore.editProfile(p.version, data.get('name') as string, data.get('icon') as string))
+          autoNotices(ps.editProfile(p.version, data.get('name') as string, data.get('icon') as string))
         }}
       >{$('SAVE')}</button>,
       <button key='cancel' className='btn btn-secondary' onClick={p.onClose}>{$('CANCEL')}</button>,
+      <button
+        key='hide'
+        className='btn btn-secondary'
+        onClick={() => {
+          p.onClose()
+          delete ps.profiles[p.version]
+          autoNotices(ps.saveLaunchProfileJson())
+        }}
+      >{$('HIDE')}</button>,
       <button
         key='delete'
         className='btn btn-danger'

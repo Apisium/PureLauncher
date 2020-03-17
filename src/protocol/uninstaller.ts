@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
-import { join } from 'path'
 import { shell } from 'electron'
+import { join, basename } from 'path'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_VERSIONS_PATH, VERSIONS_PATH,
   RESOURCES_MODS_INDEX_FILE_NAME, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH, DELETES_FILE, RESOURCES_PLUGINS_INDEX } from '../constants'
 import { Plugin } from '../plugin/Plugin'
@@ -52,9 +52,9 @@ export const uninstallPlugin = async (p: Plugin) => {
   const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
   if (!pluginMaster.isPluginUninstallable(p, deletes)) throw new Error('Plugin cannot be uninstalled!')
   pluginMaster.pluginFileMap[p.pluginInfo.id] = p[FILE]
-  deletes.push(p[FILE])
+  deletes.push(basename(p[FILE]))
   const json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
   delete json[p.pluginInfo.id]
-  await Promise.all([fs.writeJson(DELETES_FILE, deletes), fs.writeJson(json, DELETES_FILE)])
+  await Promise.all([fs.writeJson(DELETES_FILE, deletes), fs.writeJson(RESOURCES_PLUGINS_INDEX, json)])
   return deletes
 }

@@ -1,14 +1,16 @@
+import { join } from 'path'
 import { plugin, Plugin, event } from '../Plugin'
-import { version } from '../../../package.json'
+import { version as pluginVersion } from '../../../package.json'
 import { isVersion, ResourceVersion } from '../../protocol/types'
-import { addTask } from '../../utils/index'
-import { GAME_ROOT } from '../../constants'
+import { addTask, download, genId } from '../../utils/index'
+import { GAME_ROOT, TEMP_PATH } from '../../constants'
 import { getDownloaders, downloader, optifine } from '../../plugin/DownloadProviders'
 import { installMod } from '../../protocol/install-local'
+import { promises as fs } from 'fs'
 import * as Installer from '@xmcl/installer/index'
 
 @plugin({
-  version,
+  version: pluginVersion,
   id: '@pure-launcher/resource-resolver',
   description: () => $("PureLauncher's built-in plugin"),
   title: () => $('ResourcesResolver')
@@ -30,11 +32,20 @@ export default class ResourceInstaller extends Plugin {
     } else if (Array.isArray(r.$optifine)) {
       obj.notWriteJson = true
       r.version = '0.0.0'
-      await addTask(Installer.OptifineInstaller.installOptifineTask(
-        await (profilesStore.downloadProvider.optifine || optifine)(r.mcVersion, r.$optifine[0], r.$optifine[1]),
-        GAME_ROOT,
-        { versionId: r.id }
-      ), $('Install') + ' Optifine', r.mcVersion + '-' + r.$optifine[0] + '-' + r.$optifine[1]).wait()
+      const name = r.mcVersion + '-' + r.$optifine[0] + '-' + r.$optifine[1]
+      const destination = join(TEMP_PATH, genId())
+      try {
+        await download(
+          {
+            destination,
+            url: await (profilesStore.downloadProvider.optifine || optifine)(r.mcVersion, r.$optifine[0], r.$optifine[1])
+          },
+          $('Download') + ' Optifine', name)
+        await addTask(Installer.OptifineInstaller.installByInstallerTask(destination, GAME_ROOT, { versionId: r.id }),
+          $('Install') + ' Optifine', name).wait()
+      } finally {
+        await fs.unlink(destination).catch(console.error)
+      }
     } else if (typeof r.$forge === 'string') {
       obj.notWriteJson = true
       const mv = r.mcVersion

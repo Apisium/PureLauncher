@@ -69,7 +69,7 @@ const Settings: React.FC = () => {
         <label>{$('ENABLE ANIMATION')}</label>
       </div>
       <div className='group' style={{ paddingTop: 18 }}>
-        <Switch coverStyle={{ marginRight: 16 }} checked={pm.settings.soundOn} onChange={pm.toggleSound} />
+        <Switch coverStyle={{ marginRight: 16 }} checked={pm.extraJson.soundOn} onChange={pm.toggleSound} />
         <label>{$('ENABLE SOUND')}</label>
       </div>
       <div className='group' style={{ paddingTop: 24 }}>

@@ -89,11 +89,11 @@ export const isVersion = (r: any): r is ResourceVersion => {
   const a: any = r
   if (!isResource(r) || r.type !== 'Version' || typeof a.mcVersion !== 'string' || !a.mcVersion) return false
   if (a.$vanilla) return true
-  const forge = (r as any).$forge
-  if (forge && typeof forge.version === 'string' && typeof forge.universal === 'string' &&
-    typeof forge.installer === 'string') return true
+  if (typeof (r as any).$forge === 'string') return true
   const fabric = (r as any).$fabric
-  if (fabric && typeof fabric.version === 'string' && typeof fabric.loader === 'string') return true
+  if (Array.isArray(fabric) && typeof fabric[0] === 'string' && typeof fabric[1] === 'string') return true
+  const optifine = (r as any).$optifine
+  if (Array.isArray(optifine) && typeof optifine[0] === 'string' && typeof optifine[1] === 'string') return true
   if (isResourceWithVersion(r) && (typeof a.json === 'object' || (typeof a.json === 'string' && a.json))) return true
   return false
 }

@@ -19,6 +19,7 @@ const openUrl = (url: string) => {
 const Home: React.FC = () => {
   const [data, setData] = useState<News>(NIL)
   useEffect(() => {
+    if (!navigator.onLine) return
     const time = +localStorage.getItem('newsTime') || 0
     let promise = Promise.resolve()
     if (Date.now() - time > 12 * 60 * 60 * 1000) {

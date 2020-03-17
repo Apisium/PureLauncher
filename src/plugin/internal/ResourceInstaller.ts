@@ -15,6 +15,7 @@ import major from 'semver/functions/major'
 import install from '../../protocol/install'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
+import * as ofs from '../../utils/fs'
 
 class ServerInfo {
   @TagType(TagType.String)
@@ -138,7 +139,9 @@ export default class ResourceInstaller extends Plugin {
 
   public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
     if (!T.isVersion(r)) throw new TypeError($('Illegal resource type!'))
-    const id = (r as any).resolvedId = r.useIdAsName ? r.id : `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
+    const ar: any = r
+    const id = ar.resolvedId = r.useIdAsName || (ar.$fabric || ar.$forge || ar.$optifine) ? r.id
+      : `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
     const dir = resolve(VERSIONS_PATH, id)
     const old: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[r.id]
     const jsonPath = join(dir, id + '.json')
@@ -313,7 +316,7 @@ export default class ResourceInstaller extends Plugin {
       if (gte(old.version, r.version)) return
       if (r.hash !== old.hash) {
         const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
-        deletes.push(join(PLUGINS_ROOT, old.hash + (old.extension || '.asar')))
+        deletes.push(old.hash + (old.extension || '.asar'))
         await fs.writeJson(DELETES_FILE, deletes)
       }
     }
@@ -333,21 +336,21 @@ export default class ResourceInstaller extends Plugin {
       await Promise.all(Object.values(r.dependencies).map(it => install(it, false, true, T.isPlugin, o)))
     }
     if (!('noDependency' in o)) o.noDependency = noDependency
-    const p = await makeTempDir()
+    const file = join(TEMP_PATH, genId())
     try {
-      const file = join(p, genId())
       await download({ url: replace(r.url, r), destination: file,
         checksum: { algorithm: 'sha1', hash: r.hash } }, r.title || r.id)
       await fs.ensureDir(PLUGINS_ROOT)
       const path = join(PLUGINS_ROOT, r.hash + (r.extension || '.asar'))
+      console.log(file, path)
       if (await fs.pathExists(path)) await fs.unlink(path)
-      await fs.move(file, path)
+      await ofs.move(file, path)
       const json = await fs.readJson(RESOURCES_PLUGINS_INDEX, { throws: false }) || { }
       json[r.id] = r
       await fs.outputJson(RESOURCES_PLUGINS_INDEX, json)
       if (noDependency) pluginMaster.loadPluginFromPath(path)
     } finally {
-      await fs.remove(p).catch(console.error)
+      await fs.remove(file).catch(console.error)
     }
   }
 }

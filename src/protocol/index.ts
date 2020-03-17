@@ -1,4 +1,5 @@
 import { ipcRenderer, remote } from 'electron'
+import { playNoticeSound } from '../utils/index'
 import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import install from './install'
@@ -25,6 +26,7 @@ export default mappings
 
 const INTERRUPTED_MESSAGE = 'interruptedMessage'
 const handleMessage = async (data: T.Protocol) => {
+  console.log(data)
   if (!data || typeof data !== 'object') return
   try {
     if (data.plugins) {
@@ -50,25 +52,25 @@ const handleMessage = async (data: T.Protocol) => {
     }
     if (data.type in mappings) {
       mappings[data.type](data)
+      playNoticeSound()
       currentWindow.flashFrame(true)
+      currentWindow.restore()
+      currentWindow.setAlwaysOnTop(true)
+      currentWindow.setAlwaysOnTop(false)
     }
   } catch (e) {
     console.error(e)
   }
 }
 ipcRenderer.on('pure-launcher-protocol', (_, args: any, argv: any) => {
-  const str = typeof args === 'string'
-  if (str) {
-    if (args.includes('://')) {
+  const t = typeof args
+  if (t === 'string') {
+    if (args.startsWith('{') && args.endsWith('}')) handleMessage(JSON.parse(args))
+    else if (args.includes('://')) {
       if (args.startsWith('pure-launcher://')) args = args.replace(/^pure-launcher:\/+/, '')
-      else {
-        pluginMaster.emit('customProtocol', args, argv)
-        return
-      }
+      else pluginMaster.emit('customProtocol', args, argv)
     }
-    if (!args.startsWith('{') || !args.endsWith('}')) return
-  }
-  handleMessage(str ? JSON.parse(args) : args)
+  } else if (t === 'object' && !Array.isArray(t)) handleMessage(args)
 })
 
 const rs = JSON.parse(localStorage.getItem(INTERRUPTED_MESSAGE) || '[]')

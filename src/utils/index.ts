@@ -292,3 +292,8 @@ export const addDirectoryToZipFile = async (zip: ZipFile, realPath: string, path
     else if (stat.isDirectory()) await addDirectoryToZipFile(zip, f, p)
   }))
 }
+
+const clickSound = new Audio(require('../assets/sounds/levelup.ogg'))
+export const playNoticeSound = () => {
+  if (clickSound.readyState === 4 && window.profilesStore?.extraJson?.soundOn) clickSound.play().catch(() => {})
+}

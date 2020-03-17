@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: 12
 
+      - name: Check release tag
+        run: node -e "if (require('./package.json').version !== '${{ github.ref }}'.replace('refs/tags/', '')) throw new Error('Wrong release tag!')"
+
       - name: Install dependencies
         run: npm install
 

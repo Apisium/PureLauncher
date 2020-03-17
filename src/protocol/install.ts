@@ -26,7 +26,7 @@ export default <R extends T.Resource> (
       win.moveTop()
       const req = await global.__requestInstallResources(r, obj)
       if (pluginsNotInstalled) return req
-      if (!req) return
+      if (!req) throw new Error($('canceled'))
       user.event('resource', 'install').catch(console.error)
       notice({ content: $('Installing resources...') })
     }

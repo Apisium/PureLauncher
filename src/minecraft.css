@@ -215,6 +215,7 @@ progress/* , select */ {
   height: 10px;
   overflow: hidden;
   position: relative;
+  color: #ffffffe0;
   -webkit-appearance: none;
 }
 progress[value='-1']::after {

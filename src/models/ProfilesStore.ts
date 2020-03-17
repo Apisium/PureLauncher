@@ -37,8 +37,7 @@ export default class ProfilesStore extends Store {
     enableSnapshots: false,
     locale: DEFAULT_LOCATE,
     showMenu: true,
-    showGameLog: false,
-    soundOn: true
+    showGameLog: false
   }
   public selectedUser = {
     account: '',
@@ -56,6 +55,7 @@ export default class ProfilesStore extends Store {
     copyMode: false,
     noChecker: false,
     downloadThreads: 16,
+    soundOn: true,
     downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
       .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICAL',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
@@ -259,7 +259,7 @@ export default class ProfilesStore extends Store {
       type: 'custom'
     }
     if (save) await this.saveLaunchProfileJson()
-    localStorage.delItem('skinCacheTime')
+    localStorage.removeItem('skinCacheTime')
     this.cacheSkins().catch(console.error)
     return key
   }
@@ -306,8 +306,8 @@ export default class ProfilesStore extends Store {
   }
 
   public async toggleSound () {
-    this.settings.soundOn = !this.settings.soundOn
-    await this.saveLaunchProfileJson()
+    this.extraJson.soundOn = !this.extraJson.soundOn
+    await this.saveExtraConfigJson()
   }
 
   public async toggleShowLog () {
@@ -464,7 +464,7 @@ export default class ProfilesStore extends Store {
   }
 
   private loadExtraConfigJson (extra: this['extraJson']) {
-    this.extraJson = extra
+    this.extraJson = { ...this.extraJson, ...extra }
     if (!extra.loginType && this.selectedUser.account && this.selectedUser.profile) extra.loginType = YGGDRASIL
     if (extra.animation) startAnimation()
   }

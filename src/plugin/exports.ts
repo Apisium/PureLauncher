@@ -21,6 +21,7 @@ import * as Yazl from 'yazl'
 import * as Yauzl from 'yauzl'
 import * as types from '../protocol/types'
 import * as ReactRouter from 'react-router-dom'
+import * as ofs from '../utils/fs'
 
 export { version } from '../../package.json'
 export { Plugin, plugin, event } from './Plugin'
@@ -53,9 +54,9 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin, isX64, createUnzipTask,
-  getJavaVersion, validPath, sha1, md5, replace, getVersionTypeText, download, getSuitableMemory, unzip,
+  getJavaVersion, validPath, sha1, md5, replace, getVersionTypeText, download, getSuitableMemory, unzip, playNoticeSound,
   removeFormatCodes, autoNotices, readBuffer, addTask, createDownloadTask, addDirectoryToZipFile } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache,
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, ofs,
   constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types, ReactRouter }
 
 export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0

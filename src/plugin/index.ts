@@ -10,6 +10,7 @@ import { Plugin, EVENTS, PLUGIN_INFO, PluginInfo, ExtensionsButton } from './Plu
 import { YGGDRASIL, OFFLINE, Yggdrasil, Offline } from './logins'
 import { remote, ipcRenderer } from 'electron'
 import { join, extname } from 'path'
+import { promises as ofs } from 'original-fs'
 import { PLUGINS_ROOT, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS } from '../constants'
 
 const AUTHENTICATORS = Symbol('Authenticators')
@@ -102,7 +103,7 @@ export default class Master extends EventBus {
     await fs.ensureDir(PLUGINS_ROOT)
     if (await fs.pathExists(DELETES_FILE)) {
       const deletes: string[] = await fs.readJson(DELETES_FILE, { throws: false }) || []
-      await Promise.all(deletes.map(it => fs.unlink(join(PLUGINS_ROOT, it)).catch()))
+      await Promise.all(deletes.map(it => ofs.unlink(join(PLUGINS_ROOT, it)).catch()))
       await fs.unlink(DELETES_FILE)
     }
     let plugins: Array<typeof Plugin> = []
@@ -116,7 +117,8 @@ export default class Master extends EventBus {
           path = join(path, pkg && pkg.main ? pkg.main : 'index.js')
         }
         try {
-          const plugin = require(path)
+          let plugin = require(path)
+          plugin = plugin?.default || plugin
           const info: PluginInfo = plugin[PLUGIN_INFO]
           if (!info || !info.id) throw new Error('This file is not a plugin!')
           plugin[FILE] = file
@@ -200,11 +202,12 @@ export default class Master extends EventBus {
   }
 
   public loadPluginFromPath (path: string) {
-    const plugin = require(path)
-    const info: PluginInfo = plugin[PLUGIN_INFO]
+    let Plugin = require(path)
+    Plugin = Plugin?.default || Plugin
+    const info: PluginInfo = Plugin[PLUGIN_INFO]
     if (!info || !info.id) throw new Error('This file is not a plugin!')
-    plugin[FILE] = path
-    const p = new ((plugin as any).default || plugin)()
+    Plugin[FILE] = path
+    const p = new Plugin()
     p[FILE] = path
     this.loadPlugin(p)
   }

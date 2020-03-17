@@ -36,7 +36,7 @@ window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boo
 }
 
 pluginMaster.once('loaded', () => {
-  document.getElementsByTagName('html')[0].style.opacity = '1'
+  process.nextTick(() => (document.getElementsByTagName('html')[0].style.opacity = '1'))
   ReactDOM.render(<App />, document.getElementById('root'), () => {
     pluginMaster.emit('rendered')
     let full = true
@@ -80,7 +80,7 @@ pluginMaster.once('loaded', () => {
 
 const clickSound = new Audio(require('./assets/sounds/click.ogg'))
 clickSound.oncanplay = () => document.addEventListener('click', e => {
-  if (!window.profilesStore?.settings?.soundOn) return
+  if (!window.profilesStore?.extraJson?.soundOn) return
   const t = e.target as HTMLElement
   if (t.tagName === 'BUTTON' || t.tagName === 'A' || t.dataset.sound || t.parentElement?.dataset.sound) {
     clickSound.play().catch(() => {})
