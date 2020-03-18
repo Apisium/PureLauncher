@@ -12,7 +12,7 @@ steps:
 - task: AzureFileCopy@3
   displayName: 'AzureBlob File Copy'
   inputs:
-    SourcePath: '$(System.DefaultWorkingDirectory)/_Apisium_PureLauncher/latest_manifest.json'
+    SourcePath: '$(System.DefaultWorkingDirectory)/_Apisium_PureLauncher/latestManifest.json'
     azureSubscription: 'Visual Studio Enterprise Subscription (d3076e5f-e198-4e44-a689-837848a5f2be)'
     Destination: AzureBlob
     storage: xmcl
