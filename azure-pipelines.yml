@@ -5,6 +5,7 @@ steps:
     userRepository: Apisium/PureLauncher
     defaultVersionType: 'latest'
     version: ''
+    downloadPath: '$(System.DefaultWorkingDirectory)/_Apisium_PureLauncher'
 - task: CopyFilesOverSSH@0
   displayName: 'Copy Files'
   inputs:
