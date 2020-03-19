@@ -4,6 +4,7 @@ import Slider from 'react-slick'
 import user from '../utils/analytics'
 import React, { useEffect, useState } from 'react'
 import { shell } from 'electron'
+import { NEWS_URL } from '../constants'
 
 interface News {
   slides: Array<{ url: string, title: string, img: string }>
@@ -24,7 +25,7 @@ const Home: React.FC = () => {
     let promise = Promise.resolve()
     if (Date.now() - time > 12 * 60 * 60 * 1000) {
       localStorage.removeItem('news')
-      promise = fetch('https://xmcl.blob.core.windows.net/pure-launcher/mcbbsData.json')
+      promise = fetch(NEWS_URL)
         .then(it => it.text())
         .then(it => {
           localStorage.setItem('news', it)

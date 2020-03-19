@@ -44,5 +44,5 @@ export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
 
 export const LAUNCHING_IMAGE = join(APP_PATH, 'launching.webp')
 export const LAUNCHER_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'
-export const MCBBS_DATA_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'
 export const LATEST_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/latestManifest.json'
+export const NEWS_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/mcbbsData.json'

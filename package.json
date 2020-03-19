@@ -15,8 +15,7 @@
     "test": "npm run lint",
     "postinstall": "npm run build:web-api",
     "clean": "del-cli app/dist",
-    "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules",
-    "compile": "electron-build-env --disturl http://npm.taobao.org/mirrors/atom-shell -- neon build --release"
+    "build:web-api": "bili packages/web-api/index.js --format cjs --format umd-min --format esm --module-name PureLauncherApi --minimal -d packages/web-api/dist --bundle-node-modules"
   },
   "repository": {
     "type": "git",

@@ -465,7 +465,11 @@ export default class ProfilesStore extends Store {
 
   private loadExtraConfigJson (extra: this['extraJson']) {
     this.extraJson = { ...this.extraJson, ...extra }
-    if (!extra.loginType && this.selectedUser.account && this.selectedUser.profile) extra.loginType = YGGDRASIL
+    if (!extra.loginType && this.selectedUser.account && this.selectedUser.profile &&
+      this.selectedUser.account in this.authenticationDatabase) {
+      extra.loginType = YGGDRASIL
+      extra.selectedUser = this.selectedUser.profile
+    }
     if (extra.animation) startAnimation()
   }
 

@@ -15,11 +15,11 @@ An awesome Minecraft Launcher.
 
 ## Snapshots
 
-![Home](./snapshots/home.jpg)
+![Home](./screenshots/home.jpg)
 
-![Accounts](./snapshots/accounts.jpg)
+![Accounts](./screenshots/accounts.png)
 
-![Settings](./snapshots/settings.jpg)
+![Settings](./screenshots/versions.png)
 
 ## Documentation
 
@@ -34,7 +34,6 @@ For plugins developers, resource creators, testers and advanced users:
 ### Requirements
 
 - Nodejs v12.0.0+
-- [Rust](https://rustup.rs/)
 
 ### Commands
 
@@ -72,7 +71,7 @@ npm run run
 
 ## Thanks
 
-- Baline2000
+- Baleine2000
 - Fleey
 
 ## License

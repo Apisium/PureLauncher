@@ -106,10 +106,10 @@ jobs:
         uses: ./.github/actions/upload-manifest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Notify AzurePipeline
-        uses: Azure/pipelines@v1
+        uses: Azure/pipelines@v1S
         with:
-          azure-devops-project-url: 'https://shirasawasama.visualstudio.com/PureLauncher'
-          azure-pipeline-name: 'Apisium.PureLauncher' # name of the Azure pipeline to be triggered
+          azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
+          azure-pipeline-name: 'Apisium.PureLauncher'
           azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
