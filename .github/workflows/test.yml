@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
     steps: 
       - name: Notify AzurePipeline
-        uses: Azure/pipelines@v1S
+        uses: Azure/pipelines@master
         with:
           azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
           azure-pipeline-name: 'Apisium.PureLauncher'
