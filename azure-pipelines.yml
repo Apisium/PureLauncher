@@ -3,7 +3,7 @@ steps:
   inputs:
     connection: github.com_ci010
     userRepository: https://github.com/Apisium/PureLauncher
-    defaultVersionType: latest
+    defaultVersionType: 'Latest Release'
 - task: CopyFilesOverSSH@0
   displayName: 'Copy Files'
   inputs:
