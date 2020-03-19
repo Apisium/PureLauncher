@@ -8,11 +8,8 @@ jobs:
   test:
     runs-on: windows-latest
     steps: 
-      - name: install core
-        run: |
-          npm install @actions/core
       - name: Notify AzurePipeline
-        uses: Azure/pipelines@master
+        uses: Azure/pipelines@v1
         with:
           azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
           azure-pipeline-name: 'Apisium.PureLauncher'
