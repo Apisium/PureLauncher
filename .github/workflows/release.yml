@@ -108,7 +108,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify AzurePipeline
-        uses: Azure/pipelines@v1S
+        uses: Azure/pipelines@v1
         with:
           azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
           azure-pipeline-name: 'Apisium.PureLauncher'
