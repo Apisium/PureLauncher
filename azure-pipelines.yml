@@ -2,7 +2,7 @@ steps:
 - task: DownloadGitHubRelease@0
   inputs:
     connection: github.com_ci010
-    userRepository: https://github.com/Apisium/PureLauncher
+    userRepository: Apisium/PureLauncher
     defaultVersionType: 'latest'
     version: ''
 - task: CopyFilesOverSSH@0
