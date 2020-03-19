@@ -8,6 +8,9 @@ jobs:
   test:
     runs-on: windows-latest
     steps: 
+      - name: install core
+        run: |
+          npm install @actions/core
       - name: Notify AzurePipeline
         uses: Azure/pipelines@master
         with:
