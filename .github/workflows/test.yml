@@ -1,0 +1,16 @@
+name: test-workflow
+
+on:
+  issue_comment	:
+    types: [created, edited, deleted]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps: 
+      - name: Notify AzurePipeline
+        uses: Azure/pipelines@v1S
+        with:
+          azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
+          azure-pipeline-name: 'Apisium.PureLauncher'
+          azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
