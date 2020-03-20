@@ -5,7 +5,9 @@
   "description": "An awesome Minecraft Launcher.",
   "main": "dist/src/main.js",
   "scripts": {
-    "lint": "eslint src/ packages/ .github/ --ext .js,.ts,.tsx",
+    "lint": "npm run lint:code && npm run lint:language",
+    "lint:code": "eslint src/ packages/ .github/ --ext .js,.ts,.tsx",
+    "lint:language": "node packages/language-tools/cli.js check src/**/*.{ts,tsx}",
     "fix": "eslint src/ packages/ .github/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --bundle-node-modules --no-autoinstall --target electron --public-url .",
     "run": "electron .",
@@ -130,7 +132,7 @@
   },
   "bin": {
     "pl-plugin-dev": "packages/plugin/cli.js",
-    "pl-translation": "packages/translation-tools/cli.js"
+    "pl-language": "packages/language-tools/cli.js"
   },
   "browserslist": [
     "electron 6.1.6"
@@ -140,6 +142,7 @@
     "bili": "^4.8.1",
     "chalk": "^3.0.0",
     "fs-extra": "^8.1.0",
+    "globby": "^11.0.0",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.0",
     "original-fs": "^1.1.0",
