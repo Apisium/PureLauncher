@@ -68,7 +68,6 @@
     "@types/yazl": "^2.4.2",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
-    "@xmcl/client": "^2.0.3",
     "@xmcl/core": "^2.0.7",
     "@xmcl/installer": "^2.6.0",
     "@xmcl/nbt": "^2.0.1",
@@ -102,6 +101,7 @@
     "p-all": "^2.1.0",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
     "parcel-plugin-replacer": "file:packages/parcel-plugin-replacer",
+    "parcel-plugin-static-files-copy": "^2.3.1",
     "parcel-plugin-v8-cache": "file:packages/parcel-plugin-v8-cache",
     "pretty-bytes": "^5.3.0",
     "rc-dialog": "^7.6.0",
@@ -134,10 +134,15 @@
     "pl-plugin-dev": "packages/plugin/cli.js",
     "pl-language": "packages/language-tools/cli.js"
   },
+  "staticFiles": {
+    "staticPath": "static",
+    "watcherGlob": "**"
+  },
   "browserslist": [
     "electron 6.1.6"
   ],
   "dependencies": {
+    "@xmcl/client": "^2.0.3",
     "asar": "^3.0.1",
     "bili": "^4.8.1",
     "chalk": "^3.0.0",

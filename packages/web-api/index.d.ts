@@ -1,3 +1,4 @@
+import { queryStatus } from '@xmcl/client'
 import * as T from '../../src/protocol/types'
 
 export * from '../../src/protocol/types'
@@ -38,3 +39,4 @@ export const protocol: (data: T.Protocol) => Promise<any>
 export const setDevPlugin: (path: string) => Promise<boolean>
 export const isRunning: () => Promise<boolean>
 export const ensureRunning: (time?: number) => Promise<void>
+export const queryMinecraftServer: typeof queryStatus

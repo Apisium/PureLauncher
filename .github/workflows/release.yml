@@ -102,14 +102,28 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: release/PureLauncher.tar.gz release/PureLauncher.deb release/PureLauncher.rpm
 
-      - name: Upload manifest
-        uses: ./.github/actions/upload-manifest
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  pull_release:
+    runs-on: self-hosted
+    needs: build_linux
 
-      - name: Notify AzurePipeline
-        uses: Azure/pipelines@v1
+    steps:
+      - name: Pull files
+        run: curl https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripsts/sync-release.sh | sh
+        env:
+          HTTO_PROXY: http://127.0.0.1
+
+  upload_manifest:
+    runs-on: ubuntu-latest
+    needs: pull_release
+
+    steps:
+      - name: Fetch manifest
+        run: curl https://api.github.com/repos/Apisium/PureLauncher/releases/latest | jq -r '.body' > latestManifest.json
+
+      - name: Upload manifest
+        uses: bacongobbler/azure-blob-storage-upload@v1.0.0
         with:
-          azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
-          azure-pipeline-name: 'Apisium.PureLauncher'
-          azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
+          source_dir: .
+          container_name: pure_launcher
+          connection_string: ${{ secrets.CONNECTION_STRING }}
+          extra_args: '--pattern latestManifest.json'

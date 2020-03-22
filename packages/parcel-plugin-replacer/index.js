@@ -9,4 +9,5 @@ module.exports = b => {
   b.addAssetType('ts', ts)
   b.addAssetType('tsx', ts)
   b.addAssetType('json', require.resolve('./JSONAsset'))
+  b.addAssetType('unpack.js', require.resolve('parcel/lib/assets/RawAsset'))
 }

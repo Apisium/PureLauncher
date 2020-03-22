@@ -9,28 +9,6 @@ body, input, select, textarea {
   --top-border: #fff483c7;
   --top-shadow: rgba(255, 255, 255, 0.62);
 
-  --main-color: #e8c38d;
-  --secondary-color: var(--main-color);
-  --dropdown-color: #edd1a6;
-  --scroll-color: var(--main-color);
-
-  --text-color-0: #000000e0;
-  --text-color-1: #1d1e1ee0;
-  --text-color-2: #00000080;
-  --text-color-3: #000000c0;
-  --link-color: #6ead3c;
-  --link-hover-color: #578830;
-
-  --input-color: #f8e8bf;
-  --background: #b6824e;
-
-  /* --background: url(https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/startpage-hero/index-hero-sm.png); */
-}
-
-:root {
-  /* --top-color: url(./assets/images/bg-wool-dark-light.png);
-  --top-border: #fff483c7;
-  --top-shadow: rgba(255, 255, 255, 0.22); */
   --top-filter: brightness(0.5);
   --launch-filter: brightness(0.8);
 
@@ -43,9 +21,10 @@ body, input, select, textarea {
   --text-color-1: #ffffffe0;
   --text-color-2: #ffffff80;
   --text-color-3: #ffffffc0;
+  --link-color: #6ead3c;
+  --link-hover-color: #578830;
 
   --input-color: #444;
-
   --background: url(./assets/images/bg-wool-dark.png);
 }
 

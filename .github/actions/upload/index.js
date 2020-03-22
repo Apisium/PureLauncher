@@ -13,7 +13,7 @@ const { createHash } = require('crypto')
   const { data } = await octokit.repos.getReleaseByTag({ ...github.context.repo, tag })
   core.info('Files: ' + JSON.stringify(files))
 
-  const json = JSON.parse(data.body || '{}')
+  const json = JSON.parse(data.body || `{"version":"${tag}"}`)
   core.info('Reading files...')
   const buffers = await Promise.all(files.map(it => fs.readFile(it)))
   core.info('Read files!')
@@ -34,7 +34,7 @@ const { createHash } = require('crypto')
   core.info('Uploaded files!')
 
   core.info('Uploading hash...')
-  await octokit.repos.updateRelease({ ...github.context.repo, body: JSON.stringify(json, null, 2), release_id: data.id }) // eslint-disable-line
+  await octokit.repos.updateRelease({ ...github.context.repo, body: JSON.stringify(json), release_id: data.id }) // eslint-disable-line
   core.info('Hash uploaded!')
 })().catch(e => {
   core.setFailed(e.stack)
