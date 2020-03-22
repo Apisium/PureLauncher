@@ -1,7 +1,7 @@
 #!/bin/bash
 
-API="https://api.github.com/repos/Apisium/PureLauncher/releases/latest"
-
+TAG="`echo $REF | sed -e "s#refs/tags/\(.*\)#\1#g"`"
+API="https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$TAG"
 JSON="`curl "$API"`"
 BODY="`echo "$JSON" | jq -r '.body'`"
 VERSION="`echo "$BODY" | jq -r '.version'`"
