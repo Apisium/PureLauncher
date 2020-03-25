@@ -108,10 +108,8 @@ jobs:
 
     steps:
       - name: Pull files
-        run: wget -qO /dev/null https://github.com && (curl https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash)
+        run: export HTTP_PROXY=http://127.0.0.1:1080 && export HTTPS_PROXY=http://127.0.0.1:1080 && wget -qO - https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash
         env:
-          HTTP_PROXY: http://127.0.0.1:1080
-          HTTPS_PROXY: http://127.0.0.1:1080
           REF: ${{ github.ref }}
 
   upload_manifest:
