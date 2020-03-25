@@ -1,4 +1,4 @@
-import Lang from '../lang/zh-cn.json'
+import Lang from '../langs/zh-cn.json'
 import Master from './plugin/index'
 import ProfilesStore from './models/ProfilesStore'
 import { GetStore } from 'reqwq'

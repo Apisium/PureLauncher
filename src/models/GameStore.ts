@@ -192,7 +192,9 @@ export default class GameStore extends Store {
               }
               this.status = STATUS.READY
             }).once('error', reject)
-            p.stdout.once('data', () => resolve())
+            p.stdout
+              .once('data', () => resolve())
+              .on('data', data => data.includes('OpenAL initialized.') && ipcRenderer.send('close-launching-dialog'))
             if (showGameLog) {
               const write = (text: string, color) => logWindow &&
                 logWindow.webContents.executeJavaScript(`;(() => {
@@ -278,13 +280,13 @@ System: ${process.platform} ${release()}, Arch: ${process.arch}`, 'b')
   private async ensureMinecraftVersion (version: any) {
     if (!version) throw new Error('No version provided!')
     const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders(version))
-    await addTask(task, $('Ensure version JAR') + ': ' + version.id).wait()
+    await addTask(task, $('Ensure version JAR'), version.id).wait()
   }
   private async ensureLocalVersion (versionId: string) {
     if (!versionId) throw new Error('No version provided!')
     const resolved = await Version.parse(GAME_ROOT, versionId)
     const task = Installer.installDependenciesTask(resolved, getDownloaders())
-    await addTask(task, $('Ensure version files') + ': ' + versionId).wait()
+    await addTask(task, $('Ensure version files'), versionId).wait()
   }
 
   public async resolveJavaPath (javaPath: string) {

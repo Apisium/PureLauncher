@@ -1,6 +1,6 @@
 {
   "$LanguageName$": "简体中文",
-  "§7Powered by §e§lPureLauncher §r§o({0})": "§7由 §e§lPureLauncher §7§o({0}) §7强力驱动",
+  "§7Powered by §e§lPureLauncher §r§o({0})§r": "§7由 §e§lPureLauncher §7§o({0}) §7强力驱动§r",
   "Home": "主页",
   "Manager": "管理",
   "Settings": "设置",
@@ -32,14 +32,12 @@
   "Worlds": "地图",
   "world": "地图",
   "Clear": "清理已完成项",
-  "Error:": "发生错误:",
   "Speed": "下载速度",
   "Loading...": "加载中...",
   "Launching...": "启动中...",
   "Downloading...": "下载中...",
   "Download": "下载文件",
   "Preparing...": "准备中...",
-  "Saving...": "保存中...",
   "Launched": "游戏运行中",
   "Fail to launch": "启动失败",
   "No such version:": "没有这个版本:",
@@ -52,6 +50,7 @@
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
   "OK": "确认",
+  "HOW TO INSTALL": "如何安装",
   "Successfully installed resources!": "资源安装成功!",
   "Failed to install resources": "资源安装失败",
   "Hash is different: {0} -> {1}": "哈希值不相同: {0} -> {1}",
@@ -101,9 +100,10 @@
   "File drag detected, release to install.": "检测到文件拖入，释放后即可安装",
   "Illegal resource type!": "错误的资源类型!",
   "Do you want to export MODS and resource packs?": "是否要导出模组和材质包?",
-  "No resources found!": "错误的资源类型!",
   "It has been detected that the file type dragged in is {0}. Do you want to install it?":
     "检测到拖入的文件类型为{0}，请问是否需要安装?",
+  "The current game version is not installed by PureLauncher, so the export may be incomplete!":
+    "当前游戏版本并不是由PureLauncher安装的，因此可能会导致导出不完整！",
   "Received the request to launch the game. Do you want to launch the game": "收到启动游戏请求，是否要启动游戏",
   "Aero is not enabled in the current system, resulting in abnormal GUI!": "当前系统没有启用Aero, 导致界面显示异常!",
   "The game launched successfully, but the game has exited abnormally. Game crash is not a problem of PureLauncher, but may be caused by incompatible mods. So please DO NOT report this log to PureLauncher!":
@@ -173,18 +173,15 @@
   "Currently, the game is launching. Please restart manually later to install the plugins!": "当前游戏启动中，请稍后手动重启启动器以进行插件安装!",
   "The plugin cannot be uninstalled because it is dependent on other plugins!": "当前插件由于被其他插件依赖而无法卸载!",
 
-  "finished": "已完成",
   "canceled": "已取消",
-  "error": "发生错误",
+  "Error": "发生错误",
   "CANCEL": "取消",
   "Cancel": "取消",
   "SAVE": "保存",
   "ADD": "添加",
   "Export": "导出",
-  "Disable": "禁用",
   "HIDE": "隐藏",
 
-  "Open official website": "打开官网",
   "Recent play": "快速启动",
 
   "Detailed List": "详细列表",

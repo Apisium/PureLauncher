@@ -5,7 +5,9 @@
   "description": "An awesome Minecraft Launcher.",
   "main": "dist/src/main.js",
   "scripts": {
-    "lint": "eslint src/ packages/ .github/ --ext .js,.ts,.tsx",
+    "lint": "npm run lint:code && npm run lint:language",
+    "lint:code": "eslint src/ packages/ .github/ --ext .js,.ts,.tsx",
+    "lint:language": "node packages/language-tools/cli.js check src/**/*.{ts,tsx}",
     "fix": "eslint src/ packages/ .github/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --bundle-node-modules --no-autoinstall --target electron --public-url .",
     "run": "electron .",
@@ -66,7 +68,6 @@
     "@types/yazl": "^2.4.2",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
-    "@xmcl/client": "^2.0.3",
     "@xmcl/core": "^2.0.7",
     "@xmcl/installer": "^2.6.0",
     "@xmcl/nbt": "^2.0.1",
@@ -100,6 +101,7 @@
     "p-all": "^2.1.0",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
     "parcel-plugin-replacer": "file:packages/parcel-plugin-replacer",
+    "parcel-plugin-static-files-copy": "^2.3.1",
     "parcel-plugin-v8-cache": "file:packages/parcel-plugin-v8-cache",
     "pretty-bytes": "^5.3.0",
     "rc-dialog": "^7.6.0",
@@ -130,16 +132,22 @@
   },
   "bin": {
     "pl-plugin-dev": "packages/plugin/cli.js",
-    "pl-translation": "packages/translation-tools/cli.js"
+    "pl-language": "packages/language-tools/cli.js"
+  },
+  "staticFiles": {
+    "staticPath": "static",
+    "watcherGlob": "**"
   },
   "browserslist": [
     "electron 6.1.6"
   ],
   "dependencies": {
+    "@xmcl/client": "^2.0.3",
     "asar": "^3.0.1",
     "bili": "^4.8.1",
     "chalk": "^3.0.0",
     "fs-extra": "^8.1.0",
+    "globby": "^11.0.0",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.0",
     "original-fs": "^1.1.0",

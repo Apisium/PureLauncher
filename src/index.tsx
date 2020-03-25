@@ -30,7 +30,7 @@ window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boo
   if (ctx.error) {
     ac.style.backgroundColor = '#d4441a'
     ac.style.color = '#fff'
-    if (typeof ctx.content === 'string') ctx.content = $('Error:') + ' ' + ctx.content
+    if (typeof ctx.content === 'string') ctx.content = $('Error') + ': ' + ctx.content
   }
   instance.notice(ctx)
 }
