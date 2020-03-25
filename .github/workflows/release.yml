@@ -107,9 +107,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # - name: Notify AzurePipeline
+      #   uses: Azure/pipelines@v1
+      #   with:
+      #     azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
+      #     azure-pipeline-name: 'Apisium.PureLauncher'
+      #     azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
       - name: Notify AzurePipeline
-        uses: Azure/pipelines@v1
+        uses: azure/CLI@v1
         with:
-          azure-devops-project-url: 'https://dev.azure.com/ShirasawaSama/PureLauncher'
-          azure-pipeline-name: 'Apisium.PureLauncher'
-          azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
+          azcliversion: 2.0.72
+          inlineScript: |
+            az storage blob upload --connection-string ${{ secrets.CONNECTION_STRING }} --container-name pure_launcher --name $GITHUB_WORKSPACE/latestManifest.json --file $GITHUB_WORKSPACE/latestManifest.json
