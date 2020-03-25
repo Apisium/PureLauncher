@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Pull files
-        run: (wget -qO /dev/null 1.1.1.1 || exit -1) && (curl https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash)
+        run: wget -qO /dev/null https://github.com && (curl https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash)
         env:
           HTTP_PROXY: http://127.0.0.1:1080
           HTTPS_PROXY: http://127.0.0.1:1080
@@ -123,12 +123,6 @@ jobs:
         run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")" | jq -r '.body' > latestManifest.json
 
       - name: Upload manifest
-        # uses: bacongobbler/azure-blob-storage-upload@v1.0.0
-        # with:
-        #   source_dir: .
-        #   container_name: pure_launcher
-        #   connection_string: ${{ secrets.CONNECTION_STRING }}
-        #   extra_args: '--pattern latestManifest.json'
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
