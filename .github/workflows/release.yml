@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Pull files
-        run: curl https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash
+        run: (wget -qO /dev/null 1.1.1.1 || exit -1) && (curl https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash)
         env:
           HTTP_PROXY: http://127.0.0.1:1080
           HTTPS_PROXY: http://127.0.0.1:1080
@@ -120,7 +120,7 @@ jobs:
 
     steps:
       - name: Fetch manifest
-        run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")" | jq -r '.body' > "latestManifest.json"
+        run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")" | jq -r '.body' > latestManifest.json
 
       - name: Upload manifest
         uses: bacongobbler/azure-blob-storage-upload@v1.0.0

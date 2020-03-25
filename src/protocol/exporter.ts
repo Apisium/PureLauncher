@@ -7,6 +7,27 @@ import { sha1, addDirectoryToZipFile } from '../utils'
 import { ResourceVersion, ResourceMod, ResourceResourcePack, Resource } from './types'
 import { RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH, RESOURCE_PACKS_PATH } from '../constants'
 
+const str = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <title data-t="indexTitle">PureLauncher | Redirect</title>
+</head>
+<body>
+  Redirecting...
+  <script>location.href='https://pl.apisium.cn/redirect.html'</script>
+</body>
+</html>
+`
+
+let _buf: Buffer
+const getBuffer = () => _buf || (_buf = Buffer.from(str))
+
 const waitEnd = (stream: Stream) => new Promise((resolve, reject) => stream.once('end', resolve).once('error', reject))
 
 const requestPath = (name?: string) => remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
@@ -42,7 +63,11 @@ export const exportVersion = async (key: string, path?: string) => {
     await profilesStore.ensureVersionManifest()
     if (profilesStore.versionManifest.versions.some(it => it.id === ver)) {
       zip.addBuffer(Buffer.from(JSON.stringify(
-        { type: 'Version', mcVersion: ver, id: ver, useIdAsName: true, $vanilla: true })), 'resource-manifest.json')
+        { type: 'Version', mcVersion: ver, id: ver, $vanilla: true })), 'resource-manifest.json')
+    } else {
+      await openConfirmDialog({
+        text: $('The current game version is not installed by PureLauncher, so the export may be incomplete!')
+      })
     }
   }
   const dir = join(verRoot, 'mods')
@@ -78,6 +103,7 @@ export const exportVersion = async (key: string, path?: string) => {
     }))
   }
   if (local.length) zip.addBuffer(Buffer.from(JSON.stringify(local)), 'local-resources.json')
+  zip.addBuffer(getBuffer(), $('HOW TO INSTALL') + '.html')
   zip.end()
   await waitEnd(zip.outputStream)
 }
@@ -89,6 +115,7 @@ export const exportResource = async (r: ResourceMod | ResourceResourcePack, path
   zip.outputStream.pipe(fs.createWriteStream(path))
   if (r.source) zip.addBuffer(Buffer.from(r.source), 'resource-manifest')
   else zip.addBuffer(Buffer.from(JSON.stringify(r)), 'resource-manifest.json')
+  zip.addBuffer(getBuffer(), $('HOW TO INSTALL') + '.html')
   zip.end()
   await waitEnd(zip.outputStream)
 }
@@ -114,6 +141,7 @@ export const exportWorld = async (path: string, file?: string) => {
   zip.outputStream.pipe(fs.createWriteStream(file))
   zip.addBuffer(Buffer.from(name), 'world-manifest')
   await addDirectoryToZipFile(zip, path)
+  zip.addBuffer(getBuffer(), $('HOW TO INSTALL') + '.html')
   zip.end()
   await waitEnd(zip.outputStream)
 }
