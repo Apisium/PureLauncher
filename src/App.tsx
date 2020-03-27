@@ -48,7 +48,7 @@ const Drag: React.FC = () => {
                 else notice({ content: $('Failed!') })
               })
               .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
-          } else pluginMaster.emitSync('fileDiagIn', file)
+          } else pluginMaster.emitSync('fileDragIn', file)
         }
       }
     }

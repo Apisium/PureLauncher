@@ -31,6 +31,8 @@
   "Servers": "服务器",
   "Worlds": "地图",
   "world": "地图",
+  "ShaderPacks": "光影",
+  "shader pack": "光影",
   "Clear": "清理已完成项",
   "Speed": "下载速度",
   "Loading...": "加载中...",
@@ -81,6 +83,7 @@
   "The Java you selected is 32-bit, but the system supports 64-bit, which will not be able to take full advantage of computer performance.":
     "你当前选择的 Java 为 32 位, 而系统只支持 64 位的 Java, 这样会导致无法充分利用计算机的性能.",
   "If you want to ignore the warning, please click the ok button.": "忽略警告请点击下方的确认按钮.",
+  "Please provide a name for the resource to be exported:": "请给要导出的资源提供一个名字:",
   "Unable to find the Java, do you want to install Java automatically?":
     "无法找到合适的java，是否要需要帮您安装java?",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":

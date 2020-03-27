@@ -1,6 +1,5 @@
 import { ipcRenderer, remote } from 'electron'
 import { playNoticeSound } from '../utils/index'
-import { protocol } from '../../packages/web-api'
 import * as T from './types'
 import install from './install'
 import P from '../models/index'
@@ -80,5 +79,3 @@ if (rs.length) {
     for (const r of rs) await handleMessage(r)
   })
 }
-const data: T.ProtocolInstall = { type: 'Install', resource: 'http://acode.apisium.cn/libraries/version.json' }
-;(window as any).h = () => protocol(data).then(console.log, console.error)

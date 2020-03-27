@@ -13,6 +13,7 @@ import Plugins from './manager/Plugins'
 import Mods from './manager/Mods'
 import ResourcePacks from './manager/ResourcePacks'
 import Worlds from './manager/Worlds'
+import ShaderPacks from './manager/ShaderPacks'
 
 export const getPages = () => [
   {
@@ -49,6 +50,7 @@ const Manager: React.FC = () => {
       <Route component={Mods} path='/manager/mods/:version' />
       <Route component={ResourcePacks} path='/manager/resourcePacks' />
       <Route component={Worlds} path='/manager/worlds' />
+      <Route component={ShaderPacks} path='/manager/shaderPacks' />
     </div>
     <Dots
       count={pages.length}

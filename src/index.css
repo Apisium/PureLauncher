@@ -5,6 +5,7 @@
 @import 'rc-notification/assets/index.css';
 @import './minecraft.css';
 @import './custom.css';
+@import './assets/iconfont.css';
 
 * {
   -webkit-user-drag: none;

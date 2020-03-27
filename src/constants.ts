@@ -24,6 +24,7 @@ export const WORLDS_PATH = join(GAME_ROOT, 'saves')
 export const VERSIONS_PATH = join(GAME_ROOT, 'versions')
 export const RESOURCE_PACKS_PATH = join(GAME_ROOT, 'resourcepacks')
 export const LIBRARIES_PATH = join(GAME_ROOT, 'libraries')
+export const SHADER_PACKS_PATH = join(GAME_ROOT, 'shaderpacks')
 export const SERVERS_FILE_NAME = 'servers.dat'
 export const SERVERS_PATH = join(GAME_ROOT, SERVERS_FILE_NAME)
 

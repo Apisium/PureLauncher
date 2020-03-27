@@ -1,8 +1,8 @@
 import { sha1, genId } from '../utils'
 import { join, basename } from 'path'
-// import { extract } from '@xmcl/unzip'
 import { open, CachedZipFile, Entry } from '@xmcl/unzip/index'
-import { VERSIONS_PATH, RESOURCE_PACKS_PATH, WORLDS_PATH } from '../constants'
+import { VERSIONS_PATH, RESOURCE_PACKS_PATH, WORLDS_PATH, SHADER_PACKS_PATH } from '../constants'
+import { plugins } from '../plugin/internal/index'
 import * as T from './types'
 import fs from 'fs-extra'
 import install from './install'
@@ -35,6 +35,11 @@ const installResources = async (zip: CachedZipFile, json: any, versionDir?: stri
       await installResource(zip, RESOURCE_PACKS_PATH, json, zip.entries['files/' + json.hash], json.id + '.zip')
       return true
     }
+    case 'Server': {
+      if (!versionDir && !await global.__requestInstallResources(json)) break
+      await plugins.resourceInstaller.installServer(json)
+      return true
+    }
   }
   return false
 }
@@ -52,6 +57,26 @@ export const installResourcePack = async (path: string, zip?: CachedZipFile) => 
       zip.close()
       await fs.ensureDir(RESOURCE_PACKS_PATH)
       await fs.copyFile(path, join(RESOURCE_PACKS_PATH, basename(path)))
+      return true
+    }
+  }
+  return false
+}
+
+export const installShaderPack = async (path: string, zip?: CachedZipFile) => {
+  if (!zip) zip = await open(path)
+  console.log(Object.keys(zip.entries))
+  if ('shaders/' in zip.entries) {
+    if (await openConfirmDialog({
+      cancelButton: true,
+      text: $(
+        'It has been detected that the file type dragged in is {0}. Do you want to install it?',
+        $('shader pack')
+      )
+    })) {
+      zip.close()
+      await fs.ensureDir(SHADER_PACKS_PATH)
+      await fs.copyFile(path, join(SHADER_PACKS_PATH, basename(path)))
       return true
     }
   }
@@ -108,7 +133,7 @@ export default async (path: string, autoInstallOthers = false, emitEvent = false
     return ret
   }
   file = zip.entries['local-resources.json']
-  let resources: Array<T.ResourceMod | T.ResourceResourcePack>
+  let resources: Array<T.ResourceMod | T.ResourceResourcePack | T.ResourceServer>
   if (file) {
     const str = (await zip.readEntry(file)).toString()
     if (!str) throw new Error($('Illegal resource type!'))
@@ -137,7 +162,8 @@ export default async (path: string, autoInstallOthers = false, emitEvent = false
     zip.close()
     return true
   }
-  if (autoInstallOthers && (await installResourcePack(path, zip) || await installWorld(zip))) return true
+  if (autoInstallOthers && (await installResourcePack(path, zip) || await installWorld(zip) ||
+    await installShaderPack(path, zip))) return true
   if (!emitEvent) return false
   await pluginMaster.emitSync('zipDragIn', zip, path)
   return true

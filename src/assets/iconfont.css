@@ -1,0 +1,32 @@
+@font-face {
+  font-family: 'iconfont';
+  src: url('iconfont.ttf') format('truetype');
+}
+
+.iconfont {
+  font-family: 'iconfont' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+.icon-tuoruwenjian:before {
+  content: "\e629";
+}
+
+.icon-minecraft:before {
+  content: "\e63f";
+}
+
+.icon-icons-minecraft_pic:before {
+  content: "\ed9e";
+}
+
+.icon-shanchu_o:before {
+  content: "\eb84";
+}
+
+.icon-shuliang-zengjia_o:before {
+  content: "\eb83";
+}
+

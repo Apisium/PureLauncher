@@ -1,9 +1,10 @@
+import React from 'react'
 import fs from 'fs-extra'
 import { ZipFile } from 'yazl'
 import { Stream } from 'stream'
 import { remote } from 'electron'
 import { join, basename, extname } from 'path'
-import { sha1, addDirectoryToZipFile } from '../utils'
+import { sha1, addDirectoryToZipFile, md5 } from '../utils'
 import { ResourceVersion, ResourceMod, ResourceResourcePack, Resource } from './types'
 import { RESOURCES_VERSIONS_INDEX_PATH, VERSIONS_PATH, RESOURCE_PACKS_PATH } from '../constants'
 
@@ -30,29 +31,48 @@ const getBuffer = () => _buf || (_buf = Buffer.from(str))
 
 const waitEnd = (stream: Stream) => new Promise((resolve, reject) => stream.once('end', resolve).once('error', reject))
 
-const requestPath = (name?: string) => remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
+export const requestPath = (name?: string, filters?: any) => remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
   defaultPath: name ? name + '.zip' : undefined,
-  filters: [{ name: $('Zip file'), extensions: ['zip'] }]
+  filters: filters || [{ name: $('Zip file'), extensions: ['zip'] }]
 }).then(it => {
-  if (!it.canceled) {
+  if (!it.canceled || !it.filePath) {
     notice({ content: $('Exporting...') })
     return it.filePath
   }
+  throw new Error($('canceled'))
 })
+
+const requestName = (def = Date.now().toString(36)) => {
+  let value = ''
+  const component = () => <div style={{ display: 'flex' }}>
+    <input defaultValue={def} style={{ width: '100%' }} onChange={e => (value = e.target.value)} />
+  </div>
+  return openConfirmDialog({ text: $('Please provide a name for the resource to be exported:'), component })
+    .then(() => value)
+}
 
 export const exportVersion = async (key: string, path?: string) => {
   const ver = await profilesStore.resolveVersion(key)
   if (!path) path = await requestPath(ver)
-  if (!path) return
   const json: ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[ver]
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(path))
   const verRoot = join(VERSIONS_PATH, ver)
   if (json) {
-    if (json.source) zip.addBuffer(Buffer.from(json.source), 'resource-manifest')
-    else {
-      const output: any = { ...json }
+    if (json.source) {
+      const data: any = json.source
+      if (json.needRename) {
+        const title = await requestName()
+        zip.addBuffer(Buffer.from(JSON.stringify({ title, id: (json.id ? json.id + '-' : '') + md5(title),
+          extends: data })), 'resource-manifest.json')
+      } else zip.addBuffer(Buffer.from(data), 'resource-manifest')
+    } else {
+      let output: any = { ...json }
       delete output.resolvedId
+      if ('$forge' in output || '$fabric' in output || output.needRename) {
+        const title = await requestName()
+        output = { title, id: (output.id ? output.id + '-' : '') + md5(title), extends: output }
+      }
       zip.addBuffer(Buffer.from(JSON.stringify(output)), 'resource-manifest.json')
     }
     if (!await openConfirmDialog({ text: $('Do you want to export MODS and resource packs?'), cancelButton: true })) {
@@ -110,7 +130,6 @@ export const exportVersion = async (key: string, path?: string) => {
 
 export const exportResource = async (r: ResourceMod | ResourceResourcePack, path?: string) => {
   if (!path) path = await requestPath(r.id)
-  if (!path) return
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(path))
   if (r.source) zip.addBuffer(Buffer.from(r.source), 'resource-manifest')
@@ -123,7 +142,6 @@ export const exportResource = async (r: ResourceMod | ResourceResourcePack, path
 export const exportUnidentified = async (file: string, type: string, ext: any = { }, path?: string) => {
   const name = basename(file, extname(file))
   if (!path) path = await requestPath(name)
-  if (!path) return
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(path))
   const hash = await sha1(file)
@@ -136,7 +154,6 @@ export const exportUnidentified = async (file: string, type: string, ext: any = 
 export const exportWorld = async (path: string, file?: string) => {
   const name = basename(path)
   if (!file) file = await requestPath(name)
-  if (!file) return
   const zip = new ZipFile()
   zip.outputStream.pipe(fs.createWriteStream(file))
   zip.addBuffer(Buffer.from(name), 'world-manifest')

@@ -77,7 +77,7 @@ const World: React.FC = () => {
           className='btn2'
           onClick={() => autoNotices(exportWorld(join(WORLDS_PATH, it[0])))}
         >{$('Export')}</button>
-        <button className='btn2 danger' onClick={() => requestUninstall(it[0], true)}>{$('Delete')}</button>
+        <button className='btn2 danger' onClick={() => requestUninstall(it[0])}>{$('Delete')}</button>
       </div>
     </li>)}
   </ul> : <Empty />

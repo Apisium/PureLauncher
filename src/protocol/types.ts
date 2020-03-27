@@ -26,6 +26,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   icon?: string
   useIdAsName?: boolean
   serverHome?: string
+  needRename?: string
 }
 export interface ResourceMod extends Resource<'Mod'> {
   version: string
@@ -46,6 +47,15 @@ export interface ResourceWorld extends Resource<'World'> {
   hash?: string
 }
 export interface ResourceResourcePack extends Resource<'ResourcePack'> {
+  version: string
+  urls: string[]
+  source?: string
+  website?: string
+  hashes?: string[]
+  extends?: string | ResourceResourcePack
+  updateUrl?: string
+}
+export interface ResourceShaderPack extends Resource<'ShaderPack'> {
   version: string
   urls: string[]
   source?: string
