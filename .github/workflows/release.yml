@@ -87,6 +87,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: release/PureLauncher.dmg
 
+      - name: Setup qshell
+        uses: foxundermoon/setup-qshell@v1
+        with:
+          qshell-version: '2.4.1'
+
       - name: Add qiniu account
         run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
 
