@@ -47,14 +47,12 @@ jobs:
         with:
           qshell-version: '2.4.1'
 
-      - name: Get version tag
-        run: TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
-
       - name: Add qiniu account
         run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
 
       - name: Upload files to qiniu
         run: |
+          $TAG=('${{ github.ref }}' -Replace 'refs/tags/')
           qshell fput pure-launcher download/pl/$TAG/app.asar release/win-ia32-unpacked/resources/app.asar --overwrite
           qshell fput pure-launcher download/pl/$TAG/PureLauncher.exe release/PureLauncher.exe --overwrite
 
@@ -88,14 +86,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: release/PureLauncher.dmg
 
-      - name: Get version tag
-        run: TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
-
       - name: Add qiniu account
         run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
 
       - name: Upload files to qiniu
-        run: qshell fput pure-launcher download/pl/$TAG/PureLauncher.dmg release/PureLauncher.dmg
+        run: qshell fput pure-launcher download/pl/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")/PureLauncher.dmg release/PureLauncher.dmg
 
   build_linux:
     runs-on: ubuntu-latest
@@ -133,7 +128,7 @@ jobs:
           qshell-version: '2.4.1'
 
       - name: Get version tag
-        run: TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
+        run: export TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
 
       - name: Add qiniu account
         run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
@@ -145,7 +140,7 @@ jobs:
           qshell fput pure-launcher download/pl/$TAG/PureLauncher.rpm release/PureLauncher.rpm --overwrite
 
       - name: Fetch manifest
-        run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")" | jq -r '.body' > latestManifest.json
+        run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$TAG" | jq -r '.body' > latestManifest.json
 
       - name: Upload manifest
         uses: azure/CLI@v1
