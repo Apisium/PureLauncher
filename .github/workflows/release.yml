@@ -42,6 +42,22 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: app/dist/report.html release/win-ia32-unpacked/resources/app.asar release/PureLauncher.exe
 
+      - name: Setup qshell
+        uses: foxundermoon/setup-qshell@v1
+        with:
+          qshell-version: '2.4.1'
+
+      - name: Get version tag
+        run: TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
+
+      - name: Add qiniu account
+        run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
+
+      - name: Upload files to qiniu
+        run: |
+          qshell fput pure-launcher download/pl/$TAG/app.asar release/win-ia32-unpacked/resources/app.asar --overwrite
+          qshell fput pure-launcher download/pl/$TAG/PureLauncher.exe release/PureLauncher.exe --overwrite
+
   build_macos:
     runs-on: macos-latest
     needs: build_windows
@@ -71,6 +87,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: release/PureLauncher.dmg
+
+      - name: Get version tag
+        run: TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
+
+      - name: Add qiniu account
+        run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
+
+      - name: Upload files to qiniu
+        run: qshell fput pure-launcher download/pl/$TAG/PureLauncher.dmg release/PureLauncher.dmg
 
   build_linux:
     runs-on: ubuntu-latest
@@ -102,15 +127,22 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: release/PureLauncher.tar.gz release/PureLauncher.deb release/PureLauncher.rpm
 
-  pull_release:
-    runs-on: self-hosted
-    needs: build_linux
+      - name: Setup qshell
+        uses: foxundermoon/setup-qshell@v1
+        with:
+          qshell-version: '2.4.1'
 
-    steps:
-      - name: Pull files
-        run: export HTTP_PROXY=http://127.0.0.1:1080 && export HTTPS_PROXY=http://127.0.0.1:1080 && wget -qO - https://raw.githubusercontent.com/Apisium/PureLauncher/master/scripts/sync-release.sh | bash
-        env:
-          REF: ${{ github.ref }}
+      - name: Get version tag
+        run: TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
+
+      - name: Add qiniu account
+        run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
+
+      - name: Upload files to qiniu
+        run: |
+          qshell fput pure-launcher download/pl/$TAG/PureLauncher.tar.gz release/PureLauncher.tar.gz --overwrite
+          qshell fput pure-launcher download/pl/$TAG/PureLauncher.deb release/PureLauncher.deb --overwrite
+          qshell fput pure-launcher download/pl/$TAG/PureLauncher.rpm release/PureLauncher.rpm --overwrite
 
   upload_manifest:
     runs-on: ubuntu-latest
@@ -124,5 +156,4 @@ jobs:
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
-          inlineScript: |
-            az storage blob upload --connection-string ${{ secrets.CONNECTION_STRING }} --container-name pure_launcher --name $GITHUB_WORKSPACE/latestManifest.json --file $GITHUB_WORKSPACE/latestManifest.json
+          inlineScript: az storage blob upload --connection-string ${{ secrets.CONNECTION_STRING }} -c pure_launcher -n $GITHUB_WORKSPACE/latestManifest.json -f $GITHUB_WORKSPACE/latestManifest.json
