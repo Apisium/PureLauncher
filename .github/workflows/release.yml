@@ -144,11 +144,6 @@ jobs:
           qshell fput pure-launcher download/pl/$TAG/PureLauncher.deb release/PureLauncher.deb --overwrite
           qshell fput pure-launcher download/pl/$TAG/PureLauncher.rpm release/PureLauncher.rpm --overwrite
 
-  upload_manifest:
-    runs-on: ubuntu-latest
-    needs: pull_release
-
-    steps:
       - name: Fetch manifest
         run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")" | jq -r '.body' > latestManifest.json
 
