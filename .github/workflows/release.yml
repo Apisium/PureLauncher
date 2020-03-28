@@ -107,14 +107,12 @@ jobs:
         with:
           qshell-version: '2.4.1'
 
-      - name: Get version tag
-        run: export TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
-
       - name: Add qiniu account
         run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
 
       - name: Upload files to qiniu
         run: |
+          TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/app.asar pure-launcher -k download/pl/$TAG/app.asar
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.exe pure-launcher -k download/pl/$TAG/PureLauncher.exe
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.dmg pure-launcher -k download/pl/$TAG/PureLauncher.dmg
