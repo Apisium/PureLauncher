@@ -53,8 +53,9 @@ jobs:
       - name: Upload files to qiniu
         run: |
           $TAG=('${{ github.ref }}' -Replace 'refs/tags/')
-          qshell fput pure-launcher download/pl/$TAG/app.asar release/win-ia32-unpacked/resources/app.asar --overwrite
-          qshell fput pure-launcher download/pl/$TAG/PureLauncher.exe release/PureLauncher.exe --overwrite
+          New-Item -Name temp -Type Directory
+          Move-Item -Path release/win-ia32-unpacked/resources/app.asar,release/PureLauncher.exe -Destination temp
+          qshell qupload2 --src-dir=temp --bucket=pure-launcher --overwrite --check-exists --check-hash --up-host=http://upload.qiniu.com --key-prefix=download/pl/$TAG 2> $null
 
   build_macos:
     runs-on: macos-latest
@@ -90,7 +91,11 @@ jobs:
         run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
 
       - name: Upload files to qiniu
-        run: qshell fput pure-launcher download/pl/$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")/PureLauncher.dmg release/PureLauncher.dmg
+        run: |
+          mkdir temp
+          mv release/PureLauncher.dmg temp/PureLauncher.dmg
+          TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
+          qshell qupload2 --src-dir=temp --bucket=pure-launcher --overwrite --check-exists --check-hash --up-host=http://upload.qiniu.com --key-prefix=download/pl/$TAG 2> /dev/null
 
   build_linux:
     runs-on: ubuntu-latest
@@ -135,12 +140,11 @@ jobs:
 
       - name: Upload files to qiniu
         run: |
-          qshell fput pure-launcher download/pl/$TAG/PureLauncher.tar.gz release/PureLauncher.tar.gz --overwrite
-          qshell fput pure-launcher download/pl/$TAG/PureLauncher.deb release/PureLauncher.deb --overwrite
-          qshell fput pure-launcher download/pl/$TAG/PureLauncher.rpm release/PureLauncher.rpm --overwrite
-
-      - name: Fetch manifest
-        run: curl -q "https://api.github.com/repos/Apisium/PureLauncher/releases/tags/$TAG" | jq -r '.body' > latestManifest.json
+          mkdir temp
+          mv release/PureLauncher.tar.gz temp/PureLauncher.tar.gz
+          mv release/PureLauncher.deb temp/PureLauncher.deb
+          mv release/PureLauncher.rpm temp/PureLauncher.rpm
+          qshell qupload2 --src-dir=temp --bucket=pure-launcher --overwrite --check-exists --check-hash --up-host=http://upload.qiniu.com --key-prefix=download/pl/$TAG 2> /dev/null
 
       - name: Upload manifest
         uses: azure/CLI@v1

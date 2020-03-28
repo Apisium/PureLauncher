@@ -18,8 +18,7 @@ const { createHash } = require('crypto')
   const buffers = await Promise.all(files.map(it => fs.readFile(it)))
   core.info('Read files!')
   buffers.forEach((it, i) => (json[extname(files[i]).replace(/^\./, '')] = createHash('sha1').update(it).digest('hex')))
-  const body = JSON.stringify(json, null, 2)
-  core.info('Files hash: ' + body)
+  core.info('Files hash: ' + JSON.stringify(json, null, 2))
 
   core.info('Uploading files...')
   await Promise.all(files.map((it, i) => octokit.repos.uploadReleaseAsset({
@@ -33,8 +32,11 @@ const { createHash } = require('crypto')
   })))
   core.info('Uploaded files!')
 
+  const body = JSON.stringify(json)
+  await fs.writeFile('latestManifest.json', body)
+
   core.info('Uploading hash...')
-  await octokit.repos.updateRelease({ ...github.context.repo, body: JSON.stringify(json), release_id: data.id }) // eslint-disable-line
+  await octokit.repos.updateRelease({ ...github.context.repo, body, release_id: data.id }) // eslint-disable-line
   core.info('Hash uploaded!')
 })().catch(e => {
   core.setFailed(e.stack)
