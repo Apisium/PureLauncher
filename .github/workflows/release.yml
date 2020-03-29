@@ -113,12 +113,12 @@ jobs:
       - name: Upload files to qiniu
         run: |
           TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/app.asar pure-launcher -k download/pl/$TAG/app.asar
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.exe pure-launcher -k download/pl/$TAG/PureLauncher.exe
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.dmg pure-launcher -k download/pl/$TAG/PureLauncher.dmg
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.tar.gz pure-launcher -k download/pl/$TAG/PureLauncher.tar.gz
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.deb pure-launcher -k download/pl/$TAG/PureLauncher.deb
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.rpm pure-launcher -k download/pl/$TAG/PureLauncher.rpm
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/app.asar pure-launcher-us -k download/pl/$TAG/app.asar
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.exe pure-launcher-us -k download/pl/$TAG/PureLauncher.exe
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.dmg pure-launcher-us -k download/pl/$TAG/PureLauncher.dmg
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.tar.gz pure-launcher-us -k download/pl/$TAG/PureLauncher.tar.gz
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.deb pure-launcher-us -k download/pl/$TAG/PureLauncher.deb
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.rpm pure-launcher-us -k download/pl/$TAG/PureLauncher.rpm
 
       - name: Upload manifest
         uses: azure/CLI@v1
