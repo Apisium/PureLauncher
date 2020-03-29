@@ -126,4 +126,4 @@ jobs:
           version: 'v10'
 
       - name: Upload manifest
-        run: azcopy_v10 copy $GITHUB_WORKSPACE/latestManifest.json 'https://xmcl.blob.core.windows.net/pure-launcher${{ secrets.SAS }}'
+        run: azcopy_v10 copy latestManifest.json 'https://xmcl.blob.core.windows.net/pure-launcher${{ secrets.SAS }}'
