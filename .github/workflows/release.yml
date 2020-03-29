@@ -120,8 +120,10 @@ jobs:
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.deb pure-launcher-us -k download/pl/$TAG/PureLauncher.deb
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.rpm pure-launcher-us -k download/pl/$TAG/PureLauncher.rpm
 
-      - name: Upload manifest
-        uses: azure/CLI@v1
+      - name: Install azcopy
+        uses: kheiakiyama/install-azcopy-action@v1
         with:
-          azcliversion: 2.0.72
-          inlineScript: az storage blob upload --connection-string ${{ secrets.CONNECTION_STRING }} -c pure_launcher -n $GITHUB_WORKSPACE/latestManifest.json -f $GITHUB_WORKSPACE/latestManifest.json
+          version: 'v10'
+
+      - name: Upload manifest
+        run: azcopy_v10 copy $GITHUB_WORKSPACE/latestManifest.json 'https://xmcl.blob.core.windows.net/pure-launcher${{ secrets.SAS }}'
