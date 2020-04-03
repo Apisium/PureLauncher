@@ -41,7 +41,7 @@ interface DownloadAndMoveOption extends DownloadOption {
 
 const downloadAndGetHash = (options: DownloadOption | DownloadOption[]) => download(options).then(() => {
   const files = Array.isArray(options) ? options : [options]
-  return files[0]?.checksum ? pAll(files.map(it => () => sha1(it.destination)), { concurrency: 8 }) : undefined
+  return files[0]?.checksum ? undefined : pAll(files.map(it => () => sha1(it.destination)), { concurrency: 8 })
 })
 
 @plugin({

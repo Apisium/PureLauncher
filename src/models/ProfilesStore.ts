@@ -153,7 +153,7 @@ export default class ProfilesStore extends Store {
       title: $('Locate Java'),
       message: $('Locate the path of Java 8'),
       filters: [
-        { name: $('Executable File (Javaw)'), extensions: process.platform === 'win32' ? ['exe'] : [] }
+        { name: $('Executable File (Javaw)'), extensions: process.platform === 'win32' ? ['exe'] : [''] }
       ]
     })
     if (ret.canceled) return

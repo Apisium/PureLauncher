@@ -79,13 +79,13 @@ const App: React.FC = () => {
         <Router ref={ref as any} history={history}>
           <SideBar />
           <section id='main-content' className='scrollable'>
-            <LiveRoute exact component={Home} path='/' />
+            {!(window as any).__indexUrl && <LiveRoute exact component={Home} path='/' />}
             <LiveRoute component={Manager} path='/manager/:type' className='vh100' />
             <LiveRoute exact component={Settings} path='/settings' />
             <LiveRoute exact component={ErrorPage} path='/error' className='vh100' />
             <LiveRoute exact component={ServerHome} path='/serverHome' className='vh100' />
             <Route component={CustomServerHome} path='/customServerHome' className='vh100' />
-            <Redirect to='/' />
+            <Redirect to={(window as any).__indexUrl || '/'} />
             <PluginRoutes />
           </section>
         </Router>

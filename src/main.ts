@@ -111,8 +111,10 @@ const create = () => {
   createServer(window)
 }
 
+if (process.platform === 'linux') app.commandLine.appendSwitch('enable-transparent-visuals')
+
 app
-  .on('ready', create)
+  .on('ready', process.platform === 'linux' ? () => setTimeout(create, 400) : create)
   .on('before-quit', () => runBeforeQuit && runBeforeQuit.length && spawn.apply(null, runBeforeQuit)
     .once('error', console.error).unref())
   .on('quit', () => setTimeout(() => app.exit(), 1500))

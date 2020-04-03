@@ -6,13 +6,14 @@ import { queryStatus } from '@xmcl/client'
 const style = {
   position: 'absolute' as 'absolute',
   left: 192,
-  right: 0,
+  right: -10,
   bottom: 0,
   top: 0
 }
 const ServerHome: React.FC = () => {
-  const src = useLocation().search.replace(/^\?/, '')
+  let src = useLocation().search.replace(/^\?/, '')
   if (!src) return null
+  src = decodeURIComponent(src)
   const ref = useRef<E.WebviewTag>()
   const w = ref.current
   useLayoutEffect(() => {

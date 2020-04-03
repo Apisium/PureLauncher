@@ -256,7 +256,8 @@ export const vertifyJava = async (version: [string, boolean], dialog = false) =>
 const locateJavaAsync: (options: ILocateJavaHomeOptions) => Promise<IJavaHomeInfo[] | null> = promisify(locateJava)
 export const findJavaPath = async () => {
   const ext = process.platform === 'win32' ? '.exe' : ''
-  const name = 'bin/javaw' + ext
+  const baseName = (process.platform === 'linux' ? 'java' : 'javaw') + ext
+  const name = 'bin/' + baseName
   let path = join(getSelfInstalledJavaPath(), name)
   if (await pathExists(path)) return path
   const arch = isX64() ? '64' : '86'
@@ -271,9 +272,9 @@ export const findJavaPath = async () => {
       break
   }
   if (await pathExists(path)) return path
-  const version = await getJavaVersion('javaw' + ext)
+  const version = await getJavaVersion(baseName)
   if (version && await vertifyJava(version)) {
-    path = await which('javaw' + ext).catch(console.error)
+    path = await which(baseName).catch(console.error)
     if (path) return path
   }
   const java = await locateJavaAsync({ version: '~1.8', mustBe64Bit: isX64(), paranoid: true }).catch(console.error)

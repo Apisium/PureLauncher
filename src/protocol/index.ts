@@ -56,7 +56,7 @@ const handleMessage = async (data: T.Protocol) => {
       currentWindow.restore()
       currentWindow.setAlwaysOnTop(true)
       currentWindow.setAlwaysOnTop(false)
-    }
+    } else pluginMaster.emit('protocol', data)
   } catch (e) {
     console.error(e)
   }
