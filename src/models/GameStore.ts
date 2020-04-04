@@ -260,6 +260,19 @@ System: ${process.platform} ${release()}, Arch: ${process.arch}`, 'b')
                 return
               case 'CorruptedVersionJar':
                 throw new Error($('Bad version jar!'))
+              case 'CorruptedVersionJson':
+                launched = true
+                /* fallthrough */
+              case 'MissingVersionJson':
+                this.status = STATUS.DOWNLOADING
+                if (e.version) {
+                  await ensureVersionManifest()
+                  await this.ensureMinecraftVersion(this.profilesStore.versionManifest.versions
+                    .find(v => v.id === e.version))
+                }
+                this.status = STATUS.LAUNCHING
+                await launch2()
+                return
             }
           }
           throw e

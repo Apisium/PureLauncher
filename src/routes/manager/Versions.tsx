@@ -151,7 +151,7 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
           <label>{$('VERSION')}</label>
           <select name='version'>{versions.map(it => <option value={it} key={it}>{it}</option>)}</select>
         </div>
-        <a role='link' onClick={() => shell.openExternal('https://pl.apisium.cn/versions')}>
+        <a role='link' onClick={() => shell.openExternal('https://pl.apisium.cn/versions.html')}>
           {$('Install the vanilla Minecraft / Forge / Fabric?')}
         </a>
       </form>}

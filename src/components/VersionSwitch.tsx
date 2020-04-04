@@ -19,6 +19,7 @@ const VersionSwitch: React.FC<{ open: boolean, onClose: () => void }> = props =>
     className='version-switch'
     onClose={props.onClose}
     visible={props.open}
+    destroyOnClose
   >
     <ul>
       {pm.sortedVersions.map(ver => <li
