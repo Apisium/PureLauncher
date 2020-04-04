@@ -22,34 +22,43 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
   const u = pm.getCurrentProfile()
   const [skin, setSkin] = useState('')
   useEffect(() => {
-    if (!ref.current) return
-    const skinViewer = new SkinViewer({
-      domElement: ref.current,
-      width: 200,
-      height: 260,
-      skinUrl
+    let skinViewer: SkinViewer
+    process.nextTick(() => {
+      const elm = document.getElementById('skin-viewer')
+      if (!elm) return
+      skinViewer = new SkinViewer({
+        skinUrl,
+        domElement: elm,
+        width: 200,
+        height: 260
+      })
+      createOrbitControls(skinViewer).enableRotate = true
+      skinViewer.animations.add(WalkingAnimation)
+      skinViewer.animations.add(RotatingAnimation)
+      ref2.current = skinViewer
     })
-    createOrbitControls(skinViewer).enableRotate = true
-    skinViewer.animations.add(WalkingAnimation)
-    skinViewer.animations.add(RotatingAnimation)
-    ref2.current = skinViewer
-    return () => skinViewer.dispose()
-  }, [ref.current])
+    return () => { try { skinViewer.dispose() } catch { } }
+  }, [props.open, ref.current])
   useEffect(() => {
-    if (ref2.current) ref2.current.renderPaused = !props.open
+    if (ref2.current && !props.open) {
+      try { ref2.current.dispose() } catch { }
+      ref2.current = null
+    }
   }, [props.open])
   useEffect(() => {
-    if (ref2.current) {
-      if (skin) ref2.current.skinUrl = skin + '?' + pm.i
-      else if (u) {
-        const path = join(SKINS_PATH, u.key + '.png')
-        fs.stat(path)
-          .then(it => {
-            if (it.isFile()) ref2.current.skinUrl = path + '?' + pm.i
-            else throw new Error('')
-          }, () => (ref2.current.skinUrl = skinUrl))
-      } else ref2.current.skinUrl = skinUrl
-    }
+    process.nextTick(() => {
+      if (ref2.current) {
+        if (skin) ref2.current.skinUrl = skin + '?' + pm.i
+        else if (u) {
+          const path = join(SKINS_PATH, u.key + '.png')
+          fs.stat(path)
+            .then(it => {
+              if (it.isFile()) ref2.current.skinUrl = path + '?' + pm.i
+              else throw new Error('')
+            }, () => (ref2.current.skinUrl = skinUrl))
+        } else ref2.current.skinUrl = skinUrl
+      }
+    })
   }, [u, skin, pm.i])
   const l = u && pluginMaster.logins[u.type]
   const [loading, setLoading] = useState(false)
@@ -114,10 +123,10 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
     className='profile'
     onClose={() => !loading && props.onClose()}
     visible={props.open}
-    forceRender
+    destroyOnClose
   >
     <div className='left'>
-      <div ref={ref} className='skin' />
+      <div id='skin-viewer' ref={ref} className='skin' />
       <div className='buttons' style={{ display: u && 'changeSkin' in l ? undefined : 'none' }}>
         <button className='btn btn-primary' disabled={loading} onClick={handleSkinChange}>
           {$(skin ? 'Upload!' : 'Change skin')}
