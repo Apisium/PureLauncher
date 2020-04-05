@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "npm run lint:code && npm run lint:language",
     "lint:code": "eslint src/ packages/ .github/ --ext .js,.ts,.tsx",
-    "lint:language": "node packages/language-tools/cli.js check src/**/*.{ts,tsx}",
+    "lint:language": "node packages/language-tools/cli.js check 'src/**/*.{ts,tsx}'",
     "fix": "eslint src/ packages/ .github/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --bundle-node-modules --no-autoinstall --target electron --public-url .",
     "run": "electron .",
