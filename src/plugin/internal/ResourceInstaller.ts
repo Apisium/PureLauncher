@@ -140,7 +140,7 @@ export default class ResourceInstaller extends Plugin {
   public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
     if (!T.isVersion(r)) throw new TypeError($('Illegal resource type!'))
     const ar: any = r
-    const id = ar.resolvedId = r.useIdAsName || (ar.$fabric || ar.$forge || ar.$optifine) ? r.id
+    const id = ar.resolvedId = r.useIdAsName || (ar.$fabric || ar.$forge || ar.$optifine || ar.$vanilla) ? r.id
       : `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
     const dir = resolve(VERSIONS_PATH, id)
     const old: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[r.id]

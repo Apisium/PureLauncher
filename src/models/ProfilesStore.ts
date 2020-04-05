@@ -57,7 +57,7 @@ export default class ProfilesStore extends Store {
     downloadThreads: 16,
     soundOn: true,
     downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
-      .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICAL',
+      .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICIAL',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow'
   }
