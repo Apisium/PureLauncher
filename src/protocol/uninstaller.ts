@@ -27,6 +27,7 @@ export const uninstallMod = async (version: string, id: string, directly = false
     if (!shell.moveItemToTrash(join(dir, id))) throw new Error('Delete failed!')
   } else {
     const jsonPath = join(RESOURCES_VERSIONS_PATH, version, RESOURCES_MODS_INDEX_FILE_NAME)
+    console.log(version, id, directly, jsonPath)
     const json = await fs.readJson(jsonPath, { throws: false }) || {}
     if (!Array.isArray(json[id]?.hashes)) return
     await Promise.all(json[id].hashes.map((it: string) => fs.unlink(join(dir, it + '.jar')).catch(() => {})))

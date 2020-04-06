@@ -236,7 +236,9 @@ export default class ResourceInstaller extends Plugin {
       if (gte(old.version, r.version)) return
       if (old.hashes) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.zip')).catch(() => {})))
     }
-    if (r.extends) await install(r.extends, false, true, T.isResourcePack)
+    if (typeof r.extends === 'object' && !Array.isArray(r.extends)) {
+      for (const key in r.extends) await install(r.extends[key], false, true, T.isResourcePack)
+    }
     const p = await makeTempDir()
     const urls: DownloadOption[] = r.urls.map((url, i) => ({
       url: replace(url, r),
@@ -284,7 +286,9 @@ export default class ResourceInstaller extends Plugin {
       if (gte(old.version, r.version)) return
       if (old.hashes) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.jar')).catch(() => {})))
     }
-    if (r.extends) await install(r.extends, false, true, T.isMod, o)
+    if (typeof r.extends === 'object' && !Array.isArray(r.extends)) {
+      for (const key in r.extends) await install(r.extends[key], false, true, T.isMod)
+    }
     const p = await makeTempDir()
     const urls: DownloadOption[] = r.urls.map((url, i) => ({
       url: replace(url, r),

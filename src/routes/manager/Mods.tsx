@@ -16,11 +16,11 @@ import { VERSIONS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_MODS_INDEX_FILE_NAME,
   RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
 import { autoNotices } from '../../utils'
 
-interface Ret { path: string, installed: ResourceMod[], mods: string[], unUninstallable: ResourceMod[] }
+interface Ret { path: string, installed: ResourceMod[], mods: string[], unUninstallable: ResourceMod[], ver: string }
 
 const cache = new OneCache()
 
-const NIL: Ret = { path: '', installed: [], mods: [], unUninstallable: [] }
+const NIL: Ret = { path: '', installed: [], mods: [], unUninstallable: [], ver: '' }
 const useVersion = createResource(async (ver: string): Promise<Ret> => {
   if (!ver) return NIL
   try {
@@ -41,14 +41,15 @@ const useVersion = createResource(async (ver: string): Promise<Ret> => {
       unUninstallable = Object.values(verJson.resources).filter(isMod)
       unUninstallable.forEach(it => Array.isArray(it.hashes) && it.hashes.forEach(h => hashes.add(h)))
     } else unUninstallable = []
-    return { path, installed, unUninstallable, mods: files.filter(it => !hashes.has(basename(it, '.jar'))) }
+    return { path, installed, ver, unUninstallable, mods: files.filter(it => !hashes.has(basename(it, '.jar'))) }
   } catch (e) { console.error(e) }
   return NIL
 }, cache as any)
 
 const Version: React.FC<{ version: string }> = p => {
   const [loading, setLoading] = useState(false)
-  const requestUninstall = (id: string, d?: boolean) => !loading && openConfirmDialog({
+  const ver = useVersion(p.version)
+  const requestUninstall = (id: string, d?: boolean) => !loading && ver.ver && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
     text: $(
@@ -60,13 +61,12 @@ const Version: React.FC<{ version: string }> = p => {
     if (ok) {
       setLoading(true)
       notice({ content: $('Deleting...') })
-      autoNotices(uninstallMod(p.version, id, d)).finally(() => {
+      autoNotices(uninstallMod(ver.ver, id, d)).finally(() => {
         cache.delete(cache.key)
         setLoading(false)
       })
     }
   })
-  const ver = useVersion(p.version)
   const ps = useStore(ProfilesStore)
   return ver.mods.length + ver.installed.length + ver.unUninstallable.length ? <ul className='scrollable'>
     {ver.installed.map(it => <li key={it.id}>

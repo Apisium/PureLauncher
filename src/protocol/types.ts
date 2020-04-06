@@ -36,7 +36,7 @@ export interface ResourceMod extends Resource<'Mod'> {
   mcVersion?: string
   apis?: MinecraftApis
   hashes?: string[]
-  extends?: string | ResourceMod
+  extends?: Record<string, string | ResourceMod>
   updateUrl?: string
 }
 export interface ResourceWorld extends Resource<'World'> {
@@ -52,7 +52,7 @@ export interface ResourceResourcePack extends Resource<'ResourcePack'> {
   source?: string
   website?: string
   hashes?: string[]
-  extends?: string | ResourceResourcePack
+  extends?: Record<string, string | ResourceResourcePack>
   updateUrl?: string
 }
 export interface ResourceShaderPack extends Resource<'ShaderPack'> {
@@ -61,7 +61,7 @@ export interface ResourceShaderPack extends Resource<'ShaderPack'> {
   source?: string
   website?: string
   hashes?: string[]
-  extends?: string | ResourceResourcePack
+  extends?: Record<string, string | ResourceResourcePack>
   updateUrl?: string
 }
 export interface ResourceServer extends Resource<'Server'> {
