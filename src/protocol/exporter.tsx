@@ -17,11 +17,11 @@ const str = `
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="renderer" content="webkit">
   <meta http-equiv="Cache-Control" content="no-siteapp" />
-  <title data-t="indexTitle">PureLauncher | Redirect</title>
+  <title data-t="indexTitle">PureLauncher | Redirecting</title>
 </head>
 <body>
   Redirecting...
-  <script>location.href='https://pl.apisium.cn/redirect.html'</script>
+  <script>location.href='https://pl.apisium.cn/install-local.html'</script>
 </body>
 </html>
 `

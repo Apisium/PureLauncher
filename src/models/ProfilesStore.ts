@@ -4,7 +4,7 @@ import { Store, NOT_PROXY } from 'reqwq'
 import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import { ResourceVersion } from '../protocol/types'
-import { getJavaVersion, cacheSkin, genUUID, vertifyJava } from '../utils/index'
+import { getJavaVersion, cacheSkin, genUUID, vertifyJava, openServerHome } from '../utils/index'
 import { LAUNCH_PROFILE_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH, LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH,
   GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
 import fs from 'fs-extra'
@@ -302,6 +302,13 @@ export default class ProfilesStore extends Store {
     }
     profile.lastUsed = new Date().toISOString()
     await this.saveLaunchProfileJson()
+
+    this.resolveVersion(id)
+      .then(rid => fs.readJson(RESOURCES_VERSIONS_INDEX_PATH)
+        .then((it: Record<string, ResourceVersion>) => it && it[rid] && openServerHome(it[rid].serverHome))
+      )
+      .catch(() => {})
+
     this.setTasks()
   }
 

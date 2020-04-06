@@ -1,7 +1,8 @@
 import { Store, injectStore } from 'reqwq'
 import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core/index'
 import { Installer } from '@xmcl/installer/index'
-import { getVersionTypeText, addTask, installJava, findJavaPath, getSuitableMemory, isX64 } from '../utils/index'
+import { getVersionTypeText, addTask, installJava, findJavaPath,
+  getSuitableMemory, isX64, openServerHome } from '../utils/index'
 import { GAME_ROOT, LIBRARIES_PATH, VERSIONS_PATH } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer, BrowserView } from 'electron'
@@ -11,7 +12,6 @@ import { join } from 'path'
 import fs from 'fs-extra'
 import user from '../utils/analytics'
 import prettyBytes from 'pretty-bytes'
-import history from '../utils/history'
 import ProfilesStore from './ProfilesStore'
 import updateResources from '../protocol/check-update'
 
@@ -98,19 +98,7 @@ export default class GameStore extends Store {
       const json = await updateResources(versionId)
       await pluginMaster.emit('launchPostUpdate', v.version, profile, json)
 
-      const url = json?.serverHome
-      if (url && typeof url === 'string') {
-        if (url.startsWith('/serverHome?')) history.push(url)
-        else {
-          try {
-            // eslint-disable-next-line no-new
-            new URL(url)
-            if (url.startsWith('https://') || url.startsWith('http://')) {
-              history.push('/customServerHome?' + encodeURIComponent(url))
-            }
-          } catch { }
-        }
-      }
+      openServerHome(json?.serverHome)
 
       await checkModsDirectoryOfVersion(versionId, json)
       await pluginMaster.emit('launchEnsureFiles', versionId)

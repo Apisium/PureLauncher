@@ -40,3 +40,4 @@ export const setDevPlugin: (path: string) => Promise<boolean>
 export const isRunning: () => Promise<boolean>
 export const ensureRunning: (time?: number) => Promise<void>
 export const queryMinecraftServer: typeof queryStatus
+export const getAccount: () => Promise<{ uuid: string, name: string, type: string, skinUrl?: string }>

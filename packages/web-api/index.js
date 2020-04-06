@@ -25,3 +25,4 @@ export const ensureRunning = time => isRunning().then(r => r ? undefined : new P
   f()
 }))
 export const queryMinecraftServer = window.queryMinecraftServer
+export const getAccount = window.getAccount

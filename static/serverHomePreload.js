@@ -13,3 +13,9 @@ window.queryMinecraftServer = (...args) => {
   ipcRenderer.sendToHost('query-minecraft-server', id, args)
   return p
 }
+
+window.getAccount = () => {
+  ipcRenderer.sendToHost('get-account')
+  return new Promise(resolve => ipcRenderer.once('account', (e, uuid, name, skinUrl, type) =>
+    resolve({ uuid, name, skinUrl, type })))
+}

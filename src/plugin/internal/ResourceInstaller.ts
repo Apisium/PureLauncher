@@ -237,7 +237,13 @@ export default class ResourceInstaller extends Plugin {
       if (old.hashes) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.zip')).catch(() => {})))
     }
     if (typeof r.extends === 'object' && !Array.isArray(r.extends)) {
-      for (const key in r.extends) await install(r.extends[key], false, true, T.isResourcePack)
+      for (const key in r.extends) {
+        await install(r.extends[key], false, true, T.isResourcePack, {
+          resolvedId: o.resolvedId,
+          oldResourceVersion: o.oldResourceVersion,
+          isolation: o.isolation
+        })
+      }
     }
     const p = await makeTempDir()
     const urls: DownloadOption[] = r.urls.map((url, i) => ({
@@ -287,7 +293,14 @@ export default class ResourceInstaller extends Plugin {
       if (old.hashes) await Promise.all(old.hashes.map(it => fs.unlink(join(dir, it + '.jar')).catch(() => {})))
     }
     if (typeof r.extends === 'object' && !Array.isArray(r.extends)) {
-      for (const key in r.extends) await install(r.extends[key], false, true, T.isMod)
+      for (const key in r.extends) {
+        await install(r.extends[key], false, true, T.isMod, {
+          resolvedId: o.resolvedId,
+          resolvedDir: o.resolvedDir,
+          oldResourceVersion: o.oldResourceVersion,
+          isolation: o.isolation
+        })
+      }
     }
     const p = await makeTempDir()
     const urls: DownloadOption[] = r.urls.map((url, i) => ({

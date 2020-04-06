@@ -1,9 +1,10 @@
-import arch from 'arch'
+import * as resolveP from 'resolve-path'
 import fs, { pathExists } from 'fs-extra'
 import Unzip from '@xmcl/unzip/index'
 import uuid from 'uuid-by-string'
 import which from 'which'
-import * as resolveP from 'resolve-path'
+import arch from 'arch'
+import history from './history'
 import locateJava from 'locate-java-home/js/es5/index'
 import { freemem, totalmem } from 'os'
 import { Task } from '@xmcl/task/index'
@@ -297,4 +298,17 @@ export const addDirectoryToZipFile = async (zip: ZipFile, realPath: string, path
 const clickSound = new Audio(require('../assets/sounds/levelup.ogg'))
 export const playNoticeSound = () => {
   if (clickSound.readyState === 4 && window.profilesStore?.extraJson?.soundOn) clickSound.play().catch(() => {})
+}
+
+export const openServerHome = (url: string) => {
+  if (!url || typeof url !== 'string') return
+  if (url.startsWith('/serverHome?')) history.push(url)
+  else {
+    try {
+      // eslint-disable-next-line no-new
+      new URL(url)
+      if (!url.startsWith('https://') && !url.startsWith('http://')) return
+      history.push('/customServerHome?' + encodeURIComponent(url))
+    } catch { }
+  }
 }

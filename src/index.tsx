@@ -13,8 +13,10 @@ import { join } from 'path'
 import { exists } from 'fs'
 import { remote, shell } from 'electron'
 import { update } from './protocol/check-update'
-import { download, genId, getJson } from './utils/index'
-import { TEMP_PATH, DEFAULT_LOCATE, LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL } from './constants'
+import { ResourceVersion } from './protocol/types'
+import { download, genId, getJson, openServerHome } from './utils/index'
+import { TEMP_PATH, DEFAULT_LOCATE, LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL,
+  RESOURCES_VERSIONS_INDEX_PATH } from './constants'
 
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
@@ -106,6 +108,11 @@ pluginMaster.once('rendered', () => {
       .then(ex => ex && fs.unlink(destination))
       .catch(console.error)
   })
+  profilesStore.resolveVersion(profilesStore.selectedVersion.key)
+    .then(rid => fs.readJson(RESOURCES_VERSIONS_INDEX_PATH)
+      .then((it: Record<string, ResourceVersion>) => it && it[rid] && openServerHome(it[rid].serverHome))
+    )
+    .catch(() => {})
   if (!navigator.onLine) return
   const now = Date.now()
   const updateCheckTime = parseInt(localStorage.getItem('updateCheckTime'))

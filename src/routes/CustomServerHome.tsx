@@ -42,6 +42,11 @@ const ServerHome: React.FC = () => {
     elm.addEventListener('dom-ready', cb)
     const ipcEvent = (e: E.IpcMessageEvent) => {
       switch (e.channel) {
+        case 'get-account': {
+          const p = profilesStore.getCurrentProfile()
+          elm.send('account', p.uuid, p.username, p.skinUrl, p.type)
+          break
+        }
         case 'query-minecraft-server':
           queryStatus.apply(null, e.args[1])
             .then(info => elm.send('minecraft-server-data', e.args[0], null, info))
