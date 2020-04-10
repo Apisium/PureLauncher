@@ -1,21 +1,21 @@
 import './list.less'
 import fs from 'fs-extra'
+import ToolTip from 'rc-tooltip'
 import history from '../../utils/history'
 import Empty from '../../components/Empty'
 import Loading from '../../components/Loading'
 import ProfilesStore from '../../models/ProfilesStore'
-import React, { Suspense, useState, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { join, basename } from 'path'
 import { plugins } from '../../plugin/internal/index'
-import { removeFormatCodes, autoNotices } from '../../utils/index'
+import { removeFormatCodes, autoNotices, watchFile } from '../../utils/index'
 import { ResourcePack as RPP } from '@xmcl/resourcepack/index'
 import { ResourceResourcePack } from '../../protocol/types'
-import { createResource, OneCache } from 'react-cache-enhance'
 import { uninstallResourcePack } from '../../protocol/uninstaller'
 import { RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCE_PACKS_PATH } from '../../constants'
 import { exportResource, exportUnidentified } from '../../protocol/exporter'
 import { useStore } from 'reqwq'
-import { clipboard, remote } from 'electron'
+import { clipboard, remote, shell } from 'electron'
 
 pluginMaster.addExtensionsButton({
   title: () => $('ResourcePacks'),
@@ -25,10 +25,8 @@ pluginMaster.addExtensionsButton({
 
 interface Ret { installed: ResourceResourcePack[], unidentified: string[][] }
 
-const cache = new OneCache()
-
 const NIL: Ret = { installed: [], unidentified: [] }
-const useResourcePack = createResource(async (): Promise<Ret> => {
+const getResourcePacks = async (): Promise<Ret> => {
   try {
     let files = (await fs.readdir(RESOURCE_PACKS_PATH)).filter(it => it.endsWith('.zip'))
     const stats = await Promise.all(files.map(it => fs.stat(join(RESOURCE_PACKS_PATH, it)).catch(() => null)))
@@ -51,13 +49,13 @@ const useResourcePack = createResource(async (): Promise<Ret> => {
         })))).sort((a, b) => +!a[1] - +!b[1]) }
   } catch (e) { console.error(e) }
   return NIL
-}, cache as any)
+}
 
-const ResourcePack: React.FC = () => {
-  const [loading, setLoading] = useState(false)
-  const pack = useResourcePack()
-  useMemo(() => cache.delete(cache.key), [0])
-  const requestUninstall = (id: string, d?: boolean) => !loading && openConfirmDialog({
+const ResourcePackList: React.FC = () => {
+  const [packs, setPacks] = useState<Ret>()
+  useEffect(() => watchFile(RESOURCE_PACKS_PATH, () => setPacks(null)), [])
+  useEffect(() => { if (!packs) getResourcePacks().then(setPacks) }, [packs])
+  const requestUninstall = (id: string, d?: boolean) => packs && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
     text: $(
@@ -67,17 +65,14 @@ const ResourcePack: React.FC = () => {
     )
   }).then(ok => {
     if (ok) {
-      setLoading(true)
+      setPacks(null)
       notice({ content: $('Deleting...') })
-      autoNotices(uninstallResourcePack(id, d)).finally(() => {
-        cache.delete(cache.key)
-        setTimeout(setLoading, 500, false)
-      })
+      autoNotices(uninstallResourcePack(id, d)).finally(() => setPacks(null))
     }
   })
   const ps = useStore(ProfilesStore)
-  return pack.installed.length + pack.unidentified.length ? <ul className='scrollable'>
-    {pack.installed.map(it => <li key={it.id}>
+  return packs ? packs.installed.length + packs.unidentified.length ? <ul className='scrollable'>
+    {packs.installed.map(it => <li key={it.id}>
       {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
       <div className='time'>{it.description}</div>
       <div className='buttons'>
@@ -94,7 +89,7 @@ const ResourcePack: React.FC = () => {
         <button className='btn2 danger' onClick={() => requestUninstall(it.id)}>{$('Delete')}</button>
       </div>
     </li>)}
-    {pack.unidentified.map(it => <li
+    {packs.unidentified.map(it => <li
       key={it[0]}
       draggable='true'
       onDragStart={e => {
@@ -114,15 +109,18 @@ const ResourcePack: React.FC = () => {
         <button className='btn2 danger' onClick={() => requestUninstall(it[0], true)}>{$('Delete')}</button>
       </div>
     </li>)}
-  </ul> : <Empty />
+  </ul> : <Empty /> : <div style={{ flex: 1, display: 'flex' }}><Loading /></div>
 }
 
 const ResourcePacks: React.FC = () => {
   return <div className='manager-list version-switch manager-versions resource-packs'>
     <div className='list-top'>
-      <span className='header no-button'>{$('ResourcePacks')}</span>
+      <ToolTip placement='top' overlay={$('Click here to open the directory')}>
+        <span data-sound className='header no-button' onClick={() => shell.openItem(RESOURCE_PACKS_PATH)}>
+          {$('ResourcePacks')}</span>
+      </ToolTip>
     </div>
-    <Suspense fallback={<div style={{ flex: 1, display: 'flex' }}><Loading /></div>}><ResourcePack /></Suspense>
+    <ResourcePackList />
   </div>
 }
 

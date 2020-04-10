@@ -4,7 +4,6 @@ import PluginMaster from './index'
 import ProfilesStore from '../models/ProfilesStore'
 import * as fs from 'fs-extra'
 import * as skinView3d from 'skinview3d'
-import * as ReactCache from 'react-cache-enhance'
 import * as IconButtonExports from '../components/IconButton'
 import * as constants from '../constants'
 import * as Reqwq from 'reqwq'
@@ -55,9 +54,9 @@ export { default as ReactImage } from 'react-image'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin,
   isX64, createUnzipTask, openServerHome, getJavaVersion, validPath, sha1, md5, replace,
-  getVersionTypeText, download, getSuitableMemory, unzip, playNoticeSound, removeFormatCodes,
+  getVersionTypeText, download, getSuitableMemory, unzip, playNoticeSound, removeFormatCodes, reloadPage,
   autoNotices, readBuffer, addTask, createDownloadTask, addDirectoryToZipFile } from '../utils/index'
-export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ReactCache, ofs,
+export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ofs,
   constants, Reqwq, ProfilesStore, Authenticator, fs, Yazl, Yauzl, types, ReactRouter }
 
 export const $: (name: string, ...args: string[]) => string = (window as any).__$pli0

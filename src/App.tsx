@@ -18,6 +18,7 @@ import ServerHome from './routes/ServerHome'
 import CustomServerHome from './routes/CustomServerHome'
 import SideBar from './SideBar'
 import InstallList from './components/InstallList'
+import Loading from './components/Loading'
 
 ipcRenderer.on('pure-launcher-reload', () => location.reload())
 const ref = createRef()
@@ -72,6 +73,8 @@ const Drag: React.FC = () => {
   </div>
 }
 
+const LoadingPage = () => <div style={{ flex: 1, display: 'flex' }}><Loading /></div>
+
 const App: React.FC = () => {
   try {
     return (
@@ -84,6 +87,7 @@ const App: React.FC = () => {
             <LiveRoute exact component={Settings} path='/settings' />
             <LiveRoute exact component={ErrorPage} path='/error' className='vh100' />
             <LiveRoute exact component={ServerHome} path='/serverHome' className='vh100' />
+            <LiveRoute exact component={LoadingPage} path='/loading' className='vh100' />
             <Route component={CustomServerHome} path='/customServerHome' className='vh100' />
             <Redirect to={(window as any).__indexUrl || '/'} />
             <PluginRoutes />

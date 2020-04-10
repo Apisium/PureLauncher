@@ -51,7 +51,7 @@ Use taobao registry:
 set REGISTRY=https://registry.npm.taobao.org/
 set dist-url=http://npm.taobao.org/mirrors/atom-shell
 set ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
-set ELECTRON_CUSTOM_DIR=8.2.0
+set ELECTRON_CUSTOM_DIR=8.2.1
 ```
 
 ### Development

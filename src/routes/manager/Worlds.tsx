@@ -1,14 +1,14 @@
 import './list.less'
 import fs from 'fs-extra'
+import ToolTip from 'rc-tooltip'
 import history from '../../utils/history'
 import Empty from '../../components/Empty'
 import Loading from '../../components/Loading'
-import React, { Suspense, useState, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { join } from 'path'
 import { deserialize } from '@xmcl/nbt'
 import { plugins } from '../../plugin/internal/index'
-import { removeFormatCodes, autoNotices } from '../../utils/index'
-import { createResource, OneCache } from 'react-cache-enhance'
+import { removeFormatCodes, autoNotices, watchFile } from '../../utils/index'
 import { WORLDS_PATH } from '../../constants'
 import { exportWorld } from '../../protocol/exporter'
 import { remote, shell } from 'electron'
@@ -19,11 +19,9 @@ pluginMaster.addExtensionsButton({
   onClick () { history.push('/manager/worlds') }
 }, plugins.resourceInstaller)
 
-const cache = new OneCache()
-
 const icon = require('../../assets/images/unknown-server.png')
 
-const useWorlds = createResource(async () => {
+const getWorlds = async () => {
   try {
     const ret = await Promise.all((await fs.readdir(WORLDS_PATH)).map(async it => {
       const path = join(WORLDS_PATH, it)
@@ -40,29 +38,25 @@ const useWorlds = createResource(async () => {
     return ret.filter(Boolean).sort((a, b) => b[3] - a[3])
   } catch (e) { console.error(e) }
   return []
-}, cache as any)
+}
 
-const World: React.FC = () => {
-  const [loading, setLoading] = useState(false)
-  const pack = useWorlds()
-  useMemo(() => cache.delete(cache.key), [0])
-  const requestUninstall = (id: string) => !loading && openConfirmDialog({
+const WorldsList: React.FC = () => {
+  const [worlds, setWorlds] = useState<Array<[string, string, string, number]>>()
+  useEffect(() => watchFile(WORLDS_PATH, () => setWorlds(null)), [])
+  useEffect(() => { if (!worlds) getWorlds().then(setWorlds) }, [worlds])
+  const requestUninstall = (id: string) => !worlds && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
     text: $('Are you sure to delete this {0}? Files can be recovered in the recycle bin.', $('world'))
   }).then(ok => {
     if (ok) {
-      setLoading(true)
       notice({ content: $('Deleting...') })
-      // eslint-disable-next-line prefer-promise-reject-errors
-      autoNotices(shell.moveItemToTrash(join(WORLDS_PATH, id)) ? Promise.resolve() : Promise.reject()).finally(() => {
-        cache.delete(cache.key)
-        setTimeout(setLoading, 500, false)
-      })
+      autoNotices(shell.moveItemToTrash(join(WORLDS_PATH, id)))
+      setWorlds(null)
     }
   })
-  return pack.length ? <ul className='scrollable'>
-    {pack.map(it => <li
+  return worlds ? worlds.length ? <ul className='scrollable'>
+    {worlds.map(it => <li
       key={it[0]}
       draggable='true'
       onDragStart={e => {
@@ -80,15 +74,17 @@ const World: React.FC = () => {
         <button className='btn2 danger' onClick={() => requestUninstall(it[0])}>{$('Delete')}</button>
       </div>
     </li>)}
-  </ul> : <Empty />
+  </ul> : <Empty /> : <div style={{ flex: 1, display: 'flex' }}><Loading /></div>
 }
 
 const Worlds: React.FC = () => {
   return <div className='manager-list version-switch manager-versions resource-packs'>
     <div className='list-top'>
-      <span className='header no-button'>{$('Worlds')}</span>
+      <ToolTip placement='top' overlay={$('Click here to open the directory')}>
+        <span data-sound className='header no-button' onClick={() => shell.openItem(WORLDS_PATH)}>{$('Worlds')}</span>
+      </ToolTip>
     </div>
-    <Suspense fallback={<div style={{ flex: 1, display: 'flex' }}><Loading /></div>}><World /></Suspense>
+    <WorldsList />
   </div>
 }
 

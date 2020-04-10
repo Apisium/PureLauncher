@@ -52,6 +52,7 @@
   "PureLauncher's built-in plugin": "PureLauncher 的内置插件.",
   "News:": "信息:",
   "OK": "确认",
+  "Online Players": "在线人数",
   "HOW TO INSTALL": "如何安装",
   "Successfully installed resources!": "资源安装成功!",
   "Failed to install resources": "资源安装失败",
@@ -88,6 +89,7 @@
     "无法找到合适的java，是否要需要帮您安装java?",
   "An unknown error occurred!\nPlease click the Creeper icon above to reload the page.":
     "发生未知错误，请点击上方苦力怕图标以刷新页面!",
+  "Click here to open the directory": "点击这里可以快速打开目录",
   "The number of files is not equal to the number of hashes provided!": "文件数与提供多个哈希数不相同!",
   "Mods folder detected, which has been moved to the game version {0}'s root. Please try not to move the mods folder manually. PureLauncher will handle the mods.":
     "检测到模组文件夹, 现已将其移动到游戏版本 {0} 的根目录中. 请尽量不要手动修改模组文件夹, 启动器将会对模组进行控制.",

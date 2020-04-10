@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import './list.less'
-import React, { useState, useMemo, useRef, Suspense } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import IconPicker, { resolveIcon } from '../../components/IconPicker'
 import ProfilesStore, { Version } from '../../models/ProfilesStore'
 import fs from 'fs-extra'
@@ -13,7 +13,6 @@ import analytics from '../../utils/analytics'
 import Loading from '../../components/Loading'
 import { join } from 'path'
 import { useStore } from 'reqwq'
-import { createResource, OneCache } from 'react-cache-enhance'
 import { VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
 import { exportVersion } from '../../protocol/exporter'
 import { uninstallVersion } from '../../protocol/uninstaller'
@@ -159,12 +158,9 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
   </Dialog>
 }
 
-const cache = new OneCache()
-const useVersions = createResource((): Promise<Record<string, ResourceVersion>> => fs.readJson(RESOURCES_VERSIONS_INDEX_PATH)
-  .catch(() => ({})), cache as any)
-
 const Versions: React.FC = () => {
-  const json = useVersions()
+  const [json, setJson] = useState<Record<string, ResourceVersion>>()
+  useEffect(() => void fs.readJson(RESOURCES_VERSIONS_INDEX_PATH).catch(() => ({})).then(setJson), [])
   const [open, setOpen] = useState(false)
   const [currentVersion, setCurrentVersion] = useState('')
   const pm = useStore(ProfilesStore)
@@ -179,13 +175,15 @@ const Versions: React.FC = () => {
     .filter(([_, ver]) => ver.type !== 'latest-snapshot' || pm.settings.enableSnapshots)
   return <div className='manager-list version-switch manager-versions'>
     <div className='list-top'>
-      <span className='header'>{$('Versions List')}</span>
+      <ToolTip placement='top' overlay={$('Click here to open the directory')}>
+        <span data-sound className='header' onClick={() => shell.openItem(VERSIONS_PATH)}>{$('Versions List')}</span>
+      </ToolTip>
       <a className='add-btn' role='button' onClick={() => setOpen(true)}>
         <i data-sound className='iconfont icon-shuliang-zengjia_o' />
         <span data-sound>{$('Add new...')}</span>
       </a>
     </div>
-    {versions.length ? <ul className='scrollable'>
+    {json ? versions.length ? <ul className='scrollable'>
       {versions
         .map(([key, ver]) => ({ ...ver, key, lastUsed: moment(ver.lastUsed) }))
         .sort((a, b) => b.lastUsed.valueOf() - a.lastUsed.valueOf())
@@ -220,12 +218,10 @@ const Versions: React.FC = () => {
             </div>
           </li>
         </ToolTip>)}
-    </ul> : <Empty />}
+    </ul> : <Empty /> : <div style={{ flex: 1, display: 'flex' }}><Loading /></div>}
     <VersionEdit version={currentVersion} installed={json} onClose={() => setCurrentVersion('')} />
     <VersionAdd open={open} onClose={() => setOpen(false)} />
   </div>
 }
 
-export default () => <Suspense fallback={<div style={{ flex: 1, display: 'flex' }}><Loading /></div>}>
-  <Versions />
-</Suspense>
+export default Versions

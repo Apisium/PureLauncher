@@ -1,27 +1,25 @@
 import './list.less'
 import fs from 'fs-extra'
+import ToolTip from 'rc-tooltip'
 import Empty from '../../components/Empty'
 import Loading from '../../components/Loading'
 import ProfilesStore, { Version } from '../../models/ProfilesStore'
-import React, { Suspense, useState } from 'react'
-import { clipboard } from 'electron'
+import React, { useState, useEffect, useRef } from 'react'
+import { clipboard, shell } from 'electron'
 import { ResourceMod, ResourceVersion, isMod } from '../../protocol/types'
 import { join, basename } from 'path'
 import { useParams } from 'react-router-dom'
-import { createResource, OneCache } from 'react-cache-enhance'
 import { useStore } from 'reqwq'
 import { exportResource, exportUnidentified } from '../../protocol/exporter'
 import { uninstallMod } from '../../protocol/uninstaller'
 import { VERSIONS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_MODS_INDEX_FILE_NAME,
   RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
-import { autoNotices } from '../../utils'
+import { autoNotices, watchFile } from '../../utils'
 
 interface Ret { path: string, installed: ResourceMod[], mods: string[], unUninstallable: ResourceMod[], ver: string }
 
-const cache = new OneCache()
-
 const NIL: Ret = { path: '', installed: [], mods: [], unUninstallable: [], ver: '' }
-const useVersion = createResource(async (ver: string): Promise<Ret> => {
+const getMods = async (ver: string): Promise<Ret> => {
   if (!ver) return NIL
   try {
     ver = await profilesStore.resolveVersion(ver)
@@ -44,12 +42,28 @@ const useVersion = createResource(async (ver: string): Promise<Ret> => {
     return { path, installed, ver, unUninstallable, mods: files.filter(it => !hashes.has(basename(it, '.jar'))) }
   } catch (e) { console.error(e) }
   return NIL
-}, cache as any)
+}
 
-const Version: React.FC<{ version: string }> = p => {
-  const [loading, setLoading] = useState(false)
-  const ver = useVersion(p.version)
-  const requestUninstall = (id: string, d?: boolean) => !loading && ver.ver && openConfirmDialog({
+const Mods: React.FC = () => {
+  const { version } = useParams<{ version: string }>()
+  const [mods, setMods] = useState<Ret>()
+  const ref = useRef<() => void>()
+  useEffect(() => {
+    const f = () => {
+      if (!ref.current) return
+      ref.current()
+      ref.current = null
+    }
+    if (!mods) {
+      getMods(version).then(mods => {
+        f()
+        if (mods.path) ref.current = watchFile(mods.path, () => setMods(null))
+        setMods(mods)
+      })
+    }
+    return f
+  }, [version, mods])
+  const requestUninstall = (id: string, d?: boolean) => mods?.ver && openConfirmDialog({
     cancelButton: true,
     title: $('Warning!'),
     text: $(
@@ -59,62 +73,58 @@ const Version: React.FC<{ version: string }> = p => {
     )
   }).then(ok => {
     if (ok) {
-      setLoading(true)
       notice({ content: $('Deleting...') })
-      autoNotices(uninstallMod(ver.ver, id, d)).finally(() => {
-        cache.delete(cache.key)
-        setLoading(false)
-      })
+      autoNotices(uninstallMod(mods.ver, id, d)).finally(() => setMods(null))
     }
   })
-  const ps = useStore(ProfilesStore)
-  return ver.mods.length + ver.installed.length + ver.unUninstallable.length ? <ul className='scrollable'>
-    {ver.installed.map(it => <li key={it.id}>
-      {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
-      <div className='time'>{it.description}</div>
-      <div className='buttons'>
-        {(!ps.extraJson.copyMode || typeof it.source === 'string') &&
-          <button
-            className='btn2'
-            onClick={() => {
-              if (ps.extraJson.copyMode) {
-                clipboard.writeText(it.source)
-                notice({ content: $('Copied!') })
-              } else autoNotices(exportResource(it))
-            }}
-          >{$('Export')}</button>}
-        <button className='btn2 danger' onClick={() => requestUninstall(it.id)}>{$('Delete')}</button>
-      </div>
-    </li>)}
-    {ver.mods.map(it => <li key={it}>
-      {it}
-      <div className='buttons'>
-        {!ps.extraJson.copyMode &&
-          <button
-            className='btn2'
-            onClick={() => autoNotices(exportUnidentified(join(ver.path, it), 'Mod'))}
-          >{$('Export')}</button>}
-        <button className='btn2 danger' onClick={() => requestUninstall(it, true)}>{$('Delete')}</button>
-      </div>
-    </li>)}
-    {ver.unUninstallable.map(it => <li key={it.id}>
-      {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
-      <div className='time'>{it.description}</div>
-    </li>)}
-  </ul> : <Empty />
-}
-
-const Mods: React.FC = () => {
-  const { version } = useParams<{ version: string }>()
   const ps = useStore(ProfilesStore)
   const profile: Version = ps.profiles[version] || { } as any
   return <div className='manager-list version-switch manager-versions manager-mods'>
     <div className='list-top'>
-      <span className='header no-button'>{$('Mods')} - {profile.name || $('No Title')} ({profile.lastVersionId})</span>
+      <ToolTip placement='top' overlay={$('Click here to open the directory')}>
+        <span
+          data-sound
+          className='header no-button'
+          onClick={() => mods?.ver && shell.openItem(mods.path)}>
+          {$('Mods')} - {profile.name || $('No Title')} ({profile.lastVersionId})
+        </span>
+      </ToolTip>
     </div>
-    <Suspense fallback={<div style={{ flex: 1, display: 'flex' }}><Loading /></div>}>
-      <Version version={version} />
-    </Suspense>
+    {mods ? mods.ver && mods.mods.length + mods.installed.length + mods.unUninstallable.length
+      ? <ul className='scrollable'>
+        {mods.installed.map(it => <li key={it.id}>
+          {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
+          <div className='time'>{it.description}</div>
+          <div className='buttons'>
+            {(!ps.extraJson.copyMode || typeof it.source === 'string') &&
+              <button
+                className='btn2'
+                onClick={() => {
+                  if (ps.extraJson.copyMode) {
+                    clipboard.writeText(it.source)
+                    notice({ content: $('Copied!') })
+                  } else autoNotices(exportResource(it))
+                }}
+              >{$('Export')}</button>}
+            <button className='btn2 danger' onClick={() => requestUninstall(it.id)}>{$('Delete')}</button>
+          </div>
+        </li>)}
+        {mods.mods.map(it => <li key={it}>
+          {it}
+          <div className='buttons'>
+            {!ps.extraJson.copyMode &&
+              <button
+                className='btn2'
+                onClick={() => autoNotices(exportUnidentified(join(mods.path, it), 'Mod'))}
+              >{$('Export')}</button>}
+            <button className='btn2 danger' onClick={() => requestUninstall(it, true)}>{$('Delete')}</button>
+          </div>
+        </li>)}
+        {mods.unUninstallable.map(it => <li key={it.id}>
+          {it.title ? <>{it.title} <span>({it.id})</span></> : it.id}
+          <div className='time'>{it.description}</div>
+        </li>)}
+      </ul> : <Empty /> : <div style={{ flex: 1, display: 'flex' }}><Loading /></div>}
   </div>
 }
 

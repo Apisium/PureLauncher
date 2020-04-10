@@ -1,19 +1,17 @@
 import './server-home.less'
-import React, { Suspense, useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import Img from 'react-image'
 import Loading from '../components/Loading'
 import { AnimatePresence, motion } from 'framer-motion'
 import { parse } from 'querystring'
 import { useLocation } from 'react-router-dom'
 import { queryStatus } from '@xmcl/client/status'
-import { createResource, OneCache } from 'react-cache-enhance'
 import { fromFormattedString, render } from '@xmcl/text-component/index'
+import { Empty } from '../plugin/exports'
 
 const Div = motion.div as any
 
 const LOGO = require('../assets/images/unknown-server.png')
-
-const cache = new OneCache()
 
 interface Ret {
   description: string
@@ -23,7 +21,7 @@ interface Ret {
   ping: number
 }
 
-const useStatus = createResource(async (host: string, port?: string) => {
+const getStatus = async (host: string, port?: string) => {
   if (host) {
     const obj: any = { host }
     if (port) {
@@ -40,50 +38,45 @@ const useStatus = createResource(async (host: string, port?: string) => {
       ping: data.ping
     } as Ret : null
   } else return null
-}, cache as any)
-
-interface Query { host?: string, port?: string, name?: string, description?: string, logo?: string }
-const Context: React.FC = () => {
-  const args: Query = parse(useLocation().search.replace(/^\?/, ''))
-  if (!args.name) return null
-  const status = (args.host && useStatus(args.host, args.port)) || ({ } as any as Ret)
-  const desc = (args.description || status.description || '').toString()
-  // console.log(status)
-  return <Div
-    key={LOGO}
-    className='container'
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-  >
-    <Img
-      src={status.logo || LOGO}
-      loader={<img src={LOGO} alt='logo' />}
-      unloader={<img src={LOGO} alt='logo' />}
-    />
-    <h1>{args.name}</h1>
-    {status.online && status.max && <p>在线人数: {status.online}/{status.max}</p>}
-    {useMemo(() => {
-      if (!desc) return
-      const p = render(fromFormattedString(desc))
-      return <p className='desc' key={desc} style={p.style}>{p.component.text}{p.children?.map((it, i) =>
-        <span key={i} style={it.style}>{it.component.text}</span>)}</p>
-    }, [desc])}
-  </Div>
 }
 
+interface Info { host?: string, port?: string, name?: string, description?: string, logo?: string }
+
 const ServerHome: React.FC = () => {
+  const [status, setStatus] = useState<Ret>()
+  const args: Info = parse(useLocation().search.replace(/^\?/, ''))
+  if (!args.host) return <Empty />
+  useEffect(() => { if (args.host) getStatus(args.host, args.port).then(setStatus) }, [args.host])
+  const desc = (args.description || status?.description || '').toString()
   return <div className='server-home'>
     <AnimatePresence exitBeforeEnter>
-      <Suspense fallback={<Div
-        key={LOGO}
+      {status ? <Div
+        key={0}
+        className='container'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <Img
+          src={status.logo || LOGO}
+          loader={<img src={LOGO} alt='logo' />}
+          unloader={<img src={LOGO} alt='logo' />}
+        />
+        <h1>{args.name || args.host}</h1>
+        {status.online && status.max && <p>{$('Online Players')}: {status.online}/{status.max}</p>}
+        {useMemo(() => {
+          if (!desc) return
+          const p = render(fromFormattedString(desc))
+          return <p className='desc' key={desc} style={p.style}>{p.component.text}{p.children?.map((it, i) =>
+            <span key={i} style={it.style}>{it.component.text}</span>)}</p>
+        }, [desc])}
+      </Div> : <Div
+        key={1}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         style={{ flex: 1, display: 'flex' }}
-      ><Loading /></Div>}>
-        <Context />
-      </Suspense>
+      ><Loading /></Div>}
     </AnimatePresence>
   </div>
 }

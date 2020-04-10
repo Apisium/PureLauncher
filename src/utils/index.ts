@@ -5,6 +5,7 @@ import uuid from 'uuid-by-string'
 import which from 'which'
 import arch from 'arch'
 import history from './history'
+import debounce from 'lodash/debounce'
 import locateJava from 'locate-java-home/js/es5/index'
 import { freemem, totalmem } from 'os'
 import { Task } from '@xmcl/task/index'
@@ -175,13 +176,14 @@ export const removeFormatCodes = (text: string) => text.replace(/([\u00A7§]|\\u
 
 export const getVersionTypeText = () => $('§7Powered by §e§lPureLauncher §r§o({0})§r', version)
 
-export const autoNotices = <T> (p: Promise<T>) => p.then(r => {
-  notice({ content: $('Success!') })
-  return r
-}, e => {
-  console.error(e)
-  notice({ content: $('Failed!'), error: true })
-}) as any as Promise<T>
+export const autoNotices = <T extends boolean | Promise<any>> (p: T): T extends Promise<any> ? T : void =>
+  typeof p === 'boolean' ? notice({ content: $(p ? 'Success!' : 'Failed!'), error: p }) : (p as any).then(r => {
+    notice({ content: $('Success!') })
+    return r
+  }, e => {
+    console.error(e)
+    notice({ content: $('Failed!'), error: true })
+  }) as any
 
 export const readBuffer = (stream: Readable) => new Promise<Buffer>((resolve, reject) => {
   const arr = []
@@ -296,9 +298,8 @@ export const addDirectoryToZipFile = async (zip: ZipFile, realPath: string, path
 }
 
 const clickSound = new Audio(require('../assets/sounds/levelup.ogg'))
-export const playNoticeSound = () => {
-  if (clickSound.readyState === 4 && window.profilesStore?.extraJson?.soundOn) clickSound.play().catch(() => {})
-}
+export const playNoticeSound = () => void (clickSound.readyState === 4 && window.profilesStore?.extraJson?.soundOn &&
+  clickSound.play().catch(() => {}))
 
 export const openServerHome = (url: string) => {
   if (!url || typeof url !== 'string') return
@@ -311,4 +312,14 @@ export const openServerHome = (url: string) => {
       history.push('/customServerHome?' + encodeURIComponent(url))
     } catch { }
   }
+}
+
+export const reloadPage = () => {
+  history.push('/loading')
+  process.nextTick(() => history.goBack())
+}
+
+export const watchFile = (path: fs.PathLike, onChange: () => any, time = 5000) => {
+  const f = fs.watch(path, debounce(onChange, time)).on('error', console.error)
+  return () => f.close()
 }

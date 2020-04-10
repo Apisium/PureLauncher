@@ -49,7 +49,7 @@ export default class ProfilesStore extends Store {
   public extraJson = {
     javaPath: '',
     memory: 0,
-    animation: true,
+    animation: false,
     selectedUser: '',
     loginType: '',
     copyMode: false,
@@ -304,8 +304,8 @@ export default class ProfilesStore extends Store {
     await this.saveLaunchProfileJson()
 
     this.resolveVersion(id)
-      .then(rid => fs.readJson(RESOURCES_VERSIONS_INDEX_PATH)
-        .then((it: Record<string, ResourceVersion>) => it && it[rid] && openServerHome(it[rid].serverHome))
+      .then(rid => (pluginMaster.emit('switchVersion', profile, id, rid), fs.readJson(RESOURCES_VERSIONS_INDEX_PATH)
+        .then((it: Record<string, ResourceVersion>) => it && it[rid] && openServerHome(it[rid].serverHome)))
       )
       .catch(() => {})
 

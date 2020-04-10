@@ -70,6 +70,7 @@
     "react/no-children-prop": "off",
     "object-property-newline": "off",
     "no-void": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
     "@typescript-eslint/member-delimiter-style": ["error", { "multiline": { "delimiter": "none", "requireLast": false }, "singleline": { "delimiter": "comma" } }]
   }
 }
