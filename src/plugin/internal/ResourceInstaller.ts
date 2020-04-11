@@ -145,6 +145,9 @@ export default class ResourceInstaller extends Plugin {
     const dir = resolve(VERSIONS_PATH, id)
     const old: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[r.id]
     const jsonPath = join(dir, id + '.json')
+    const installResources = !o.versionResources
+    if (installResources) o.versionResources = {}
+    if (typeof r.resources === 'object') Object.assign(o.versionResources, r.extends)
     if (await fs.pathExists(jsonPath)) {
       if (old) {
         if (gte(old.version, r.version)) return
@@ -204,8 +207,8 @@ export default class ResourceInstaller extends Plugin {
         await fs.writeJson(jsonPath, json)
       }
       if (r.isolation) o.isolation = true
-      if (typeof r.resources === 'object') {
-        await pAll(Object.values(r.resources).map(it => () =>
+      if (installResources) {
+        await pAll(Object.values(o.versionResources as Record<string, T.Resource>).map(it => () =>
           install(it, false, true, r => T.isResource(r) && !T.isVersion(r) && !T.isPlugin(r), o)), { concurrency: 5 })
       }
       const sJson = await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }

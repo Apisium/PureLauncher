@@ -1,7 +1,6 @@
 import * as resolveP from 'resolve-path'
 import fs, { pathExists } from 'fs-extra'
 import Unzip from '@xmcl/unzip/index'
-import uuid from 'uuid-by-string'
 import which from 'which'
 import arch from 'arch'
 import history from './history'
@@ -23,6 +22,9 @@ import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH, LAUNCHER_MANIFEST_URL,
   DEFAULT_LOCATE, APP_PATH, GAME_ROOT } from '../constants'
 import { DownloadOption } from '@xmcl/installer/index'
 import { downloader } from '../plugin/DownloadProviders'
+import { genUUIDOrigin } from './analytics'
+
+export { genUUIDOrigin }
 
 export const getJavaVersion = (path: string) => new Promise<[string, boolean] | undefined>(resolve =>
   exec(`${path} -version`, (_, sout, serr) => {
@@ -52,7 +54,6 @@ export const fetchJson = (url: string, post = false, body?: any, other?: Request
     : other.headers
 }).then(it => it.json().catch(() => null))
 export const getJson = <T = any> (url: string) => fetch(url, { cache: 'no-cache' }).then(r => r.json()) as Promise<T>
-export const genUUIDOrigin = (t?: string) => uuid(t || (Math.random().toString() + Math.random().toString()))
 export const genUUID = (t?: string) => genUUIDOrigin(t).replace(/-/g, '')
 export const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2)
 

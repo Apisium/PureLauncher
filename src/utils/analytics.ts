@@ -1,7 +1,8 @@
+import uuid from 'uuid-by-string'
 import GoogleAnalytics from 'google-analytics-lite/dist/esnext/index'
 import { version as av } from '../../package.json'
-import { genUUIDOrigin } from './index'
 
+export const genUUIDOrigin = (t?: string) => uuid(t || (Math.random().toString() + Math.random().toString()))
 export const pagesFilter: Array<(path: string | null, source: string) => string | null> = [
   (_, path) => path.startsWith('/manager/mods/') ? '/manager/mods' : path
 ]
