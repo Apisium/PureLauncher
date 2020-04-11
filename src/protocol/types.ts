@@ -27,6 +27,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   useIdAsName?: boolean
   serverHome?: string
   needRename?: string
+  loginType?: string
 }
 export interface ResourceMod extends Resource<'Mod'> {
   version: string

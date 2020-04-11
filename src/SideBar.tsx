@@ -1,6 +1,7 @@
 import './side-bar.less'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import GameStore, { STATUS } from './models/GameStore'
+import fs from 'fs-extra'
 import ToolTip from 'rc-tooltip'
 import Profile from './components/Profile'
 import Dropdown from './components/Dropdown'
@@ -13,8 +14,9 @@ import { Link, useLocation } from 'react-router-dom'
 import { getPages } from './routes/Manager'
 import { useStore } from 'reqwq'
 import { join } from 'path'
+import { TITLE } from './plugin/Authenticator'
 import { AnimatePresence, motion } from 'framer-motion'
-import { SKINS_PATH } from './constants'
+import { SKINS_PATH, RESOURCES_VERSIONS_INDEX_PATH } from './constants'
 
 const homeIcon = require('./assets/images/written_book.png')
 const settingsIcon = require('./assets/images/redstone.png')
@@ -37,13 +39,22 @@ const SideBar: React.FC = () => {
   const logged = !!u
   const versionName = `${ver.type === 'latest-release' ? lastRelease
     : ver.type === 'latest-snapshot' ? lastSnapshot : ver.name || noTitle} (${ver.lastVersionId})`
+  const [loginType, setLoginType] = useState<string>()
+  useEffect(() => void pm.resolveVersion(ver.key)
+    .then(id => fs.readJson(RESOURCES_VERSIONS_INDEX_PATH).catch(() => ({}))
+      .then(it => setLoginType(typeof it[id]?.loginType === 'string' ? it[id].loginType : null)))
+    .catch(e => {
+      console.error(e)
+      setLoginType(null)
+    }), [ver.lastVersionId])
+  const wrongAccount = loginType && logged && loginType === pm.extraJson.loginType
   let btnText: string
   let name: string
   if (logged) {
     name = u.username
     switch (gs.status) {
       case STATUS.READY:
-        btnText = $('Play')
+        btnText = $(wrongAccount ? 'Wrong Account' : 'Play')
         break
       case STATUS.PREPARING:
         btnText = $('Preparing...')
@@ -63,7 +74,15 @@ const SideBar: React.FC = () => {
     btnText = $('Log in')
     name = $('NOT LOGGED-IN')
   }
-  const fontSize = useMemo(() => fitText(btnText.toUpperCase(), 98, 20), [btnText]) + 'px'
+  const launchBtn = <button
+    className='btn btn-primary launch'
+    onClick={() => logged && !wrongAccount ? gs.launch() : pm.setLoginDialogVisible()}
+    disabled={wrongAccount || gs.status !== STATUS.READY}
+  >
+    <i data-sound className='iconfont icon-icons-minecraft_pic' />
+    <span data-sound style={{ fontSize: useMemo(() => fitText(btnText.toUpperCase(), 98, 20), [btnText]) + 'px' }}>
+      {btnText}</span>
+  </button>
   return (
     <div className='side-bar'>
       <ToolTip
@@ -107,14 +126,11 @@ const SideBar: React.FC = () => {
         </li>)}
         </ul>
       </Dropdown>
-      <button
-        className='btn btn-primary launch'
-        onClick={() => logged ? gs.launch() : pm.setLoginDialogVisible()}
-        disabled={gs.status !== STATUS.READY}
-      >
-        <i data-sound className='iconfont icon-icons-minecraft_pic' />
-        <span data-sound style={{ fontSize }}>{btnText}</span>
-      </button>
+      {wrongAccount ? <ToolTip
+        placement='right'
+        overlay={$('Please use {0} to play game!', pluginMaster.logins[loginType]?.[TITLE]?.() || loginType)}
+        visible
+      >{launchBtn}</ToolTip> : launchBtn}
       <a className='version' role='button' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span>
       </a>

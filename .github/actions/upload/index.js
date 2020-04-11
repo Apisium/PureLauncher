@@ -13,11 +13,15 @@ const { createHash } = require('crypto')
   const { data } = await octokit.repos.getReleaseByTag({ ...github.context.repo, tag })
   core.info('Files: ' + JSON.stringify(files))
 
-  const json = JSON.parse(data.body || `{"version":"${tag}"}`)
+  const json = JSON.parse(data.body || `{"version":"${tag}","md5":{}}`)
   core.info('Reading files...')
   const buffers = await Promise.all(files.map(it => fs.readFile(it)))
   core.info('Read files!')
-  buffers.forEach((it, i) => (json[extname(files[i]).replace(/^\./, '')] = createHash('sha1').update(it).digest('hex')))
+  buffers.forEach((it, i) => {
+    const ext = extname(files[i]).replace(/^\./, '')
+    json[ext] = createHash('sha1').update(it).digest('hex')
+    json.md5[ext] = createHash('md5').update(it).digest('hex')
+  })
   core.info('Files hash: ' + JSON.stringify(json, null, 2))
 
   core.info('Uploading files...')

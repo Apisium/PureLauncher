@@ -1,13 +1,13 @@
 import './server-home.less'
 import React, { useMemo, useState, useEffect } from 'react'
 import Img from 'react-image'
+import Empty from '../components/Empty'
 import Loading from '../components/Loading'
 import { AnimatePresence, motion } from 'framer-motion'
 import { parse } from 'querystring'
 import { useLocation } from 'react-router-dom'
 import { queryStatus } from '@xmcl/client/status'
 import { fromFormattedString, render } from '@xmcl/text-component/index'
-import { Empty } from '../plugin/exports'
 
 const Div = motion.div as any
 
