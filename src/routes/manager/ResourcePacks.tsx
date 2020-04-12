@@ -98,7 +98,7 @@ const ResourcePackList: React.FC = () => {
       }}
     >
       {it[1] && <img src={it[1]} alt={it[0]} />}
-      {it[2] ? <div>{it[0]}<div>{it[2]}</div></div> : it[0]}
+      {it[2] ? <div>{it[0]}<div className='time'>{it[2]}</div></div> : it[0]}
       <div className='buttons'>
         {!ps.extraJson.copyMode &&
           <button

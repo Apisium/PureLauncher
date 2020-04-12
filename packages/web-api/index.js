@@ -24,5 +24,7 @@ export const ensureRunning = time => isRunning().then(r => r ? undefined : new P
   const f = () => void isRunning().then(r => r ? (clearTimeout(timer), resolve()) : f())
   f()
 }))
-export const queryMinecraftServer = window.queryMinecraftServer
-export const getAccount = window.getAccount
+
+const _global = typeof window === 'object' ? window : {}
+export const queryMinecraftServer = _global.queryMinecraftServer
+export const getAccount = _global.getAccount
