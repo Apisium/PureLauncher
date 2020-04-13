@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import fs from 'fs-extra'
 import Notification from 'rc-notification'
+import history from './utils/history'
 import './protocol/index'
 import { join } from 'path'
 import { exists } from 'fs'
@@ -37,8 +38,9 @@ window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boo
   instance.notice(ctx)
 }
 
+const html = document.getElementsByTagName('html')[0]
 pluginMaster.once('loaded', () => {
-  process.nextTick(() => (document.getElementsByTagName('html')[0].style.opacity = '1'))
+  process.nextTick(() => (html.style.opacity = '1'))
   ReactDOM.render(<App />, document.getElementById('root'), () => {
     pluginMaster.emit('rendered')
     let full = true
@@ -89,8 +91,14 @@ clickSound.oncanplay = () => document.addEventListener('click', e => {
   }
 })
 
-document.getElementById('close').onclick = () => setTimeout(() => remote.app.quit(), 1000)
+document.getElementById('close').onclick = () => {
+  document.getElementById('close').onclick = () => {}
+  html.style.opacity = '0'
+  setTimeout(() => remote.app.quit(), 1000)
+}
 document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
+document.getElementById('go-left').onclick = () => history.goBack()
+document.getElementById('go-right').onclick = () => history.goForward()
 
 pluginMaster.once('rendered', () => {
   exists(LAUNCHING_IMAGE, e => {

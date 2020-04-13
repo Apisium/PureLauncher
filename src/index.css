@@ -129,21 +129,23 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   overflow-x: hidden !important;
 }
 
-#close, #hide {
+#close, #hide, #go-left, #go-right {
   z-index: 2050;
   background-color: unset;
   border: none;
   position: fixed;
-  left: 30px;
   margin-top: 3px;
   cursor: pointer;
   transition: .3s;
 }
-#close:hover, #hide:hover { transform: scale(1.1) }
+#close:hover, #hide:hover, #go-left:hover, #go-right:hover { transform: scale(1.1) }
 #hide {
-  left: 62px;
+  right: 54px;
   margin-top: 1px;
 }
+#close { right: 22px }
+#go-left { left: 24px }
+#go-right { left: 52px }
 
 .rc-dialog-mask, #pl-drag {
   left: 20px;

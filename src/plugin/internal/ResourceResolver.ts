@@ -56,9 +56,6 @@ export default class ResourceInstaller extends Plugin {
         mcversion: mv,
         installer: {
           path: `/maven/net/minecraftforge/forge/${mv}-${version}/forge-${mv}-${version}-installer.jar`
-        },
-        universal: {
-          path: `/maven/net/minecraftforge/forge/${mv}-${version}/forge-${mv}-${version}-universal.jar`
         }
       }, GAME_ROOT, {
         downloader,

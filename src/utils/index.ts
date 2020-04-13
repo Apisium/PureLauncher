@@ -320,7 +320,10 @@ export const reloadPage = () => {
   process.nextTick(() => history.goBack())
 }
 
-export const watchFile = (path: fs.PathLike, onChange: () => any, time = 5000) => {
-  const f = fs.watch(path, debounce(onChange, time)).on('error', console.error)
-  return () => f.close()
+export const watchFile = (path: string, onChange: () => any, time = 5000) => {
+  let f: fs.FSWatcher
+  fs.pathExists(path).then(exists => !exists && fs.mkdir(path))
+    .then(() => (f = fs.watch(path, debounce(onChange, time)).on('error', console.error)))
+    .catch(console.error)
+  return () => f?.close()
 }
