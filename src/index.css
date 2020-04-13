@@ -18,7 +18,7 @@ body {
   position: relative;
   overflow: hidden;
   top: 80px;
-  height: 516px;
+  height: calc(100% - 70px);
   color: var(--text-color-0);
   filter: drop-shadow(1px 4px 6px #00000077);
   -webkit-app-region: drag;
@@ -38,18 +38,21 @@ a.link:hover, a[role='link']:hover { color: var(--link-hover-color); }
   margin-top: 5px;
   height: 30px;
   will-change: width;
+  width: 800px;
   transform: translateZ(0);
   background-size: 100% 100%;
   background: var(--top-color);
   box-shadow: inset 0 0 20px -2px var(--top-shadow);
   filter: var(--top-filter);
-  clip-path: polygon(80px 0, 0 100%, 100% 100%, calc(100% - 80px) 0);
+  clip-path: polygon(10% 0, 0 100%, 100% 100%, calc(100% - 10%) 0);
 }
 .top::after {
   content: '';
   width: 100%;
   height: 100%;
 }
+
+#top-buttons { transition: opacity 1s }
 
 .blocks {
   z-index: 1060;
@@ -129,23 +132,28 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   overflow-x: hidden !important;
 }
 
-#close, #hide, #go-left, #go-right {
+#top-buttons button {
   z-index: 2050;
   background-color: unset;
   border: none;
   position: fixed;
-  margin-top: 3px;
+  top: 33px;
   cursor: pointer;
   transition: .3s;
 }
-#close:hover, #hide:hover, #go-left:hover, #go-right:hover { transform: scale(1.1) }
+#top-buttons button:hover { transform: scale(1.1) }
 #hide {
   right: 54px;
-  margin-top: 1px;
+  margin-top: -2px;
 }
 #close { right: 22px }
 #go-left { left: 24px }
 #go-right { left: 52px }
+#shrink { right: 90px }
+#spread {
+  left: 32px;
+  display: none;
+}
 
 .rc-dialog-mask, #pl-drag {
   left: 20px;

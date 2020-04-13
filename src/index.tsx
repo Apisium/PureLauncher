@@ -42,42 +42,84 @@ const html = document.getElementsByTagName('html')[0]
 pluginMaster.once('loaded', () => {
   process.nextTick(() => (html.style.opacity = '1'))
   ReactDOM.render(<App />, document.getElementById('root'), () => {
-    pluginMaster.emit('rendered')
-    let full = true
-    const content = document.getElementById('main-content')
-    if (process.platform === 'win32' && !remote.systemPreferences.isAeroGlassEnabled()) {
-      notice({ content: $('Aero is not enabled in the current system, resulting in abnormal GUI!'), error: true })
+    const goLeft = document.getElementById('go-left')
+    const goRight = document.getElementById('go-right')
+    const buttons = document.getElementById('top-buttons')
+    const shrink = document.getElementById('shrink')
+    const spread = document.getElementById('spread')
+    const list = document.getElementById('sidebar-list')
+    const switchText = document.getElementById('sidebar-switch')
+
+    document.getElementById('close').onclick = () => {
+      document.getElementById('close').onclick = () => {}
+      html.style.opacity = '0'
+      setTimeout(() => remote.app.quit(), 1000)
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const onclick = () => {
+    document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
+    goLeft.onclick = () => history.goBack()
+    goRight.onclick = () => history.goForward()
+
+    let full = !profilesStore.extraJson.fold
+    const content = document.getElementById('main-content')
+    shrink.onclick = spread.onclick = () => {
       if (full) {
         full = false
         content.style.opacity = '0'
         topBar.containers[2].style.opacity = '0'
         logo.style.opacity = '0'
+        buttons.style.opacity = '0'
         setTimeout(() => {
+          switchText.style.display = list.style.display = goLeft.style.display = goRight.style.display = 'none'
+          spread.style.display = 'block'
+          shrink.style.display = 'none'
           top.style.width = '220px'
-          main.style.width = '180px'
+          main.style.width = '182px'
           topBar.containers[0].style.width = '220px'
-          topBar.containers[1].style.width = '180px'
+          topBar.containers[1].style.width = '190px'
         }, 700)
-        setTimeout(() => remote.getCurrentWindow().setSize(240, 586), 4000)
+        setTimeout(() => {
+          remote.getCurrentWindow().setBounds({ width: 240, height: 436 })
+          setTimeout(() => (buttons.style.opacity = '1'), 500)
+        }, 3500)
       } else {
         full = true
+        remote.getCurrentWindow().setBounds({ width: 816, height: 586 })
+        top.style.width = ''
+        buttons.style.opacity = '0'
+        topBar.containers[2].style.display = ''
+        main.style.width = ''
+        topBar.containers[0].style.width = ''
+        topBar.containers[1].style.width = ''
+        list.style.display = ''
         setTimeout(() => {
-          remote.getCurrentWindow().setSize(816, 586)
-          top.style.width = ''
-          topBar.containers[2].style.display = ''
-          main.style.width = ''
-          topBar.containers[0].style.width = ''
-          topBar.containers[1].style.width = ''
-          setTimeout(() => {
-            topBar.containers[2].style.opacity = '1'
-            content.style.opacity = '1'
-            logo.style.opacity = '1'
-          }, 3000)
-        }, 1000)
+          switchText.style.display = list.style.display = goLeft.style.display = goRight.style.display = ''
+          spread.style.display = 'none'
+          shrink.style.display = ''
+          topBar.containers[2].style.opacity = '1'
+          content.style.opacity = '1'
+          logo.style.opacity = '1'
+          buttons.style.opacity = '1'
+        }, 3000)
       }
+      if (full === profilesStore.extraJson.fold) profilesStore.setFold(!full)
+    }
+    if (!full) {
+      topBar.containers[2].style.opacity = '0'
+      logo.style.opacity = '0'
+      switchText.style.display = list.style.display = goLeft.style.display = goRight.style.display = 'none'
+      spread.style.display = 'block'
+      shrink.style.display = 'none'
+      top.style.transition = 'unset'
+      top.style.width = '220px'
+      main.style.width = '182px'
+      topBar.containers[0].style.width = '220px'
+      topBar.containers[1].style.width = '190px'
+      remote.getCurrentWindow().setBounds({ width: 240, height: 436 })
+      process.nextTick(() => (top.style.transition = ''))
+    }
+    pluginMaster.emit('rendered')
+    if (process.platform === 'win32' && !remote.systemPreferences.isAeroGlassEnabled()) {
+      notice({ content: $('Aero is not enabled in the current system, resulting in abnormal GUI!'), error: true })
     }
   })
 })
@@ -90,15 +132,6 @@ clickSound.oncanplay = () => document.addEventListener('click', e => {
     clickSound.play().catch(() => {})
   }
 })
-
-document.getElementById('close').onclick = () => {
-  document.getElementById('close').onclick = () => {}
-  html.style.opacity = '0'
-  setTimeout(() => remote.app.quit(), 1000)
-}
-document.getElementById('hide').onclick = () => remote.getCurrentWindow().minimize()
-document.getElementById('go-left').onclick = () => history.goBack()
-document.getElementById('go-right').onclick = () => history.goForward()
 
 pluginMaster.once('rendered', () => {
   exists(LAUNCHING_IMAGE, e => {

@@ -56,6 +56,7 @@ export default class ProfilesStore extends Store {
     noChecker: false,
     downloadThreads: 16,
     soundOn: true,
+    fold: false,
     downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
       .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICIAL',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
@@ -320,6 +321,11 @@ export default class ProfilesStore extends Store {
   public async toggleShowLog () {
     this.settings.showGameLog = !this.settings.showGameLog
     await this.saveLaunchProfileJson()
+  }
+
+  public setFold (val: boolean) {
+    this.extraJson.fold = val
+    this.saveExtraConfigJson()
   }
 
   public async toggleAnimation () {

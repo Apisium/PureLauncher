@@ -103,7 +103,7 @@ const SideBar: React.FC = () => {
         <motion.p className='name' key={name} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           {name}</motion.p>
       </AnimatePresence>
-      <ul className='list'>
+      <ul className='list' id='sidebar-list'>
         <li className={pathname === '/' ? 'active' : null}>
           <Link to='/'><img src={homeIcon} alt='' /><span data-sound>{$('Home')}</span></Link>
         </li>
@@ -134,7 +134,7 @@ const SideBar: React.FC = () => {
       <a className='version' role='button' data-sound onClick={openVersionSwitch}>
         {$('Version')}: <span data-sound>{versionName}</span>
       </a>
-      <a className='version' role='button' data-sound style={{ margin: 0 }} onClick={openVersionSwitch}>
+      <a className='version' id='sidebar-switch' role='button' data-sound onClick={openVersionSwitch}>
         [{$('Click here to switch versions')}]
       </a>
       <Profile onClose={() => setProfile(false)} open={openProfile} />
