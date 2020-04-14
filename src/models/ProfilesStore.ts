@@ -236,10 +236,11 @@ export default class ProfilesStore extends Store {
     if (name === YGGDRASIL) {
       this.selectedUser.account = key
       this.selectedUser.profile = type.getData(key).uuid
-      this.saveLaunchProfileJsonSync()
+      await this.saveLaunchProfileJson()
     } else this.extraJson.selectedUser = key
     this.extraJson.loginType = name
-    this.saveExtraConfigJsonSync()
+    await this.saveExtraConfigJson()
+    pluginMaster.emit('selectedUser', key, type, name)
   }
 
   public async addProfile (version: string, name = '', icon = 'Furnace', avoidExists = false, save = true) {
