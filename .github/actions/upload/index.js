@@ -7,7 +7,10 @@ const { createHash } = require('crypto')
 ;(async () => {
   const octokit = new github.GitHub(core.getInput('token', { required: true }))
   const tag = github.context.ref.replace('refs/tags/', '')
-  const files = core.getInput('files', { required: true }).split(' ').map(it => it.replace(/{VERSION}/g, tag))
+  const files = core.getInput('files', { required: true })
+    .split(' ')
+    .map(it => it.replace(/{VERSION}/g, tag))
+    .filter(Boolean)
 
   const { data } = await octokit.repos.getReleaseByTag({ ...github.context.repo, tag })
   core.info('Files: ' + JSON.stringify(files))

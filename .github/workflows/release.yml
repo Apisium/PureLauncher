@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/upload
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: release/win-ia32-unpacked/resources/app.asar release/nsis-web/PureLauncher.exe  release/nsis-web/pure-launcher-{VERSION}-x64.nsis.7z  release/nsis-web/pure-launcher-{VERSION}-ia32.nsis.7z
+          files: release/win-ia32-unpacked/resources/app.asar release/nsis-web/PureLauncher.exe release/nsis-web/pure-launcher-{VERSION}-x64.nsis.7z release/nsis-web/pure-launcher-{VERSION}-ia32.nsis.7z
 
   build_macos:
     runs-on: macos-latest
