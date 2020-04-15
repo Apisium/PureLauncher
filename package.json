@@ -116,7 +116,7 @@
     "react-slick": "^0.25.2",
     "reqwq": "^0.2.4",
     "resolve-path": "^1.4.0",
-    "semver": "^7.3.0",
+    "semver": "^7.3.2",
     "shallowequal": "^1.1.0",
     "skinview-utils": "^0.2.1",
     "skinview3d": "^2.0.0-alpha.1",
@@ -169,9 +169,8 @@
     "extraFiles": "unpacked",
     "publish": [
       {
-        "provider": "github",
-        "owner": "Apisium",
-        "repo": "PureLauncher"
+        "provider": "generic",
+        "url": "https://xmcl.azurewebsites.net/api/pl/latest"
       }
     ],
     "files": [
@@ -214,14 +213,15 @@
       "icon": "build/icons/icon.ico",
       "target": [
         {
-          "target": "nsis",
+          "target": "nsis-web",
           "arch": [
-            "ia32"
+            "ia32",
+            "x64"
           ]
         }
       ]
     },
-    "nsis": {
+    "nsisWeb": {
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,

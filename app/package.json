@@ -2,6 +2,7 @@
   "name": "pure-launcher",
   "main": "main.js",
   "private": true,
-  "version": "0.0.1",
-  "author": "Shirasawa"
+  "version": "0.0.2",
+  "author": "Shirasawa",
+  "description": "An awesome Minecraft Launcher."
 }

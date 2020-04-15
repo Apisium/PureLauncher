@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/upload
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: app/dist/report.html release/win-ia32-unpacked/resources/app.asar release/PureLauncher.exe
+          files: release/win-ia32-unpacked/resources/app.asar release/nsis-web/PureLauncher.exe  release/nsis-web/pure-launcher-{VERSION}-x64.nsis.7z  release/nsis-web/pure-launcher-{VERSION}-ia32.nsis.7z
 
   build_macos:
     runs-on: macos-latest
@@ -115,6 +115,8 @@ jobs:
           TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/app.asar pure-launcher-us -k download/pl/$TAG/app.asar
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.exe pure-launcher-us -k download/pl/$TAG/PureLauncher.exe
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/pure-launcher-$TAG-ia32.nsis.7z pure-launcher-us -k download/pl/$TAG/pure-launcher-$TAG-ia32.nsis.7z
+          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/pure-launcher-$TAG-x64.nsis.7z pure-launcher-us -k download/pl/$TAG/pure-launcher-$TAG-x64.nsis.7z
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.dmg pure-launcher-us -k download/pl/$TAG/PureLauncher.dmg
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.tar.gz pure-launcher-us -k download/pl/$TAG/PureLauncher.tar.gz
           qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.deb pure-launcher-us -k download/pl/$TAG/PureLauncher.deb
