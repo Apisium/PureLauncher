@@ -44,6 +44,5 @@ export const ALLOW_PLUGIN_EXTENSIONS = ['.js', '.mjs', '.asar']
 export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
 
 export const LAUNCHING_IMAGE = join(APP_PATH, 'launching.webp')
-export const LAUNCHER_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/manifest.json'
-export const LATEST_MANIFEST_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/latestManifest.json'
-export const NEWS_URL = 'https://xmcl.blob.core.windows.net/pure-launcher/mcbbsData.json'
+export const LAUNCHER_MANIFEST_URL = 'https://r.pl.apisium.cn/manifest.json'
+export const NEWS_URL = 'https://s.pl.apisium.cn/news.json'

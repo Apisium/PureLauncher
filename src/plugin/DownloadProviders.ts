@@ -10,6 +10,7 @@ export interface DownloadProvider {
   resources: string
   libraries: string
   forge: string
+  preference?: boolean
   client?: (version: { id: string, url: string }) => string
   optifine?: (mcVersion: string, type: string, version: string) => Promise<string> | string
 }
@@ -17,6 +18,20 @@ export interface DownloadProvider {
 export const optifine = (mcVersion: string, type: string, version: string) =>
   `https://bmclapi2.bangbang93.com/optifine/${mcVersion}/${type}/${version}`
 const DownloadProviders = {
+  MCBBSAPI: {
+    [NOT_PROXY]: true,
+    preference: true,
+    name: () => 'MCBBSAPI',
+    locales: ['zh'],
+    launchermeta: 'https://download.mcbbs.net',
+    launcher: 'https://download.mcbbs.net',
+    resources: 'https://download.mcbbs.net/assets',
+    libraries: 'https://download.mcbbs.net/maven',
+    forge: 'https://download.mcbbs.net/maven',
+    client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`,
+    optifine: (mcVersion: string, type: string, version: string) =>
+      `https://download.mcbbs.net/optifine/${mcVersion}/${type}/${version}`
+  },
   BMCLAPI: {
     [NOT_PROXY]: true,
     name: () => 'BMCLAPI',
@@ -28,19 +43,6 @@ const DownloadProviders = {
     forge: 'https://bmclapi2.bangbang93.com/maven',
     client: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/client`,
     optifine
-  },
-  MCBBSAPI: {
-    [NOT_PROXY]: true,
-    name: () => 'MCBBSAPI',
-    locales: ['zh'],
-    launchermeta: 'https://download.mcbbs.net',
-    launcher: 'https://download.mcbbs.net',
-    resources: 'https://download.mcbbs.net/assets',
-    libraries: 'https://download.mcbbs.net/maven',
-    forge: 'https://download.mcbbs.net/maven',
-    client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`,
-    optifine: (mcVersion: string, type: string, version: string) =>
-      `https://download.mcbbs.net/optifine/${mcVersion}/${type}/${version}`
   },
   OFFICIAL: {
     [NOT_PROXY]: true,

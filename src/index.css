@@ -148,8 +148,8 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 #close { right: 22px }
 #go-left { left: 24px }
-#go-right { left: 52px }
-#shrink { right: 90px }
+#go-right { left: 72px }
+#shrink { right: 92px }
 #spread {
   left: 32px;
   display: none;

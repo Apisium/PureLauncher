@@ -17,7 +17,7 @@ const SUCCESS = '{"success":true}'
 
 ipcMain.on('dev-reset-devPlugin', () => (process.env.DEV_PLUGIN = ''))
 
-export default (window: BrowserWindow) => createServer((req, res) => (async () => {
+const create = (window: BrowserWindow) => createServer((req, res) => (async () => {
   if (__DEV__) console.log(` \u001b[1;33m${req.method}: \u001b[37m${req.url}\u001b[0m`)
   let body: string
   switch (req.method) {
@@ -63,6 +63,10 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
           .on('error', reject)
       })
       switch (req.url) {
+        case '/close':
+          body = SUCCESS
+          console.log(req.headers.referer)
+          break
         case '/protocol':
           window.webContents.send('pure-launcher-protocol', data)
           body = SUCCESS
@@ -89,4 +93,11 @@ export default (window: BrowserWindow) => createServer((req, res) => (async () =
     if (!res.headersSent) res.writeHead(500, HEADERS)
     res.end(ERROR)
   }
-})).on('error', e => __DEV__ && console.error(e)).listen(PORT)
+})).on('error', (e: any) => {
+  console.error(e)
+  if (e.code === 'EADDRINUSE') {
+    // TODO
+  }
+}).listen(PORT)
+
+export default create

@@ -17,6 +17,9 @@ import DownloadProviders, { DownloadProvider } from '../plugin/DownloadProviders
 const MINECRAFT_MANIFEST = 'minecraftManifest'
 const MINECRAFT_MANIFEST_UPDATE_TIME = 'minecraftManifestUpdateTime'
 
+const _downloader = Object.entries(DownloadProviders).filter(it => it[1]
+  .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))
+
 export interface Version {
   name: string
   icon: string
@@ -57,8 +60,7 @@ export default class ProfilesStore extends Store {
     downloadThreads: 16,
     soundOn: true,
     fold: false,
-    downloadProvider: Object.entries(DownloadProviders).find(it => it[1]
-      .locales?.some(l => DEFAULT_LOCATE.startsWith(l)))?.[0] || 'OFFICIAL',
+    downloadProvider: (_downloader.find(it => it[1].preference) || _downloader[0])?.[0] || 'OFFICIAL',
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow'
   }

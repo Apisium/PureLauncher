@@ -12,6 +12,29 @@ let launchingWindow: BrowserWindow = null
 const webp = join(app.getPath('userData'), 'launching.webp')
 ;(process.env as any)['D' + 'EV'] = process.env.NODE_ENV !== 'production'
 
+const parseArgs = (args: string[]) => {
+  if (window) {
+    const arr = minimist(args.slice(1))._
+    const data = arr[arr.length - 1]
+    if (data) window.webContents.send('pure-launcher-protocol', data, arr)
+  }
+}
+
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', (_, argv) => {
+    if (window) {
+      if (window.isMinimized()) {
+        window.restore()
+        window.setBounds({ height: 586, width: 816 })
+      }
+      window.focus()
+    }
+    parseArgs(argv)
+  })
+} else app.exit()
+
+app.setAsDefaultProtocolClient('pure-launcher')
+
 let launchingDialogOpened = false
 const closeLaunchingDialog = () => {
   if (!launchingWindow || !launchingDialogOpened) return
@@ -36,29 +59,6 @@ const openLaunchingDialog = () => {
     setTimeout(closeLaunchingDialog, 26000)
   })
 }
-
-const parseArgs = (args: string[]) => {
-  if (window) {
-    const arr = minimist(args.slice(1))._
-    const data = arr[arr.length - 1]
-    if (data) window.webContents.send('pure-launcher-protocol', data, arr)
-  }
-}
-
-if (app.requestSingleInstanceLock()) {
-  app.on('second-instance', (_, argv) => {
-    if (window) {
-      if (window.isMinimized()) {
-        window.restore()
-        window.setBounds({ height: 586, width: 816 })
-      }
-      window.focus()
-    }
-    parseArgs(argv)
-  })
-} else app.quit()
-
-app.setAsDefaultProtocolClient('pure-launcher')
 
 let runBeforeQuit: any
 const create = () => {

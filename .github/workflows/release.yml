@@ -40,7 +40,10 @@ jobs:
         uses: ./.github/actions/upload
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: release/win-ia32-unpacked/resources/app.asar release/nsis-web/PureLauncher.exe release/nsis-web/pure-launcher-{VERSION}-x64.nsis.7z release/nsis-web/pure-launcher-{VERSION}-ia32.nsis.7z
+          secretId: ${{ secrets.secretId }}
+          secretKey: ${{ secrets.secretKey }}
+          bucket: ${{ secrets.COS_BUCKET }}
+          files: release/win-ia32-unpacked/resources/app.asar release/nsis-web/PureLauncher.exe release/nsis-web/pure-launcher-{VERSION}-x64.nsis.7z?x64.nsis.7z release/nsis-web/pure-launcher-{VERSION}-ia32.nsis.7z?ia32.nsis.7z
 
   build_macos:
     runs-on: macos-latest
@@ -70,6 +73,9 @@ jobs:
         uses: ./.github/actions/upload
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          secretId: ${{ secrets.secretId }}
+          secretKey: ${{ secrets.secretKey }}
+          bucket: ${{ secrets.COS_BUCKET }}
           files: release/PureLauncher.dmg
 
   build_linux:
@@ -100,32 +106,8 @@ jobs:
         uses: ./.github/actions/upload
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          secretId: ${{ secrets.secretId }}
+          secretKey: ${{ secrets.secretKey }}
+          bucket: ${{ secrets.COS_BUCKET }}
+          final: true
           files: release/PureLauncher.tar.gz release/PureLauncher.deb release/PureLauncher.rpm
-
-      - name: Setup qshell
-        uses: foxundermoon/setup-qshell@v1
-        with:
-          qshell-version: '2.4.1'
-
-      - name: Add qiniu account
-        run: qshell account ${{ secrets.ACCESS_KEY }} ${{ secrets.SECRET_KEY }} shirasawa
-
-      - name: Upload files to qiniu
-        run: |
-          TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/\(.*\)#\1#g")
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/app.asar pure-launcher-us -k download/pl/$TAG/app.asar
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.exe pure-launcher-us -k download/pl/$TAG/PureLauncher.exe
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/pure-launcher-$TAG-ia32.nsis.7z pure-launcher-us -k download/pl/$TAG/pure-launcher-$TAG-ia32.nsis.7z
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/pure-launcher-$TAG-x64.nsis.7z pure-launcher-us -k download/pl/$TAG/pure-launcher-$TAG-x64.nsis.7z
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.dmg pure-launcher-us -k download/pl/$TAG/PureLauncher.dmg
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.tar.gz pure-launcher-us -k download/pl/$TAG/PureLauncher.tar.gz
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.deb pure-launcher-us -k download/pl/$TAG/PureLauncher.deb
-          qshell fetch https://github.com/Apisium/PureLauncher/releases/download/$TAG/PureLauncher.rpm pure-launcher-us -k download/pl/$TAG/PureLauncher.rpm
-
-      - name: Install azcopy
-        uses: kheiakiyama/install-azcopy-action@v1
-        with:
-          version: 'v10'
-
-      - name: Upload manifest
-        run: azcopy_v10 copy latestManifest.json 'https://xmcl.blob.core.windows.net/pure-launcher${{ secrets.SAS }}'

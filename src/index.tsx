@@ -141,7 +141,7 @@ pluginMaster.once('rendered', () => {
       .then(it => download({
         destination,
         url: it.launchingImage[+(DEFAULT_LOCATE !== 'zh-cn')],
-        checksum: { algorithm: 'sha1', hash: it.launchingImageSha1 }
+        checksum: { algorithm: 'sha1', hash: it.launchingImageHash }
       }, $('Launching Animation'), 'launching.webp'))
       .then(() => fs.move(destination, LAUNCHING_IMAGE))
       .catch(console.error)

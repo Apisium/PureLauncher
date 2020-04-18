@@ -1,5 +1,6 @@
 import fs from 'fs-extra'
 import install from './install'
+import joinUrl from 'url-join'
 import gt from 'semver/functions/gt'
 import analytics from '../utils/analytics'
 import major from 'semver/functions/major'
@@ -14,7 +15,7 @@ import { remote, ipcRenderer, shell } from 'electron'
 import { getJson, download, genId } from '../utils/index'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_MODS_INDEX_FILE_NAME, ENTRY_POINT_PATH,
   RESOURCES_VERSIONS_PATH, ASAR_PATH, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX,
-  LATEST_MANIFEST_URL, LAUNCHER_MANIFEST_URL, TEMP_PATH, DEFAULT_LOCATE } from '../constants'
+  LAUNCHER_MANIFEST_URL, TEMP_PATH, DEFAULT_LOCATE } from '../constants'
 
 export default async (version: string) => {
   const json: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[version]
@@ -42,14 +43,15 @@ export const updatePlugins = async () => {
 
 let downloaded = ''
 export const updateLauncher = async () => {
-  const json = await getJson(LATEST_MANIFEST_URL)
-  if (!gt(json.version, version)) return
   const data = await getJson(LAUNCHER_MANIFEST_URL)
+  const url: string = data.downloads[+(DEFAULT_LOCATE !== 'zh-cn')]
+  const json = await getJson(joinUrl(url, 'latest.json'))
+  if (!gt(json.version, version)) return
   if (major(json.version) === major(version)) {
     const destination = join(TEMP_PATH, genId())
     await download({
       destination,
-      url: data.asar[+(DEFAULT_LOCATE !== 'zh-cn')].replace(/{version}/g, json.version),
+      url: joinUrl(url, 'app.asar'),
       checksum: { algorithm: 'sha1', hash: json.asar }
     }, $('Update Package'), `PureLauncher-${json.version}.asar`)
     await fs.ensureDir(ASAR_PATH)
@@ -64,8 +66,8 @@ export const updateLauncher = async () => {
         downloaded = join(TEMP_PATH, `PureLauncher-${json.version}-${genId()}.exe`)
         await download({
           destination: downloaded,
-          url: data.asar[+(DEFAULT_LOCATE !== 'zh-cn')].replace(/{version}/g, json.version),
-          checksum: { algorithm: 'sha1', hash: json.asar }
+          url: joinUrl(url, 'PureLauncher.exe'),
+          checksum: { algorithm: 'sha1', hash: json.exe }
         }, $('Update Package'), `PureLauncher-${json.version}.exe`)
         localStorage.removeItem('updateCheckTime')
         const enrtyPoint = await fs.readJson(ENTRY_POINT_PATH, { throws: false }) || { }
