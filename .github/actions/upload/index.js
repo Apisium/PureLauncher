@@ -1,7 +1,7 @@
 const github = require('@actions/github')
 const core = require('@actions/core')
 const COS = require('cos-nodejs-sdk-v5')
-const Refresher = require('tencent-cdn-refresh/src/refresh')
+const Refresher = require('tencent-cdn-refresh')
 const { extname, basename } = require('path')
 const { promises: fs } = require('fs')
 const { createHash } = require('crypto')
@@ -86,7 +86,7 @@ const { promisify } = require('util')
       Body: hashesData
     })
     try {
-      core.info(await new Refresher(options).flashDirs('https://dl.pl.apisium.cn/'))
+      core.info(await new Refresher(options).purgeDirsCache('https://dl.pl.apisium.cn/'))
     } catch (e) {
       core.warning(e)
     }

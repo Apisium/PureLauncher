@@ -44,5 +44,8 @@ export const ALLOW_PLUGIN_EXTENSIONS = ['.js', '.mjs', '.asar']
 export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
 
 export const LAUNCHING_IMAGE = join(APP_PATH, 'launching.webp')
+export const DOWNLOAD_EXE_URL = 'https://dl.pl.apisium.cn/PureLauncher.exe'
+export const DOWNLOAD_ASAR_URL = 'https://dl.pl.apisium.cn/app.asar'
+export const LATEST_URL = 'https://dl.pl.apisium.cn/latest.json'
 export const LAUNCHER_MANIFEST_URL = 'https://r.pl.apisium.cn/manifest.json'
 export const NEWS_URL = 'https://s.pl.apisium.cn/news.json'

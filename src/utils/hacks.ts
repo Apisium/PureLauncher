@@ -1,10 +1,7 @@
 import { downloader } from '../plugin/DownloadProviders'
 
-const { normailzeDownloader } = require('@xmcl/installer/util')
-require('@xmcl/installer/util').normailzeDownloader = (a: any) => {
-  if (!a.downloader) a.downloader = downloader
-  normailzeDownloader(a)
-}
+require('@xmcl/installer/util').resolveDownloader = (opts: any, closure: any) =>
+  closure(opts.downloader ? opts : { ...opts, downloader })
 
 const fs = require('fs-extra')
 const installer = require('@xmcl/installer/index')

@@ -1,37 +1,43 @@
 import urlJoin from 'url-join'
-import { DefaultDownloader, DownloadOption, Installer } from '@xmcl/installer/index'
+import { HttpDownloader, DownloadOption, Installer } from '@xmcl/installer/index'
 import { NOT_PROXY } from 'reqwq'
 
+interface Version { id: string, url: string }
 export interface DownloadProvider {
   name (): string
   locales?: string[]
   launchermeta: string
   launcher: string
-  resources: string
-  libraries: string
+  resources: string | string[]
+  libraries: string | string[]
   forge: string
   preference?: boolean
-  client?: (version: { id: string, url: string }) => string
+  json?: (version: Version) => string
+  client?: (version: Version) => string
   optifine?: (mcVersion: string, type: string, version: string) => Promise<string> | string
 }
 
 export const optifine = (mcVersion: string, type: string, version: string) =>
   `https://bmclapi2.bangbang93.com/optifine/${mcVersion}/${type}/${version}`
+
+const MCBBSAPI: DownloadProvider & { [NOT_PROXY]: true } = {
+  [NOT_PROXY]: true,
+  preference: true,
+  name: () => 'MCBBSAPI',
+  locales: ['zh'],
+  launchermeta: 'https://download.mcbbs.net',
+  launcher: 'https://download.mcbbs.net',
+  resources: 'https://download.mcbbs.net/assets',
+  libraries: 'https://download.mcbbs.net/maven',
+  forge: 'https://download.mcbbs.net/maven',
+  json: ({ id }) => `https://download.mcbbs.net/version/${id}/json`,
+  client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`,
+  optifine: (mcVersion: string, type: string, version: string) =>
+    `https://download.mcbbs.net/optifine/${mcVersion}/${type}/${version}`
+}
+
 const DownloadProviders = {
-  MCBBSAPI: {
-    [NOT_PROXY]: true,
-    preference: true,
-    name: () => 'MCBBSAPI',
-    locales: ['zh'],
-    launchermeta: 'https://download.mcbbs.net',
-    launcher: 'https://download.mcbbs.net',
-    resources: 'https://download.mcbbs.net/assets',
-    libraries: 'https://download.mcbbs.net/maven',
-    forge: 'https://download.mcbbs.net/maven',
-    client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`,
-    optifine: (mcVersion: string, type: string, version: string) =>
-      `https://download.mcbbs.net/optifine/${mcVersion}/${type}/${version}`
-  },
+  MCBBSAPI,
   BMCLAPI: {
     [NOT_PROXY]: true,
     name: () => 'BMCLAPI',
@@ -41,8 +47,22 @@ const DownloadProviders = {
     resources: 'https://bmclapi2.bangbang93.com/assets',
     libraries: 'https://bmclapi2.bangbang93.com/maven',
     forge: 'https://bmclapi2.bangbang93.com/maven',
+    json: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/json`,
     client: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/client`,
     optifine
+  },
+  TSS_MIRROR: {
+    ...MCBBSAPI,
+    preference: false,
+    name: () => 'TSS Mirror',
+    client: (c: any) => {
+      try { return 'https://mc.mirrors.tmysam.top' + new URL(c.url).pathname } catch (e) {
+        console.error(e)
+        return MCBBSAPI.client(c)
+      }
+    },
+    resources: 'https://mcres.mirrors.tmysam.top',
+    libraries: 'https://mclib.mirrors.tmysam.top'
   },
   OFFICIAL: {
     [NOT_PROXY]: true,
@@ -66,8 +86,15 @@ const DownloadProviders = {
   }
 }
 
-export class ProgressDownloader extends DefaultDownloader {
+export class ProgressDownloader extends HttpDownloader {
   public bytes = 0
+  public syncSockets = () => {
+    this.agents.http.maxSockets = this.agents.https.maxSockets = profilesStore.extraJson.downloadThreads
+  }
+  constructor () {
+    super()
+    pluginMaster.once('loaded', this.syncSockets)
+  }
   public downloadFile (option: DownloadOption) {
     const fn = option.progress
     option.progress = (c, w, t, u) => {
@@ -88,11 +115,15 @@ export const getDownloaders = (client?: any): Installer.Option => {
   if (!provider) isOffcical = true
   return {
     downloader,
+    jsonUrl: client && provider.json ? provider.json(client) : undefined,
     client: client && provider.client ? provider.client(client) : undefined,
     assetsDownloadConcurrency: profilesStore.extraJson.downloadThreads || 16,
     maxConcurrency: profilesStore.extraJson.downloadThreads || 16,
-    assetsHost: isOffcical ? undefined : [provider.resources],
-    libraryHost: isOffcical && provider?.libraries ? undefined : lib => urlJoin(provider.libraries, lib.download.path)
+    assetsHost: isOffcical ? undefined : typeof provider.resources === 'string'
+      ? [provider.resources] : provider.resources,
+    libraryHost: isOffcical && provider?.libraries ? undefined : lib => typeof provider.libraries === 'string'
+      ? urlJoin(provider.libraries, lib.download.path)
+      : provider.libraries.map(it => urlJoin(it, lib.download.path))
   }
 }
 

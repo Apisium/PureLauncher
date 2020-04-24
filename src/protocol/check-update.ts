@@ -15,7 +15,7 @@ import { remote, ipcRenderer, shell } from 'electron'
 import { getJson, download, genId } from '../utils/index'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_MODS_INDEX_FILE_NAME, ENTRY_POINT_PATH,
   RESOURCES_VERSIONS_PATH, ASAR_PATH, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX,
-  LAUNCHER_MANIFEST_URL, TEMP_PATH, DEFAULT_LOCATE } from '../constants'
+  LATEST_URL, TEMP_PATH, DOWNLOAD_ASAR_URL, DOWNLOAD_EXE_URL } from '../constants'
 
 export default async (version: string) => {
   const json: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[version]
@@ -43,15 +43,13 @@ export const updatePlugins = async () => {
 
 let downloaded = ''
 export const updateLauncher = async () => {
-  const data = await getJson(LAUNCHER_MANIFEST_URL)
-  const url: string = data.downloads[+(DEFAULT_LOCATE !== 'zh-cn')]
-  const json = await getJson(joinUrl(url, 'latest.json'))
+  const json = await getJson(joinUrl(LATEST_URL))
   if (!gt(json.version, version)) return
   if (major(json.version) === major(version)) {
     const destination = join(TEMP_PATH, genId())
     await download({
       destination,
-      url: joinUrl(url, 'app.asar'),
+      url: DOWNLOAD_ASAR_URL,
       checksum: { algorithm: 'sha1', hash: json.asar }
     }, $('Update Package'), `PureLauncher-${json.version}.asar`)
     await fs.ensureDir(ASAR_PATH)
@@ -66,7 +64,7 @@ export const updateLauncher = async () => {
         downloaded = join(TEMP_PATH, `PureLauncher-${json.version}-${genId()}.exe`)
         await download({
           destination: downloaded,
-          url: joinUrl(url, 'PureLauncher.exe'),
+          url: DOWNLOAD_EXE_URL,
           checksum: { algorithm: 'sha1', hash: json.exe }
         }, $('Update Package'), `PureLauncher-${json.version}.exe`)
         localStorage.removeItem('updateCheckTime')
