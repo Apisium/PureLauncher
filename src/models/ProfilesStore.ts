@@ -12,7 +12,7 @@ import pAll from 'p-all'
 import moment from 'moment'
 import urlJoin from 'url-join'
 import * as Auth from '../plugin/Authenticator'
-import DownloadProviders, { DownloadProvider } from '../plugin/DownloadProviders'
+import DownloadProviders, { DownloadProvider, downloader } from '../plugin/DownloadProviders'
 
 const MINECRAFT_MANIFEST = 'minecraftManifest'
 const MINECRAFT_MANIFEST_UPDATE_TIME = 'minecraftManifestUpdateTime'
@@ -286,6 +286,7 @@ export default class ProfilesStore extends Store {
     if (!(key in DownloadProviders)) return
     this.extraJson.downloadProvider = key
     await this.saveExtraConfigJson()
+    localStorage.removeItem(MINECRAFT_MANIFEST_UPDATE_TIME)
   }
 
   public async setArgs (args: string) {
@@ -295,6 +296,7 @@ export default class ProfilesStore extends Store {
 
   public async setDownloadThreads (num: number) {
     this.extraJson.downloadThreads = num
+    downloader.syncSockets()
     await this.saveExtraConfigJson()
   }
 

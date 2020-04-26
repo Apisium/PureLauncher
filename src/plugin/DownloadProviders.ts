@@ -1,9 +1,11 @@
 import urlJoin from 'url-join'
 import { HttpDownloader, DownloadOption, Installer } from '@xmcl/installer/index'
 import { NOT_PROXY } from 'reqwq'
+import { Version } from '@xmcl/installer/minecraft'
+import { ResolvedVersion } from '@xmcl/core'
 
-interface Version { id: string, url: string }
 export interface DownloadProvider {
+  [NOT_PROXY]: true
   name (): string
   locales?: string[]
   launchermeta: string
@@ -12,15 +14,16 @@ export interface DownloadProvider {
   libraries: string | string[]
   forge: string
   preference?: boolean
-  json?: (version: Version) => string
-  client?: (version: Version) => string
+  assetsIndex?: (version: ResolvedVersion) => string | string[]
+  json?: (version: Pick<Version, 'url' | 'id'>) => string | string[]
+  client?: (version: ResolvedVersion) => string | string[]
   optifine?: (mcVersion: string, type: string, version: string) => Promise<string> | string
 }
 
 export const optifine = (mcVersion: string, type: string, version: string) =>
   `https://bmclapi2.bangbang93.com/optifine/${mcVersion}/${type}/${version}`
 
-const MCBBSAPI: DownloadProvider & { [NOT_PROXY]: true } = {
+const MCBBSAPI: DownloadProvider = {
   [NOT_PROXY]: true,
   preference: true,
   name: () => 'MCBBSAPI',
@@ -30,60 +33,64 @@ const MCBBSAPI: DownloadProvider & { [NOT_PROXY]: true } = {
   resources: 'https://download.mcbbs.net/assets',
   libraries: 'https://download.mcbbs.net/maven',
   forge: 'https://download.mcbbs.net/maven',
+  assetsIndex: ({ assetIndex }) => 'https://download.mcbbs.net' + new URL(assetIndex.url).pathname,
   json: ({ id }) => `https://download.mcbbs.net/version/${id}/json`,
   client: ({ id }) => `https://download.mcbbs.net/version/${id}/client`,
   optifine: (mcVersion: string, type: string, version: string) =>
     `https://download.mcbbs.net/optifine/${mcVersion}/${type}/${version}`
 }
 
+const BMCLAPI: DownloadProvider = {
+  [NOT_PROXY]: true,
+  name: () => 'BMCLAPI',
+  locales: ['zh'],
+  launchermeta: 'https://bmclapi2.bangbang93.com',
+  launcher: 'https://bmclapi2.bangbang93.com',
+  resources: 'https://bmclapi2.bangbang93.com/assets',
+  libraries: 'https://bmclapi2.bangbang93.com/maven',
+  forge: 'https://bmclapi2.bangbang93.com/maven',
+  json: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/json`,
+  client: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/client`,
+  assetsIndex: ({ assetIndex }) => 'https://bmclapi2.bangbang93.com' + new URL(assetIndex.url).pathname,
+  optifine
+}
+
+const TSS_MIRROR: DownloadProvider = {
+  ...MCBBSAPI,
+  preference: false,
+  name: () => 'TSS Mirror',
+  json: ({ url }) => 'https://mc.mirrors.tmysam.top' + new URL(url).pathname,
+  client: c => 'https://mc.mirrors.tmysam.top' + new URL(c.downloads.client.url).pathname,
+  resources: 'https://mcres.mirrors.tmysam.top',
+  libraries: ['https://mclib.mirrors.tmysam.top', MCBBSAPI.libraries as string]
+}
+
+const OFFICIAL: DownloadProvider = {
+  [NOT_PROXY]: true,
+  name: () => $('OFFICIAL'),
+  launchermeta: 'http://launchermeta.mojang.com',
+  launcher: 'https://launcher.mojang.com',
+  resources: 'http://resources.download.minecraft.net',
+  libraries: 'https://libraries.minecraft.net',
+  forge: 'https://files.minecraftforge.net/maven',
+  async optifine (mcVersion: string, type: string, version: string) {
+    const text = await fetch(`https://optifine.net/adloadx?f=${version.includes('pre') ? 'preview_' : ''}OptiFine_${mcVersion}_${type}_${version}.jar`)
+      .then(it => it.text())
+    if (text) {
+      const ret = /<a href='downloadx\?(.+?)'/.exec(text)
+      if (ret && ret[1]) {
+        return 'https://optifine.net/downloadx?' + ret[1]
+      }
+    }
+    return optifine(mcVersion, type, version)
+  }
+}
+
 const DownloadProviders = {
   MCBBSAPI,
-  BMCLAPI: {
-    [NOT_PROXY]: true,
-    name: () => 'BMCLAPI',
-    locales: ['zh'],
-    launchermeta: 'https://bmclapi2.bangbang93.com',
-    launcher: 'https://bmclapi2.bangbang93.com',
-    resources: 'https://bmclapi2.bangbang93.com/assets',
-    libraries: 'https://bmclapi2.bangbang93.com/maven',
-    forge: 'https://bmclapi2.bangbang93.com/maven',
-    json: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/json`,
-    client: ({ id }) => `https://bmclapi2.bangbang93.com/version/${id}/client`,
-    optifine
-  },
-  TSS_MIRROR: {
-    ...MCBBSAPI,
-    preference: false,
-    name: () => 'TSS Mirror',
-    client: (c: any) => {
-      try { return 'https://mc.mirrors.tmysam.top' + new URL(c.url).pathname } catch (e) {
-        console.error(e)
-        return MCBBSAPI.client(c)
-      }
-    },
-    resources: 'https://mcres.mirrors.tmysam.top',
-    libraries: 'https://mclib.mirrors.tmysam.top'
-  },
-  OFFICIAL: {
-    [NOT_PROXY]: true,
-    name: () => $('OFFICIAL'),
-    launchermeta: 'http://launchermeta.mojang.com',
-    launcher: 'https://launcher.mojang.com',
-    resources: 'http://resources.download.minecraft.net',
-    libraries: 'https://libraries.minecraft.net',
-    forge: 'https://files.minecraftforge.net/maven',
-    async optifine (mcVersion: string, type: string, version: string) {
-      const text = await fetch(`https://optifine.net/adloadx?f=${version.includes('pre') ? 'preview_' : ''}OptiFine_${mcVersion}_${type}_${version}.jar`)
-        .then(it => it.text())
-      if (text) {
-        const ret = /<a href='downloadx\?(.+?)'/.exec(text)
-        if (ret && ret[1]) {
-          return 'https://optifine.net/downloadx?' + ret[1]
-        }
-      }
-      return optifine(mcVersion, type, version)
-    }
-  }
+  BMCLAPI,
+  TSS_MIRROR,
+  OFFICIAL
 }
 
 export class ProgressDownloader extends HttpDownloader {
@@ -109,14 +116,15 @@ export class ProgressDownloader extends HttpDownloader {
 
 export const downloader = new ProgressDownloader()
 
-export const getDownloaders = (client?: any): Installer.Option => {
+export const getDownloaders = (): Installer.Option => {
   let isOffcical = profilesStore.extraJson.downloadProvider === 'OFFICIAL'
   const provider: DownloadProvider = DownloadProviders[profilesStore.extraJson.downloadProvider]
   if (!provider) isOffcical = true
   return {
     downloader,
-    jsonUrl: client && provider.json ? provider.json(client) : undefined,
-    client: client && provider.client ? provider.client(client) : undefined,
+    json: provider.json,
+    client: provider.client,
+    assetsIndexUrl: provider.assetsIndex,
     assetsDownloadConcurrency: profilesStore.extraJson.downloadThreads || 16,
     maxConcurrency: profilesStore.extraJson.downloadThreads || 16,
     assetsHost: isOffcical ? undefined : typeof provider.resources === 'string'
