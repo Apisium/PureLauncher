@@ -15,7 +15,7 @@ const Profiles: React.FC = () => {
   return <div className='manager-list version-switch manager-versions manager-profiles'>
     <div className='list-top'>
       <span className='header'>{$('Accounts')}</span>
-      <a className='add-btn' role='button' onClick={() => pm.setLoginDialogVisible()}>
+      <a className='add-btn' role='button' onClick={() => (pm.loginDialogVisible = true)}>
         <i data-sound className='iconfont icon-shuliang-zengjia_o' />
         <span data-sound>{$('Add account')}</span>
       </a>

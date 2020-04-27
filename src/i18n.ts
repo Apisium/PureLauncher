@@ -2,14 +2,15 @@ import 'moment/locale/zh-cn'
 import zhCN from '../langs/zh-cn.json'
 import moment from 'moment'
 import forceUpdate from 'react-deep-force-update'
+import { RefObject } from 'react'
 
 export const langs = {
   'zh-cn': zhCN,
   'en-us': { $LanguageName$: 'English' }
 }
 
-let instance: any
-export const setInstance = (instance2: any) => (instance = instance2)
+let instance: RefObject<any>
+export const setInstance = (instance2: RefObject<any>) => (instance = instance2)
 
 let current = zhCN
 export let currentName = 'zh-cn'

@@ -69,7 +69,7 @@ export default class ResourceInstaller extends Plugin {
       await profilesStore.ensureVersionManifest()
       const data = profilesStore.versionManifest.versions.find(it => it.id === r.mcVersion)
       if (!data) throw new Error('No such version: ' + r.mcVersion)
-      await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders(data)),
+      await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders()),
         $('Install') + ' Minecraft', r.mcVersion).wait()
     }
   }

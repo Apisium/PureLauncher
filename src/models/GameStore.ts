@@ -278,9 +278,9 @@ System: ${process.platform} ${release()}, Arch: ${process.arch}`, 'b')
       throw e
     }
   }
-  private async ensureMinecraftVersion (version: any) {
+  private async ensureMinecraftVersion (version: Pick<Installer.Version, 'url' | 'id'>) {
     if (!version) throw new Error('No version provided!')
-    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders(version))
+    const task = Installer.installTask('client', version, GAME_ROOT, getDownloaders())
     await addTask(task, $('Ensure version JAR'), version.id).wait()
   }
   private async ensureLocalVersion (versionId: string) {

@@ -32,7 +32,7 @@ const SideBar: React.FC = () => {
   const noTitle = $('No Title')
   const lastRelease = $('last-release')
   const lastSnapshot = $('last-snapshot')
-  const openVersionSwitch = () => setSwitch(true)
+  const openVersionSwitch = () => !pm.extraJson.fold && setSwitch(true)
   const gs = useStore(GameStore)
   const ver = pm.selectedVersion
   const u = pm.getCurrentProfile()
@@ -76,7 +76,7 @@ const SideBar: React.FC = () => {
   }
   const launchBtn = <button
     className='btn btn-primary launch'
-    onClick={() => logged && !wrongAccount ? gs.launch() : pm.setLoginDialogVisible()}
+    onClick={() => logged && !wrongAccount ? gs.launch() : (pm.loginDialogVisible = true)}
     disabled={wrongAccount || gs.status !== STATUS.READY}
   >
     <i data-sound className='iconfont icon-icons-minecraft_pic' />
@@ -96,7 +96,11 @@ const SideBar: React.FC = () => {
             u.skinUrl,
             join(SKINS_PATH, u.key + '.png')
           ] : null}
-          onClick={() => logged ? setProfile(true) : pm.setLoginDialogVisible()}
+          onClick={() => {
+            if (pm.extraJson.fold) return
+            if (logged) setProfile(true)
+            else pm.loginDialogVisible = true
+          }}
         />
       </ToolTip>
       <AnimatePresence exitBeforeEnter>
@@ -138,7 +142,7 @@ const SideBar: React.FC = () => {
         [{$('Click here to switch versions')}]
       </a>
       <Profile onClose={() => setProfile(false)} open={openProfile} />
-      <LoginDialog onClose={() => pm.setLoginDialogVisible(false)} open={pm.loginDialogVisible} />
+      <LoginDialog onClose={() => (pm.loginDialogVisible = false)} open={pm.loginDialogVisible} />
       <VersionSwitch onClose={() => setSwitch(false)} open={openSwitch} />
     </div>
   )

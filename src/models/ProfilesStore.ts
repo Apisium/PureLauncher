@@ -13,6 +13,7 @@ import moment from 'moment'
 import urlJoin from 'url-join'
 import * as Auth from '../plugin/Authenticator'
 import DownloadProviders, { DownloadProvider, downloader } from '../plugin/DownloadProviders'
+import { VersionList } from '@xmcl/installer/minecraft'
 
 const MINECRAFT_MANIFEST = 'minecraftManifest'
 const MINECRAFT_MANIFEST_UPDATE_TIME = 'minecraftManifestUpdateTime'
@@ -64,7 +65,7 @@ export default class ProfilesStore extends Store {
     javaArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 ' +
       '-XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -XX:-UseAdaptiveSizePolicy -XX:-OmitStackTraceInFastThrow'
   }
-  public versionManifest = {
+  public versionManifest: VersionList & { [NOT_PROXY]: true } = {
     [NOT_PROXY]: true,
     timestamp: '',
     versions: [],
@@ -122,10 +123,7 @@ export default class ProfilesStore extends Store {
     downloader.syncSockets()
     this.checkModsDirectory().catch(console.error)
     this.syncVersions().catch(console.error)
-    // this.ensureVersionManifest().catch(console.error)
   }
-
-  public setLoginDialogVisible (state = true) { this.loginDialogVisible = state }
 
   public getCurrentProfile () {
     if (!this.extraJson.loginType) return null

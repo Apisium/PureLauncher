@@ -141,7 +141,7 @@ const Profile: React.FC<{ open: boolean, onClose: () => void }> = props => {
         <button
           className='btn btn-primary' disabled={loading} onClick={() => {
             props.onClose()
-            pm.setLoginDialogVisible(true)
+            pm.loginDialogVisible = true
           }}
         >{$('Add account')}</button>
         <button

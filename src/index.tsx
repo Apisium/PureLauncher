@@ -24,7 +24,7 @@ const top = document.getElementById('top')
 const logo = document.getElementById('top-logo')
 logo.onclick = () => shell.openExternal('https://pl.apisium.cn')
 
-let instance: any
+let instance: import('rc-notification/lib/Notification').NotificationInstance
 Notification.newInstance({ getContainer: () => document.body }, it => (instance = it))
 window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boolean }) => {
   if (!ctx.duration) ctx.duration = 5
