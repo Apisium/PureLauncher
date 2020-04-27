@@ -11,7 +11,7 @@
     "fix": "eslint src/ packages/ .github/ --fix --ext .js,.ts,.tsx",
     "start": "parcel index.html src/main.ts --bundle-node-modules --no-autoinstall --target electron --public-url .",
     "run": "electron .",
-    "pack": "npm run sync-version && electron-builder",
+    "pack": "npm run sync-version && electron-builder --publish=never",
     "sync-version": "node packages/sync-version/index.js",
     "build": "npm run clean && parcel build index.html src/main.ts --target electron --public-url . -d app/dist --bundle-node-modules --no-source-maps --no-cache",
     "test": "npm run lint",
@@ -224,7 +224,6 @@
       "include": "build/installer.nsh",
       "appPackageUrl": "https://nsis.pl.apisium.cn/release/pl-nsis-redirect"
     },
-    "publish": [],
     "linux": {
       "maintainer": "Shirasawa <764798966@qq.com>",
       "icon": "build/icons",
