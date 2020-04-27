@@ -224,6 +224,7 @@
       "include": "build/installer.nsh",
       "appPackageUrl": "https://nsis.pl.apisium.cn/release/pl-nsis-redirect"
     },
+    "publish": [],
     "linux": {
       "maintainer": "Shirasawa <764798966@qq.com>",
       "icon": "build/icons",
