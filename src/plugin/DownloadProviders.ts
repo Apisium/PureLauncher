@@ -95,12 +95,8 @@ const DownloadProviders = {
 
 export class ProgressDownloader extends HttpDownloader {
   public bytes = 0
-  public syncSockets = () => {
+  public syncSockets () {
     this.agents.http.maxSockets = this.agents.https.maxSockets = profilesStore.extraJson.downloadThreads
-  }
-  constructor () {
-    super()
-    pluginMaster.once('loaded', this.syncSockets)
   }
   public downloadFile (option: DownloadOption) {
     const fn = option.progress
