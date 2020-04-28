@@ -1,7 +1,7 @@
 import { sha1, genId } from '../utils'
 import { join, basename } from 'path'
 import { open, CachedZipFile, Entry } from '@xmcl/unzip/index'
-import { VERSIONS_PATH, RESOURCE_PACKS_PATH, WORLDS_PATH, SHADER_PACKS_PATH } from '../constants'
+import { VERSIONS_PATH, RESOURCE_PACKS_PATH, WORLDS_PATH, SHADER_PACKS_PATH, GAME_ROOT } from '../constants'
 import { plugins } from '../plugin/internal/index'
 import * as T from './types'
 import fs from 'fs-extra'
@@ -50,7 +50,7 @@ export const installResourcePack = async (path: string, zip?: CachedZipFile) => 
     if (await openConfirmDialog({
       cancelButton: true,
       text: $(
-        'It has been detected that the file type dragged in is {0}. Do you want to install it?',
+        'The file type has been dragged in is {0}. Do you want to install it?',
         $('resource pack')
       )
     })) {
@@ -70,7 +70,7 @@ export const installShaderPack = async (path: string, zip?: CachedZipFile) => {
     if (await openConfirmDialog({
       cancelButton: true,
       text: $(
-        'It has been detected that the file type dragged in is {0}. Do you want to install it?',
+        'The file type has been dragged in is {0}. Do you want to install it?',
         $('shader pack')
       )
     })) {
@@ -87,7 +87,7 @@ export const installMod = async (path: string) => {
   const obj = { selectedVersion: '' }
   if (await openConfirmDialog({
     cancelButton: true,
-    text: $('It has been detected that the file type dragged in is {0}. Do you want to install it?', $('mod')),
+    text: $('The file type has been dragged in is {0}. Do you want to install it?', $('mod')),
     component: versionSelector(obj, profilesStore)
   })) {
     let id = obj.selectedVersion
@@ -109,7 +109,7 @@ export const installWorld = async (zip: CachedZipFile) => {
   if (!await openConfirmDialog({
     cancelButton: true,
     text: $(
-      'It has been detected that the file type dragged in is {0}. Do you want to install it?',
+      'The file type has been dragged in is {0}. Do you want to install it?',
       $('world') + ' (' + dir + ')'
     )
   })) return false
@@ -168,3 +168,20 @@ export default async (path: string, autoInstallOthers = false, emitEvent = false
   await pluginMaster.emitSync('zipDragIn', zip, path)
   return true
 }
+
+pluginMaster.on('fileDragIn', async (file: File) => {
+  const { path } = file
+  if (file.type || file.name !== '.minecraft' || await fs.stat(path).then(it => !it.isDirectory(), () => true) ||
+    !await openConfirmDialog({
+      cancelButton: true,
+      text: $('The .minecraft folder has been dragged in. Do you need to import all versions, resource packages, mods and other files?')
+    })) return
+  notice({ content: $('Installing resources...') })
+  try {
+    await fs.copy(path, GAME_ROOT, { overwrite: false })
+    notice({ content: $('Success!') })
+  } catch (e) {
+    console.error(e)
+    notice({ content: e ? e.message : $('Failed!'), error: true })
+  }
+})

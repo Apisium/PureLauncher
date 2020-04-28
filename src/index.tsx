@@ -18,6 +18,7 @@ import { ResourceVersion } from './protocol/types'
 import { download, genId, getJson, openServerHome } from './utils/index'
 import { TEMP_PATH, DEFAULT_LOCATE, LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL,
   RESOURCES_VERSIONS_INDEX_PATH } from './constants'
+import { downloader } from './plugin/DownloadProviders'
 
 const main = document.getElementsByTagName('main')[0]
 const top = document.getElementById('top')
@@ -40,6 +41,7 @@ window.notice = (ctx: { content: React.ReactNode, duration?: number, error?: boo
 
 const html = document.getElementsByTagName('html')[0]
 pluginMaster.once('loaded', () => {
+  downloader.syncSockets()
   process.nextTick(() => (html.style.opacity = '1'))
   ReactDOM.render(<App />, document.getElementById('root'), () => {
     const goLeft = document.getElementById('go-left')

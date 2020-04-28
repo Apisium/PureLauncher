@@ -107,7 +107,7 @@
   "File drag detected, release to install.": "检测到文件拖入，释放后即可安装",
   "Illegal resource type!": "错误的资源类型!",
   "Do you want to export MODS and resource packs?": "是否要导出模组和材质包?",
-  "It has been detected that the file type dragged in is {0}. Do you want to install it?":
+  "The file type has been dragged in is {0}. Do you want to install it?":
     "检测到拖入的文件类型为{0}，请问是否需要安装?",
   "The current game version is not installed by PureLauncher, so the export may be incomplete!":
     "当前游戏版本并不是由PureLauncher安装的，因此可能会导致导出不完整！",
@@ -115,6 +115,8 @@
   "Aero is not enabled in the current system, resulting in abnormal GUI!": "当前系统没有启用Aero, 导致界面显示异常!",
   "The game launched successfully, but the game has exited abnormally. Game crash is not a problem of PureLauncher, but may be caused by incompatible mods. So please DO NOT report this log to PureLauncher!":
     "游戏已经成功启动, 但目前游戏已经异常退出. 游戏崩溃并不是 PureLauncher 的问题, 而可能是由于模组不兼容所导致, 因此请不要将此日志报告给 PureLauncher!",
+  "The .minecraft folder has been dragged in. Do you need to import all versions, resource packages, mods and other files?":
+    "检测到 .minecraft 文件夹被拖入, 请问是否需要导入全部的版本, 资源包和模组等数据?",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",

@@ -22,6 +22,7 @@ const parseArgs = (args: string[]) => {
 
 if (app.requestSingleInstanceLock()) {
   app.on('second-instance', (_, argv) => {
+    console.log(argv)
     if (window) {
       if (window.isMinimized()) {
         window.restore()
@@ -117,6 +118,6 @@ app
   .on('ready', process.platform === 'linux' ? () => setTimeout(create, 400) : create)
   .on('before-quit', () => runBeforeQuit && runBeforeQuit.length && spawn.apply(null, runBeforeQuit)
     .once('error', console.error).unref())
-  .on('quit', () => setTimeout(() => app.exit(), 1500))
+  // .on('quit', () => setTimeout(() => app.exit(), 1500))
   .on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
   .on('activate', () => window == null && create())

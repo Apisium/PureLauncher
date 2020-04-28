@@ -120,7 +120,6 @@ export default class ProfilesStore extends Store {
       this.onLoadExtraConfigFailed(e)
     }
 
-    downloader.syncSockets()
     this.checkModsDirectory().catch(console.error)
     this.syncVersions().catch(console.error)
   }

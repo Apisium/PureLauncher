@@ -5,7 +5,6 @@ import { isVersion, ResourceVersion } from '../../protocol/types'
 import { addTask, download, genId } from '../../utils/index'
 import { GAME_ROOT, TEMP_PATH } from '../../constants'
 import { getDownloaders, downloader, optifine } from '../../plugin/DownloadProviders'
-import { installMod } from '../../protocol/install-local'
 import { promises as fs } from 'fs'
 import * as Installer from '@xmcl/installer/index'
 
@@ -72,16 +71,5 @@ export default class ResourceInstaller extends Plugin {
       await addTask(Installer.Installer.installTask('client', data, GAME_ROOT, getDownloaders()),
         $('Install') + ' Minecraft', r.mcVersion).wait()
     }
-  }
-
-  @event()
-  public fileDragIn (file: File) {
-    notice({ content: $('Installing resources...') })
-    installMod(file.path)
-      .then(success => {
-        if (success) notice({ content: $('Success!') })
-        else notice({ content: $('Failed!') })
-      })
-      .catch(e => notice({ content: e ? e.message : $('Failed!'), error: true }))
   }
 }
