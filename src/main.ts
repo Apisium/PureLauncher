@@ -6,7 +6,9 @@ import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
 import createServer from './createServer'
+import { Server } from 'http'
 
+let server: Server = null
 let window: BrowserWindow = null
 let launchingWindow: BrowserWindow = null
 const webp = join(app.getPath('userData'), 'launching.webp')
@@ -22,15 +24,14 @@ const parseArgs = (args: string[]) => {
 
 if (app.requestSingleInstanceLock()) {
   app.on('second-instance', (_, argv) => {
-    console.log(argv)
     if (window) {
       if (window.isMinimized()) {
         window.restore()
         window.setBounds({ height: 586, width: 816 })
       }
       window.focus()
-    }
-    parseArgs(argv)
+      parseArgs(argv)
+    } else app.exit()
   })
 } else app.exit()
 
@@ -109,15 +110,18 @@ const create = () => {
   if (isDev) window.webContents.openDevTools()
   parseArgs(process.argv)
 
-  createServer(window)
+  server = createServer(window)
 }
 
 if (process.platform === 'linux') app.commandLine.appendSwitch('enable-transparent-visuals')
 
 app
   .on('ready', process.platform === 'linux' ? () => setTimeout(create, 400) : create)
-  .on('before-quit', () => runBeforeQuit && runBeforeQuit.length && spawn.apply(null, runBeforeQuit)
-    .once('error', console.error).unref())
+  .on('before-quit', () => {
+    server.close()
+    runBeforeQuit && runBeforeQuit.length && spawn.apply(null, runBeforeQuit)
+      .once('error', console.error).unref()
+  })
   // .on('quit', () => setTimeout(() => app.exit(), 1500))
   .on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
   .on('activate', () => window == null && create())
