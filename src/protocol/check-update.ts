@@ -15,7 +15,7 @@ import { remote, ipcRenderer, shell } from 'electron'
 import { getJson, download, genId } from '../utils/index'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_MODS_INDEX_FILE_NAME, ENTRY_POINT_PATH,
   RESOURCES_VERSIONS_PATH, ASAR_PATH, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX,
-  LATEST_URL, TEMP_PATH, DOWNLOAD_ASAR_URL, DOWNLOAD_EXE_URL } from '../constants'
+  LATEST_URL, TEMP_PATH, DOWNLOAD_ASAR_URL, DOWNLOAD_EXE_URL, IS_WINDOWS } from '../constants'
 
 export default async (version: string) => {
   const json: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[version]
@@ -59,7 +59,7 @@ export const updateLauncher = async () => {
     analytics.event('update', 'asar')
     requestReload(true)
   } else {
-    if (process.platform === 'win32') {
+    if (IS_WINDOWS) {
       if (!downloaded) {
         downloaded = join(TEMP_PATH, `PureLauncher-${json.version}-${genId()}.exe`)
         await download({

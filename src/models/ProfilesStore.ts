@@ -5,8 +5,9 @@ import { YGGDRASIL } from '../plugin/logins'
 import { langs, applyLocate } from '../i18n'
 import { ResourceVersion } from '../protocol/types'
 import { getJavaVersion, cacheSkin, genUUID, vertifyJava, openServerHome } from '../utils/index'
-import { LAUNCH_PROFILE_PATH, EXTRA_CONFIG_PATH, MC_LOGO, MODS_PATH, LAUNCH_PROFILE_FILE_NAME, VERSIONS_PATH,
-  GAME_ROOT, EXTRA_CONFIG_FILE_NAME, RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
+import { LAUNCH_PROFILE_PATH, EXTRA_CONFIG_PATH, MODS_PATH, LAUNCH_PROFILE_FILE_NAME,
+  VERSIONS_PATH, MC_LOGO_PATH, IS_WINDOWS, GAME_ROOT, EXTRA_CONFIG_FILE_NAME,
+  RESOURCES_VERSIONS_INDEX_PATH, APP_PATH, DEFAULT_LOCATE } from '../constants'
 import fs from 'fs-extra'
 import pAll from 'p-all'
 import moment from 'moment'
@@ -154,7 +155,7 @@ export default class ProfilesStore extends Store {
       title: $('Locate Java'),
       message: $('Locate the path of Java 8'),
       filters: [
-        { name: $('Executable File (Javaw)'), extensions: process.platform === 'win32' ? ['exe'] : [''] }
+        { name: $('Executable File (Javaw)'), extensions: IS_WINDOWS ? ['exe'] : [''] }
       ]
     })
     if (ret.canceled) return
@@ -403,7 +404,7 @@ export default class ProfilesStore extends Store {
             type: 'tasks',
             name: $('Recent play'),
             items: versions.map(([version, v]) => ({
-              icon: MC_LOGO,
+              icon: MC_LOGO_PATH,
               type: 'task',
               iconIndex: 0,
               program: process.execPath,

@@ -86,7 +86,7 @@ const { promisify } = require('util')
       Body: hashesData
     })
     try {
-      core.info(await new Refresher(options).purgeDirsCache('https://dl.pl.apisium.cn/'))
+      core.info(JSON.stringify(await new Refresher(options).purgeDirsCache('https://dl.pl.apisium.cn/')))
     } catch (e) {
       core.warning(e)
     }

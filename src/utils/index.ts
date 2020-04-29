@@ -13,13 +13,13 @@ import { ZipFile } from 'yazl'
 import { version } from '../../package.json'
 import { join, resolve, extname, basename } from 'path'
 import { createHash, BinaryLike } from 'crypto'
-import { exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
 import { extractTaskFunction } from '@xmcl/unzip/task/index'
 import { ILocateJavaHomeOptions, IJavaHomeInfo } from 'locate-java-home/js/es5/lib/interfaces'
 import { DEFAULT_EXT_FILTER, SKINS_PATH, TEMP_PATH, LAUNCHER_MANIFEST_URL,
-  DEFAULT_LOCATE, APP_PATH, GAME_ROOT } from '../constants'
+  DEFAULT_LOCATE, APP_PATH, GAME_ROOT, UNPACKED_PATH, IS_WINDOWS } from '../constants'
 import { DownloadOption } from '@xmcl/installer/index'
 import { downloader } from '../plugin/DownloadProviders'
 import { genUUIDOrigin } from './analytics'
@@ -259,7 +259,7 @@ export const vertifyJava = async (version: [string, boolean], dialog = false) =>
 
 const locateJavaAsync: (options: ILocateJavaHomeOptions) => Promise<IJavaHomeInfo[] | null> = promisify(locateJava)
 export const findJavaPath = async () => {
-  const ext = process.platform === 'win32' ? '.exe' : ''
+  const ext = IS_WINDOWS ? '.exe' : ''
   const baseName = (process.platform === 'linux' ? 'java' : 'javaw') + ext
   const name = 'bin/' + baseName
   let path = join(getSelfInstalledJavaPath(), name)
@@ -326,4 +326,12 @@ export const watchFile = (path: string, onChange: () => any, time = 5000) => {
     .then(() => (f = fs.watch(path, debounce(onChange, time)).on('error', console.error)))
     .catch(console.error)
   return () => f?.close()
+}
+
+const CRIPT_FILE = join(UNPACKED_PATH, 'createShortcut.js')
+export const createShortcut = (name: string, target: string, args = '', description = '', icon?: string) => {
+  if (!IS_WINDOWS) return Promise.reject(new Error('It does not running in Windows!'))
+  return new Promise((resolve, reject) => spawn('cscript', [CRIPT_FILE, name, target,
+    args.replace(/"/g, '*?#!*'), description, icon || (process.execPath + ', 0')])
+    .on('error', reject).on('close', resolve))
 }

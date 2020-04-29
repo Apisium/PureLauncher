@@ -13,10 +13,10 @@ import analytics from '../../utils/analytics'
 import Loading from '../../components/Loading'
 import { join } from 'path'
 import { useStore } from 'reqwq'
-import { VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH } from '../../constants'
+import { VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, MC_LOGO_PATH, IS_WINDOWS } from '../../constants'
 import { exportVersion } from '../../protocol/exporter'
 import { uninstallVersion } from '../../protocol/uninstaller'
-import { autoNotices } from '../../utils'
+import { autoNotices, createShortcut } from '../../utils'
 import { clipboard, shell } from 'electron'
 import { ResourceVersion } from '../../protocol/types'
 
@@ -86,6 +86,21 @@ const VersionEdit: React.FC<{ version: string, onClose: () => void, installed: R
         <label>{$('NAME')}</label>
         <input name='name' defaultValue={ver.name} placeholder={$('Unnamed')} />
       </div>
+      {IS_WINDOWS && <a
+        role='link'
+        className='quick-launch'
+        onClick={() => {
+          const text = $('Quick Launch')
+          notice({ content: $('Creating...') })
+          const name = ver.name || (ver.type === 'latest-release' ? $('last-release') : ver.type === 'latest-snapshot'
+            ? $('last-snapshot') : ver.lastVersionId || $('No Title'))
+          autoNotices(createShortcut(`${name} - ${text}`, process.execPath,
+            JSON.stringify(JSON.stringify({
+              version: p.version,
+              type: 'Launch',
+              secret: localStorage.getItem('analyticsToken')
+            })), `${text} Minecraft: ${name} (PureLauncher)`, MC_LOGO_PATH))
+        }}>{$('CREATE SHORTCUT')}</a>}
     </form>
     <IconPicker onClose={it => (setIcon(it), setOpen(false))} open={open} />
   </Dialog>
@@ -165,7 +180,7 @@ const Versions: React.FC = () => {
   const [currentVersion, setCurrentVersion] = useState('')
   const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')
-  const unknown = $('Unnamed')
+  const unknown = $('Unknown')
   const lastPlayed = $('Last played')
   const lastRelease = $('last-release')
   const lastSnapshot = $('last-snapshot')

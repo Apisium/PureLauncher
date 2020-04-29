@@ -2,6 +2,9 @@ import { join } from 'path'
 import { ensureDirSync } from 'fs-extra'
 import { remote } from 'electron'
 
+export const APP_ROOT = remote.app.getAppPath()
+export const UNPACKED_PATH = join(APP_ROOT, 'unpacked')
+export const MC_LOGO_PATH = join(UNPACKED_PATH, 'mc-logo.ico')
 export const GAME_ROOT = join(process.platform === 'linux' ? remote.app.getPath('home') : remote.app.getPath('appData'),
   process.platform === 'darwin' ? 'minecraft' : '.minecraft')
 export const APP_PATH = remote.app.getPath('userData')
@@ -36,12 +39,11 @@ export const RESOURCES_RESOURCE_PACKS_INDEX_PATH = join(RESOURCES_PATH, 'resourc
 export const RESOURCES_PLUGINS_INDEX = join(RESOURCES_PATH, 'plugins-index.json')
 export const RESOURCES_MODS_INDEX_FILE_NAME = 'mods-index.json'
 
-export const MC_LOGO = join(process.cwd(), 'unpacked/mc-logo.ico')
-
 export const DEFAULT_EXT_FILTER = ['exe', 'com']
 export const ALLOW_PLUGIN_EXTENSIONS = ['.js', '.mjs', '.asar']
 
 export const DEFAULT_LOCATE = (navigator.languages[0] || 'zh-cn').toLowerCase()
+export const IS_WINDOWS = process.platform === 'win32'
 
 export const LAUNCHING_IMAGE = join(APP_PATH, 'launching.webp')
 export const DOWNLOAD_EXE_URL = 'https://dl.pl.apisium.cn/PureLauncher.exe'

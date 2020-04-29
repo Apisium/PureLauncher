@@ -3,7 +3,7 @@ import { LaunchOption, Version, launch, LaunchPrecheck } from '@xmcl/core/index'
 import { Installer } from '@xmcl/installer/index'
 import { getVersionTypeText, addTask, installJava, findJavaPath,
   getSuitableMemory, isX64, openServerHome } from '../utils/index'
-import { GAME_ROOT, LIBRARIES_PATH, VERSIONS_PATH } from '../constants'
+import { GAME_ROOT, LIBRARIES_PATH, VERSIONS_PATH, IS_WINDOWS } from '../constants'
 import { version as launcherBrand } from '../../package.json'
 import { remote, ipcRenderer, BrowserView } from 'electron'
 import { getDownloaders } from '../plugin/DownloadProviders'
@@ -299,7 +299,7 @@ System: ${process.platform} ${release()}, Arch: ${process.arch}`, 'b')
     }
     if (!javaPath || !await fs.pathExists(javaPath)) {
       localStorage.removeItem('javaPath')
-      if (process.platform === 'win32' && await openConfirmDialog({
+      if (IS_WINDOWS && await openConfirmDialog({
         text: $('Unable to find the Java, do you want to install Java automatically?'),
         cancelButton: true
       })) {

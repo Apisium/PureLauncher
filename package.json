@@ -1,7 +1,7 @@
 {
   "name": "pure-launcher",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An awesome Minecraft Launcher.",
   "main": "dist/src/main.js",
   "scripts": {
@@ -60,16 +60,16 @@
     "@types/minimist": "^1.2.0",
     "@types/node": "^13.13.4",
     "@types/react": "^16.9.34",
-    "@types/react-dom": "^16.9.6",
+    "@types/react-dom": "^16.9.7",
     "@types/react-router-dom": "^5.1.5",
     "@types/semver": "^7.1.0",
     "@types/url-join": "^4.0.0",
     "@types/yauzl": "^2.9.1",
     "@types/yazl": "^2.4.2",
-    "@typescript-eslint/eslint-plugin": "^2.29.0",
-    "@typescript-eslint/parser": "^2.29.0",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
     "@xmcl/core": "^2.2.0",
-    "@xmcl/installer": "^2.8.0",
+    "@xmcl/installer": "^2.8.1",
     "@xmcl/nbt": "^2.0.3",
     "@xmcl/resourcepack": "^1.0.12",
     "@xmcl/task": "^2.1.7",
@@ -80,8 +80,8 @@
     "babel-plugin-module-resolver": "^4.0.0",
     "cos-nodejs-sdk-v5": "^2.5.20",
     "del-cli": "^3.0.0",
-    "electron": "^8.2.3",
-    "electron-builder": "^22.5.1",
+    "electron": "^8.2.4",
+    "electron-builder": "^22.6.0",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-config-standard-react": "^9.2.0",
@@ -140,12 +140,12 @@
     "watcherGlob": "**"
   },
   "browserslist": [
-    "electron 6.1.6"
+    "electron 8.0.0"
   ],
   "dependencies": {
     "@xmcl/client": "^2.0.5",
     "asar": "^3.0.3",
-    "bili": "^4.9.2",
+    "bili": "^4.9.4",
     "chalk": "^4.0.0",
     "fs-extra": "^9.0.0",
     "globby": "^11.0.0",

@@ -53,7 +53,7 @@ export { default as ToolTip } from 'rc-tooltip'
 export { default as ReactImage } from 'react-image'
 export { default as IconPicker, resolveIcon } from '../components/IconPicker'
 export { genId, genUUID, genUUIDOrigin, getJson, fetchJson, makeTempDir, cacheSkin,
-  isX64, createUnzipTask, openServerHome, getJavaVersion, validPath, sha1, md5, replace,
+  isX64, createUnzipTask, openServerHome, getJavaVersion, validPath, sha1, md5, replace, createShortcut,
   getVersionTypeText, download, getSuitableMemory, unzip, playNoticeSound, removeFormatCodes, reloadPage,
   autoNotices, readBuffer, addTask, createDownloadTask, addDirectoryToZipFile } from '../utils/index'
 export { STATUS as LAUNCH_STATUS, IconButtonExports, skinView3d, ofs,

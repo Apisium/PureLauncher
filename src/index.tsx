@@ -15,9 +15,10 @@ import { exists } from 'fs'
 import { remote, shell } from 'electron'
 import { update } from './protocol/check-update'
 import { ResourceVersion } from './protocol/types'
+import { version } from '../package.json'
 import { download, genId, getJson, openServerHome } from './utils/index'
 import { TEMP_PATH, DEFAULT_LOCATE, LAUNCHING_IMAGE, LAUNCHER_MANIFEST_URL,
-  RESOURCES_VERSIONS_INDEX_PATH } from './constants'
+  RESOURCES_VERSIONS_INDEX_PATH, IS_WINDOWS } from './constants'
 import { downloader } from './plugin/DownloadProviders'
 
 const main = document.getElementsByTagName('main')[0]
@@ -120,7 +121,7 @@ pluginMaster.once('loaded', () => {
       process.nextTick(() => (top.style.transition = ''))
     }
     pluginMaster.emit('rendered')
-    if (process.platform === 'win32' && !remote.systemPreferences.isAeroGlassEnabled()) {
+    if (IS_WINDOWS && !remote.systemPreferences.isAeroGlassEnabled()) {
       notice({ content: $('Aero is not enabled in the current system, resulting in abnormal GUI!'), error: true })
     }
   })
@@ -156,6 +157,13 @@ pluginMaster.once('rendered', () => {
       .then((it: Record<string, ResourceVersion>) => it && it[rid] && openServerHome(it[rid].serverHome))
     )
     .catch(() => {})
+  console.log(
+    `%cPureLauncher%c${version}%c Official website: https://pl.apisium.cn\n%cCopyright © 2020 %cApisium%c. All rights reserved.`,
+    'background-color:#096dd9;padding:2px 7px;border-top-left-radius:3px;border-bottom-left-radius:3px',
+    'background-color:#389e0d;padding:2px 7px;border-top-right-radius:3px;border-bottom-right-radius:3px',
+    '', 'color:#aaa;font-size:.6rem', 'font-size:.7rem;font-weight:bold', 'color:#aaa;font-size:.6rem'
+  )
+
   if (!navigator.onLine) return
   const now = Date.now()
   const updateCheckTime = parseInt(localStorage.getItem('updateCheckTime'))
