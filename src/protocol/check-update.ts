@@ -9,6 +9,7 @@ import P from '../models/index'
 import GameStore, { STATUS } from '../models/GameStore'
 import * as T from './types'
 import { join } from 'path'
+import { move } from '../utils/fs'
 import { spawn } from 'child_process'
 import { version } from '../../package.json'
 import { remote, ipcRenderer, shell } from 'electron'
@@ -54,9 +55,9 @@ export const updateLauncher = async () => {
     }, $('Update Package'), `PureLauncher-${json.version}.asar`)
     await fs.ensureDir(ASAR_PATH)
     const file = json.version + '.asar'
-    await fs.move(destination, join(ASAR_PATH, file))
-    await fs.writeJson(ENTRY_POINT_PATH, { file: json.version + '.asar' })
-    analytics.event('update', 'asar')
+    await move(destination, join(ASAR_PATH, file))
+    await fs.writeJson(ENTRY_POINT_PATH, { file: json.version + '.asar', version: json.version })
+    analytics.event('update', 'asar', version)
     requestReload(true)
   } else {
     if (IS_WINDOWS) {

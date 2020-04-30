@@ -27,6 +27,7 @@ declare global {
   declare const stopAnimation: () => void
   declare const animationStopped: boolean
   declare const __updateTasksView: (() => void) | null
+  declare const quitApp: () => void
   declare interface Window {
     $: $
     topBar: TopBar
@@ -42,6 +43,7 @@ declare global {
     openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
     startAnimation: () => void
     stopAnimation: () => void
+    quitApp: () => void
     __updateTasksView: (() => void) | null
   }
   declare namespace NodeJS {
@@ -60,6 +62,7 @@ declare global {
       openConfirmDialog: (data: ConfirmCtx) => Promise<boolean>
       startAnimation: () => void
       stopAnimation: () => void
+      quitApp: () => void
       __updateTasksView: (() => void) | null
     }
   }

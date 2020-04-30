@@ -12,7 +12,7 @@
     "start": "parcel index.html src/main.ts --bundle-node-modules --no-autoinstall --target electron --public-url .",
     "run": "electron .",
     "pack": "npm run sync-version && electron-builder --publish=never",
-    "sync-version": "node packages/sync-version/index.js",
+    "sync-version": "node build/sync-version.js",
     "build": "npm run clean && parcel build index.html src/main.ts --target electron --public-url . -d app/dist --bundle-node-modules --no-source-maps --no-cache",
     "test": "npm run lint",
     "postinstall": "npm run build:web-api",
@@ -49,10 +49,10 @@
   "devDependencies": {
     "@actions/core": "^1.2.3",
     "@actions/github": "^2.1.1",
-    "@babel/core": "^7.9.0",
+    "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
-    "@babel/traverse": "^7.9.5",
-    "@babel/types": "^7.9.5",
+    "@babel/traverse": "^7.9.6",
+    "@babel/types": "^7.9.6",
     "@emotion/core": "^10.0.28",
     "@emotion/styled": "^10.0.27",
     "@types/fs-extra": "^8.1.0",
@@ -172,7 +172,8 @@
     "files": [
       "dist/**/*",
       "!dist/report.html",
-      "main.js"
+      "main.js",
+      "!package-lock.json"
     ],
     "protocols": [
       {

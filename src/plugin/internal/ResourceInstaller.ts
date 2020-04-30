@@ -187,7 +187,7 @@ export default class ResourceInstaller extends Plugin {
         const hashes = await downloadAndGetHash(options) || r.hashes
         await pAll(options.map(it => () => {
           const path = it.moveTo
-          return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => fs.move(it.destination, path))
+          return fs.pathExists(path).then(t => t && fs.remove(path)).then(() => ofs.move(it.destination, path))
         }), { concurrency: 8 })
         r.hashes = hashes
       } else {

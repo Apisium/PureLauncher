@@ -4,7 +4,4 @@ dist
 *.log
 release
 .idea
-cmake-build-debug
-native/target
-native/*.node
-native/artifacts.json
+app/package-lock.json

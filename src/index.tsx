@@ -53,7 +53,7 @@ pluginMaster.once('loaded', () => {
     const list = document.getElementById('sidebar-list')
     const switchText = document.getElementById('sidebar-switch')
 
-    document.getElementById('close').onclick = () => {
+    window.quitApp = document.getElementById('close').onclick = () => {
       document.getElementById('close').onclick = () => {}
       html.style.opacity = '0'
       setTimeout(() => remote.app.quit(), 1000)
