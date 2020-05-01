@@ -3,7 +3,7 @@ import { version } from '../../../package.json'
 import { plugin, Plugin, event } from '../Plugin'
 import { DownloadOption } from '@xmcl/installer/index'
 import { serialize, deserialize, TagType } from '@xmcl/nbt/index'
-import { makeTempDir, getJson, sha1, genId, md5, validPath, replace, download, unzip } from '../../utils/index'
+import { makeTempDir, getJson, sha1, genId, validPath, replace, download, unzip } from '../../utils/index'
 import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_VERSIONS_INDEX_PATH, WORLDS_PATH,
   PLUGINS_ROOT, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX, SERVERS_PATH, SERVERS_FILE_NAME,
   RESOURCES_MODS_INDEX_FILE_NAME, DELETES_FILE, ALLOW_PLUGIN_EXTENSIONS, TEMP_PATH,
@@ -11,7 +11,6 @@ import { VERSIONS_PATH, RESOURCE_PACKS_PATH, RESOURCES_VERSIONS_PATH, RESOURCES_
 import pAll from 'p-all'
 import fs from 'fs-extra'
 import gte from 'semver/functions/gte'
-import major from 'semver/functions/major'
 import install from '../../protocol/install'
 import versionSelector from '../../components/VersionSelector'
 import * as T from '../../protocol/types'
@@ -140,8 +139,7 @@ export default class ResourceInstaller extends Plugin {
   public async installVersion (r: T.ResourceVersion, o: T.InstallView = { }) {
     if (!T.isVersion(r)) throw new TypeError($('Illegal resource type!'))
     const ar: any = r
-    const id = ar.resolvedId = r.useIdAsName || (ar.$fabric || ar.$forge || ar.$optifine || ar.$vanilla) ? r.id
-      : `${r.mcVersion}-${md5(r.id)}-${major(r.version)}`
+    const id = ar.resolvedId = T.resolveVersionId(r)
     const dir = resolve(VERSIONS_PATH, id)
     const old: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[r.id]
     const jsonPath = join(dir, id + '.json')

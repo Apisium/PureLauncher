@@ -13,9 +13,7 @@ export default <R extends T.Resource> (
   pluginsNotInstalled = false
 ) => {
   const p = (async () => {
-    const f = r === 'http://acode.apisium.cn/libraries/version.json'
     if (typeof r === 'string') r = await getJson(r) as R
-    if (f) r.id = 'ACode'
     if (!checker(r)) return
     obj.request = request
     obj.throws = throws

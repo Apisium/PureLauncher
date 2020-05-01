@@ -1,10 +1,12 @@
 import { ipcRenderer, remote } from 'electron'
-import { playNoticeSound } from '../utils/index'
+import { playNoticeSound, getJson } from '../utils/index'
 import * as T from './types'
+import fs from 'fs-extra'
 import install from './install'
 import P from '../models/index'
 import GameStore from '../models/GameStore'
 import requestReload from '../utils/request-reload'
+import { RESOURCES_VERSIONS_INDEX_PATH } from '../constants'
 
 const gameStore = P.getStore(GameStore)
 const currentWindow = remote.getCurrentWindow()
@@ -12,12 +14,23 @@ const currentWindow = remote.getCurrentWindow()
 const mappings = {
   Install: (r: T.ProtocolInstall, request?: boolean) => install(r.resource, request, false),
   async Launch (data: T.ProtocolLaunch) {
+    let { version, resource } = data
+    if (!version && resource) {
+      if (typeof resource === 'string') resource = await getJson(resource) as T.ResourceVersion
+      if (!T.isVersion(resource)) return
+      version = T.resolveVersionId(resource)
+      if (!(version in (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { }))) {
+        if (data.noAutoInstall) return
+        await install(resource)
+      }
+    }
+    if (!version) return
     if (data.secret !== localStorage.getItem('analyticsToken') && !await openConfirmDialog({
       cancelButton: true,
       text: $('Received the request to launch the game. Do you want to launch the game') + ': ' +
-        (data.version || profilesStore.selectedVersion.lastVersionId) + '?'
+        (version || profilesStore.selectedVersion.lastVersionId) + '?'
     })) return
-    gameStore.launch(data.version)
+    await gameStore.launch(version)
   }
 }
 

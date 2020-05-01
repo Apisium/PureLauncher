@@ -1,5 +1,10 @@
 import { ReactElement } from 'react'
+import { md5 } from '../utils/index'
+import { LaunchOption } from '@xmcl/core/index'
 import valid from 'semver/functions/valid'
+import major from 'semver/functions/major'
+
+export type LaunchExtraOptions = Pick<LaunchOption, 'isDemo' | 'server' | 'resolution'>
 
 export type MinecraftApis = Record<string, string>
 export interface Resource <T extends string = string> {
@@ -28,6 +33,7 @@ export interface ResourceVersion extends Resource<'Version'> {
   serverHome?: string
   needRename?: string
   loginType?: string
+  server?: LaunchOption['server']
 }
 export interface ResourceMod extends Resource<'Mod'> {
   version: string
@@ -117,10 +123,10 @@ export interface Protocol <T = any> {
 }
 export interface ProtocolLaunch extends Protocol<'Launch'> {
   version?: string
-  resource?: ResourceVersion
+  resource?: ResourceVersion | string
   secret?: string
-  options?: { ip: string, port?: number }
-  autoInstall?: boolean
+  options?: LaunchExtraOptions
+  noAutoInstall?: boolean
 }
 export interface ProtocolInstall extends Protocol<'Install'> {
   resource: string | AllResources | ResourceVersion | ResourcePlugin
@@ -132,4 +138,10 @@ export interface InstallView {
   request?: boolean
   type?: string
   render?: (...args: any[]) => ReactElement
+}
+
+export const resolveVersionId = (r: ResourceVersion) => {
+  const ar: any = r
+  return r.useIdAsName || (ar.$fabric || ar.$forge || ar.$optifine || ar.$vanilla) ? r.id
+    : `${r.mcVersion}-${md5(r.id).slice(0, 6)}-${major(r.version)}`
 }

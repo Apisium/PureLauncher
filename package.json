@@ -1,7 +1,7 @@
 {
   "name": "pure-launcher",
   "private": true,
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "An awesome Minecraft Launcher.",
   "main": "dist/src/main.js",
   "scripts": {
@@ -47,7 +47,7 @@
   },
   "homepage": "https://github.com/Apisium/PureLauncher#readme",
   "devDependencies": {
-    "@actions/core": "^1.2.3",
+    "@actions/core": "^1.2.4",
     "@actions/github": "^2.1.1",
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
@@ -80,7 +80,7 @@
     "babel-plugin-module-resolver": "^4.0.0",
     "cos-nodejs-sdk-v5": "^2.5.20",
     "del-cli": "^3.0.0",
-    "electron": "^8.2.4",
+    "electron": "^8.2.5",
     "electron-builder": "^22.6.0",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
@@ -98,7 +98,7 @@
     "less": "^3.11.1",
     "locate-java-home": "^1.1.2",
     "lodash": "^4.17.15",
-    "moment": "^2.24.0",
+    "moment": "^2.25.0",
     "p-all": "^3.0.0",
     "parcel-plugin-bundle-visualiser": "^1.2.0",
     "parcel-plugin-replacer": "file:packages/parcel-plugin-replacer",

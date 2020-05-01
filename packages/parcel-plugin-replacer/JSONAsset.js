@@ -5,7 +5,7 @@ global.JSONAsset = module.exports = class JSONAsset extends ParcelJSONAsset {
     if (!this.ast && this.contents.includes('pure-launcher')) {
       try {
         const json = JSON.parse(this.contents)
-        if (json.name === 'pure-launcher' && json.author === 'Shirasawa') {
+        if (json.author && json.name === 'pure-launcher' && json.author.name === 'Shirasawa') {
           return `exports.version='${json.version}'`
         }
       } catch (e) { console.error(e) }

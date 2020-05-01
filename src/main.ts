@@ -79,7 +79,7 @@ const create = () => {
     show: false,
     webPreferences: { webviewTag: true, nodeIntegration: true, nodeIntegrationInWorker: true }
   })
-  window.loadFile('./dist/index.html')
+  window.loadFile(join(__dirname, '../index.html'))
 
   launchingWindow = new BrowserWindow({
     width: 500,
