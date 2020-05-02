@@ -1,12 +1,11 @@
 /* eslint-disable node/no-deprecated-api */
 import { join } from 'path'
 import { exists } from 'fs'
-import { spawn } from 'child_process'
+import { Server } from 'http'
 import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron'
 import minimist from 'minimist'
 import isDev from './utils/isDev'
 import createServer from './createServer'
-import { Server } from 'http'
 
 let server: Server = null
 let window: BrowserWindow = null
@@ -54,20 +53,17 @@ const openLaunchingDialog = () => {
     launchingDialogOpened = true
     launchingWindow.show()
     launchingWindow.webContents.executeJavaScript(`
-      if (!window.img) window.img = document.getElementsByTagName("img")[0]
-      window.img.src = '${webp.replace(/\\/g, '\\\\')}'
-      window.img.style.opacity = '1'
-    `)
+if (!window.img) window.img = document.getElementsByTagName("img")[0]
+window.img.src = '${webp.replace(/\\/g, '\\\\')}'
+window.img.style.opacity = '1'`)
     setTimeout(closeLaunchingDialog, 26000)
   })
 }
 
-let runBeforeQuit: any
 const create = () => {
   ipcMain
     .on('open-launching-dialog', openLaunchingDialog)
     .on('close-launching-dialog', closeLaunchingDialog)
-    .on('run-before-quit', (...args: any[]) => (runBeforeQuit = args))
   window = new BrowserWindow({
     width: 816,
     height: 586,
@@ -117,11 +113,6 @@ if (process.platform === 'linux') app.commandLine.appendSwitch('enable-transpare
 
 app
   .on('ready', process.platform === 'linux' ? () => setTimeout(create, 400) : create)
-  .on('before-quit', () => {
-    server.close()
-    runBeforeQuit && runBeforeQuit.length && spawn.apply(null, runBeforeQuit)
-      .once('error', console.error).unref()
-  })
-  // .on('quit', () => setTimeout(() => app.exit(), 1500))
+  .on('quit', () => server.close())
   .on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
   .on('activate', () => window == null && create())

@@ -12,11 +12,11 @@ import { join } from 'path'
 import { move } from '../utils/fs'
 import { spawn } from 'child_process'
 import { version } from '../../package.json'
-import { remote, ipcRenderer, shell } from 'electron'
+import { shell } from 'electron'
 import { getJson, download, genId } from '../utils/index'
 import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_MODS_INDEX_FILE_NAME, ENTRY_POINT_PATH,
   RESOURCES_VERSIONS_PATH, ASAR_PATH, RESOURCES_RESOURCE_PACKS_INDEX_PATH, RESOURCES_PLUGINS_INDEX,
-  LATEST_URL, TEMP_PATH, DOWNLOAD_ASAR_URL, DOWNLOAD_EXE_URL, IS_WINDOWS } from '../constants'
+  LATEST_URL, TEMP_PATH, DOWNLOAD_ASAR_URL, DOWNLOAD_EXE_URL, IS_WINDOWS, APP_ROOT } from '../constants'
 
 export default async (version: string) => {
   const json: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[version]
@@ -76,12 +76,14 @@ export const updateLauncher = async () => {
       if (P.getStore(GameStore).status === STATUS.READY) {
         notice({ content: $('A new version has been released, PureLauncher will restart in five seconds for installation.') })
         setTimeout(() => {
-          spawn(downloaded, ['--updated'], { detached: true, stdio: 'ignore' }).once('error', console.error).unref()
-          remote.app.exit()
-        }, 5000)
+          spawn(join(APP_ROOT, 'resources/elevate.exe'), [downloaded], { detached: true, stdio: 'ignore' })
+            .once('error', console.error).unref()
+          window.quitApp()
+        }, 10000)
       } else {
         openConfirmDialog({ text: $('A new version has been released, but the game is running now. Please manually exit the launcher and game to upgrade.') })
-        ipcRenderer.send('run-before-quit', downloaded, ['--updated'], { detached: true, stdio: 'ignore' })
+        spawn(join(APP_ROOT, 'resources/elevate.exe'), [downloaded], { detached: true, stdio: 'ignore' })
+          .once('error', console.error).unref()
       }
     } else if (await openConfirmDialog({
       text: $('A new version has been released, but the current system does not support automatic update. Please install the new version manually and click OK to enter the download page.')

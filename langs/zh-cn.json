@@ -76,6 +76,7 @@
   "No Java available!": "找不到可用的 Java!",
   "Failed to install Java!": "安装 Java 失败!",
   "Update failed": "更新失败",
+  "Network disconnected!\nPlease click the Creeper icon above to reload the page.": "网络已断开! 请点击上方苦力怕图标以刷新页面!",
   "A new version has been released, PureLauncher will restart in five seconds for installation.":
     "检测到版本更新, 将在五秒后自动重启以便安装.",
   "A new version has been released, but the game is running now. Please manually exit the launcher and game to upgrade.":
@@ -209,13 +210,12 @@
   "Target Version": "目标版本",
   "Vanilla Minecraft": "原版 Minecraft",
 
-  "$readmeEn": "",
-  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: baleine2000 Fleey",
+  "$readmeEn": "PureLauncher is an open source Minecraft launcher, especially designed for your comfortable use.\n\nBecause it is pure, so it is perfect!\n\nDeveloper: Shirasawa CI010\nSpecial thanks: baleine2000 syj2000 Fleey",
+  "$readme": "PureLauncher 是一款基于 MIT 协议开源的 Minecraft 启动器, 只为您的舒适而精心设计.\n\n因为纯粹 · 所以完美\n\n开发者: Shirasawa CI010\n特别感谢: baleine2000 syj2000 Fleey",
   "Official Website": "官网",
   "Source Code": "源代码",
   "Tencent QQ Group": "QQ群",
   "Telegram Group": "Telegram群组",
-  "Server Provider": "下载服务器提供",
 
   "Zip file": "压缩文件 (zip)",
   "Extracting": "解压文件",

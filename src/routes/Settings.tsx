@@ -117,12 +117,6 @@ const Settings: React.FC = () => {
             role='link'
           >t.me/PureLauncher</a>
         </p>
-        <p>{$('Server Provider')}:&nbsp;
-          <a
-            onClick={() => shell.openExternal('https://www.akkocloud.com/')}
-            role='link'
-          >AkkoCloud</a>
-        </p>
       </div>
     </ShowMore>
   </div>
