@@ -2,7 +2,6 @@ import urlJoin from 'url-join'
 import { HttpDownloader, DownloadOption, Installer } from '@xmcl/installer/index'
 import { NOT_PROXY } from 'reqwq'
 import { Version } from '@xmcl/installer/minecraft'
-import { ResolvedVersion } from '@xmcl/core'
 
 export interface DownloadProvider {
   [NOT_PROXY]: true
@@ -14,9 +13,9 @@ export interface DownloadProvider {
   libraries: string | string[]
   forge: string
   preference?: boolean
-  assetsIndex?: (version: ResolvedVersion) => string | string[]
+  assetsIndex?: (version: import('@xmcl/core').ResolvedVersion) => string | string[]
   json?: (version: Pick<Version, 'url' | 'id'>) => string | string[]
-  client?: (version: ResolvedVersion) => string | string[]
+  client?: (version: import('@xmcl/core').ResolvedVersion) => string | string[]
   optifine?: (mcVersion: string, type: string, version: string) => Promise<string> | string
 }
 

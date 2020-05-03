@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import E from 'electron'
 import { useLocation } from 'react-router-dom'
-import { queryStatus } from '@xmcl/client'
+import { queryStatus } from '@xmcl/client/index'
 
 const style = {
   position: 'absolute' as 'absolute',

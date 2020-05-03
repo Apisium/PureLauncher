@@ -158,7 +158,9 @@
   "replacer": {
     "@['\"]lodash.debounce['\"]": "'lodash/debounce'",
     "require(\"three\")": "require('/packages/minimize-three/index.js')",
-    "[\"']@xmcl\\/([a-z\\d-]+)[\"']": "'@xmcl/$1/index'"
+    "import { parse as parseForge } from \"@xmcl/forge-site-parser\"": "",
+    "return getAndParseIfUpdate(url, parseForge, option.original)": "throw new Error('Unsupported method!')",
+    "@[\"']@xmcl\\/([a-z\\d-]+)[\"']": "'@xmcl/$1/index'"
   },
   "build": {
     "productName": "PureLauncher",

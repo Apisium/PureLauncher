@@ -26,20 +26,26 @@ export default class EventBus {
   public async emitSync (name: string, ...args: any[]) {
     const arr = this.map.get(name)
     if (arr) {
-      for (const fn of arr) {
-        if (fn[ONCE]) this.off(name, fn)
+      for (let i = 0; i < arr.length;) {
+        const fn = arr[i]
+        if (fn[ONCE]) arr.splice(i, 1)
+        else i++
         if (fn[INTERRUPTIBLE]) await fn.apply(null, args)
         else try { await fn.apply(null, args) } catch (e) { console.error(e) }
       }
     }
   }
-  public emit (name: string, ...args: any[]) {
+  public async emit (name: string, ...args: any[]) {
     const arr = this.map.get(name)
     if (!arr) return Promise.resolve()
-    return Promise.all(arr.map(async fn => {
-      if (fn[ONCE]) this.off(name, fn)
-      if (fn[INTERRUPTIBLE]) await fn.apply(null, args)
-      else try { await fn.apply(null, args) } catch (e) { console.error(e) }
-    }))
+    const promises = []
+    for (let i = 0; i < arr.length;) {
+      const fn = arr[i]
+      if (fn[ONCE]) arr.splice(i, 1)
+      else i++
+      if (fn[INTERRUPTIBLE]) promises.push(fn.apply(null, args))
+      else try { promises.push(fn.apply(null, args)?.catch?.(console.error)) } catch (e) { console.error(e) }
+    }
+    await Promise.all(promises)
   }
 }

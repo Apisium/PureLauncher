@@ -4,7 +4,8 @@
     "@babel/plugin-proposal-optional-chaining",
     ["module-resolver", { "alias": {
       "reqwq": "reqwq/dist/esnext/index.js",
-      "skinview3d": "skinview3d/dist/skinview3d.min.js"
+      "skinview3d": "skinview3d/dist/skinview3d.min.js",
+      "^moment$": "moment/moment.js"
     } }]
   ]
 }

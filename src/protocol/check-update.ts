@@ -20,14 +20,15 @@ import { RESOURCES_VERSIONS_INDEX_PATH, RESOURCES_MODS_INDEX_FILE_NAME, ENTRY_PO
 
 export default async (version: string) => {
   const json: T.ResourceVersion = (await fs.readJson(RESOURCES_VERSIONS_INDEX_PATH, { throws: false }) || { })[version]
-  if (json && json.updateUrl) await install(json.updateUrl, false, true, it => T.isVersion(it) && it.id === json.id)
+  if (!navigator.onLine) return json
+  if (json && json.updateUrl) await install(json.updateUrl, false, false, it => T.isVersion(it) && it.id === json.id)
   await Promise.all(Object.values(await fs.readJson(
     join(RESOURCES_VERSIONS_PATH, version, RESOURCES_MODS_INDEX_FILE_NAME),
     { throws: false }) || { }).map((it: any) => it.updateUrl &&
-      install(it.updateUrl, false, true, m => T.isMod(m) && m.id === it.id)).filter(Boolean))
+      install(it.updateUrl, false, false, m => T.isMod(m) && m.id === it.id)).filter(Boolean))
   await Promise.all(Object.values(await fs.readJson(RESOURCES_RESOURCE_PACKS_INDEX_PATH,
     { throws: false }) || { }).map((it: any) => it.updateUrl &&
-      install(it.updateUrl, false, true, m => T.isResource(m) && m.id === it.id)).filter(Boolean))
+      install(it.updateUrl, false, false, m => T.isResource(m) && m.id === it.id)).filter(Boolean))
   return json
 }
 
@@ -44,6 +45,7 @@ export const updatePlugins = async () => {
 
 let downloaded = ''
 export const updateLauncher = async () => {
+  if (__DEV__) return
   const json = await getJson(joinUrl(LATEST_URL))
   if (!gt(json.version, version)) return
   if (major(json.version) === major(version)) {
@@ -73,17 +75,23 @@ export const updateLauncher = async () => {
         enrtyPoint.version = json.version
         await fs.writeJson(ENTRY_POINT_PATH, enrtyPoint)
       }
-      if (P.getStore(GameStore).status === STATUS.READY) {
-        notice({ content: $('A new version has been released, PureLauncher will restart in five seconds for installation.') })
-        setTimeout(() => {
-          spawn(join(APP_ROOT, 'resources/elevate.exe'), [downloaded], { detached: true, stdio: 'ignore' })
+      const elevate = join(APP_ROOT, 'resources/elevate.exe')
+      if (await fs.pathExists(elevate)) {
+        if (P.getStore(GameStore).status === STATUS.READY) {
+          notice({ content: $('A new version has been released, PureLauncher will restart in five seconds for installation.') })
+          setTimeout(() => {
+            spawn(elevate, [downloaded], { detached: true, stdio: 'ignore' })
+              .once('error', console.error).unref()
+            window.quitApp()
+          }, 10000)
+        } else {
+          openConfirmDialog({ text: $('A new version has been released, but the game is running now. Please manually exit the launcher and game to upgrade.') })
+          spawn(elevate, [downloaded], { detached: true, stdio: 'ignore' })
             .once('error', console.error).unref()
-          window.quitApp()
-        }, 10000)
+        }
       } else {
-        openConfirmDialog({ text: $('A new version has been released, but the game is running now. Please manually exit the launcher and game to upgrade.') })
-        spawn(join(APP_ROOT, 'resources/elevate.exe'), [downloaded], { detached: true, stdio: 'ignore' })
-          .once('error', console.error).unref()
+        await openConfirmDialog({ text: $('Please run the installer manually to update PureLauncher!') })
+        shell.showItemInFolder(downloaded)
       }
     } else if (await openConfirmDialog({
       text: $('A new version has been released, but the current system does not support automatic update. Please install the new version manually and click OK to enter the download page.')

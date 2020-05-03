@@ -34,10 +34,13 @@ module.exports = A => class Asset extends A {
     return super.generate()
   }
   parse (code) {
-    code = replace(code)
-    return super.parse(code)
+    if (code.includes('forge-site')) console.log(code)
+    return super.parse(replace(code))
   }
   addDependency (name, opts) {
     if (!noBuilds.has(name)) super.addDependency(name, opts)
+  }
+  load () {
+    return super.load().then(it => typeof it === 'string' ? replace(it) : it)
   }
 }

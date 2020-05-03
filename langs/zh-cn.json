@@ -121,6 +121,7 @@
     "游戏已经成功启动, 但目前游戏已经异常退出. 游戏崩溃并不是 PureLauncher 的问题, 而可能是由于模组不兼容所导致, 因此请不要将此日志报告给 PureLauncher!",
   "The .minecraft folder has been dragged in. Do you need to import all versions, resource packages, mods and other files?":
     "检测到 .minecraft 文件夹被拖入, 请问是否需要导入全部的版本, 资源包和模组等数据?",
+  "Please run the installer manually to update PureLauncher!": "请手动运行安装文件以更新 PureLauncher 版本!",
 
   "<auto>": "<自动>",
   "JAVA EXECUTABLE": "Java 路径",

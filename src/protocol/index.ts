@@ -85,10 +85,8 @@ ipcRenderer.on('pure-launcher-protocol', (_, args: any, argv: any) => {
   } else if (t === 'object' && !Array.isArray(t)) handleMessage(args)
 })
 
-const rs = JSON.parse(localStorage.getItem(INTERRUPTED_MESSAGE) || '[]')
-localStorage.removeItem(INTERRUPTED_MESSAGE)
-if (rs.length) {
-  pluginMaster.once('loaded', async () => {
-    for (const r of rs) await handleMessage(r)
-  })
-}
+pluginMaster.once('loaded', () => {
+  const rs = JSON.parse(localStorage.getItem(INTERRUPTED_MESSAGE) || '[]')
+  localStorage.removeItem(INTERRUPTED_MESSAGE)
+  if (rs.length) (async () => { for (const r of rs) await handleMessage(r) })().catch(console.error)
+})
