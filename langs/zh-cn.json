@@ -85,10 +85,14 @@
     "检测到版本更新, 但当前系统不支持自动更新, 请手动更新版本, 点击确认以进入下载地址.",
   "The version of Java you selected is {0}, which may cause the game to fail to be launched. Java 8 (1.8.0) is recommended.":
     "你选择的 Java 版本为 {0}, 可能会导致游戏无法启动, 建议使用 Java 8 (1.8.0).",
-  "The Java you selected is 64-bit, but the system supports 32-bit, which will cause the game to fail to be launched.":
+  "The Java you selected is 64-bit, but the system only supports 32-bit, which will cause the game to fail to be launched.":
     "你当前选择的 Java 为 64 位, 而系统只支持 32 位的 Java, 会导致无法启动游戏.",
   "The Java you selected is 32-bit, but the system supports 64-bit, which will not be able to take full advantage of computer performance.":
-    "你当前选择的 Java 为 32 位, 而系统只支持 64 位的 Java, 这样会导致无法充分利用计算机的性能.",
+    "你当前选择的 Java 为 32 位, 而系统支持 64 位的 Java, 这样会导致无法充分利用计算机的性能.",
+  "Do you need to reset the field and let the launcher automatically select the appropriate Java?":
+    "请问您是否需要清除当前配置项并让启动器自动选择合适的 Java?",
+  "After importing, you still need to add the game version manually. Click OK to add.":
+    "导入完成后仍需手动添加游戏版本, 点击确认以快速添加.",
   "If you want to ignore the warning, please click the ok button.": "忽略警告请点击下方的确认按钮.",
   "Please provide a name for the resource to be exported:": "请给要导出的资源提供一个名字:",
   "Unable to find the Java, do you want to install Java automatically?":

@@ -158,9 +158,19 @@ export default class ProfilesStore extends Store {
         { name: $('Executable File (Javaw)'), extensions: IS_WINDOWS ? ['exe'] : [''] }
       ]
     })
-    if (ret.canceled) return
+    if (ret.canceled) {
+      if (this.extraJson.javaPath && await openConfirmDialog({
+        cancelButton: true,
+        text: $('Do you need to reset the field and let the launcher automatically select the appropriate Java?')
+      })) {
+        this.extraJson.javaPath = ''
+        notice({ content: $('Success!') })
+      }
+      return
+    }
+    notice({ content: $('Loading...') })
     const file = ret.filePaths[0]
-    const version = await getJavaVersion(file)
+    const version = await getJavaVersion(file, true)
     if (version) {
       if (!await vertifyJava(version, true)) return
       this.extraJson.javaPath = file
@@ -168,6 +178,7 @@ export default class ProfilesStore extends Store {
       const arches = JSON.parse(localStorage.getItem('javaArches') || '{}')
       arches[file] = version[1]
       localStorage.setItem('javaArches', JSON.stringify(arches))
+      notice({ content: $('Success!') })
     } else notice({ content: $('Incorrect java version!'), error: true })
   }
 

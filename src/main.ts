@@ -103,7 +103,7 @@ const create = () => {
       const url1 = new URL(window.webContents.getURL())
       if (url.origin !== url1.origin || url.pathname !== url1.pathname) e.preventDefault()
     })
-  if (isDev) window.webContents.openDevTools()
+  if (isDev) window.webContents.openDevTools({ mode: 'detach' })
   parseArgs(process.argv)
 
   server = createServer(window)

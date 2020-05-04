@@ -175,8 +175,12 @@ const VersionAdd: React.FC<{ open: boolean, onClose: () => void }> = p => {
 
 const Versions: React.FC = () => {
   const [json, setJson] = useState<Record<string, ResourceVersion>>()
-  useEffect(() => void fs.readJson(RESOURCES_VERSIONS_INDEX_PATH).catch(() => ({})).then(setJson), [])
+  useEffect(() => {
+    fs.readJson(RESOURCES_VERSIONS_INDEX_PATH).catch(() => ({})).then(setJson)
+    return () => ((window as any).__setVersionAddDialogOpen = null)
+  }, [])
   const [open, setOpen] = useState(false)
+  ;(window as any).__setVersionAddDialogOpen = setOpen
   const [currentVersion, setCurrentVersion] = useState('')
   const pm = useStore(ProfilesStore)
   const noTitle = $('No Title')

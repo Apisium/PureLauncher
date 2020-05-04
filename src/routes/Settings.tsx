@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import './settings.css'
 import React from 'react'
 import Switch from '../components/Switch'
@@ -6,10 +7,12 @@ import ProfilesStore from '../models/ProfilesStore'
 import DownloadProviders from '../plugin/DownloadProviders'
 import { langs } from '../i18n'
 import { useStore } from 'reqwq'
-import { shell } from 'electron'
+import { shell, remote } from 'electron'
 import { version } from '../../package.json'
 import { DEFAULT_LOCATE } from '../constants'
 
+let i = 0
+let timer: NodeJS.Timeout
 const Settings: React.FC = () => {
   const pm = useStore(ProfilesStore)
   const recommend = ` (${$('Recommend')})`
@@ -92,7 +95,17 @@ const Settings: React.FC = () => {
     <ShowMore>
       <div style={{ textAlign: 'center' }}>
         <p style={{ whiteSpace: 'pre-line' }}>{$('$readme')}</p>
-        <p>{$('Version')}: {version}</p>
+        <p
+          onClick={() => {
+            i++
+            if (!timer) {
+              timer = setTimeout(() => {
+                if (i > 4) remote.getCurrentWebContents().openDevTools({ mode: 'detach' })
+                i = 0
+                timer = null
+              }, 1000)
+            }
+          }}>{$('Version')}: {version}</p>
         <p>{$('Official Website')}:&nbsp;
           <a
             onClick={() => shell.openExternal('https://p.apisium.cn')}

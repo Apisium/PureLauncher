@@ -153,7 +153,11 @@ export default class GameStore extends Store {
         }
         this.status = STATUS.READY
         this.process = null
-      }).once('error', reject)
+      }).once('error', e => {
+        this.status = STATUS.READY
+        this.process = null
+        reject(e)
+      })
       this.process.stdout
         .once('data', () => resolve())
         .on('data', data => data.includes('OpenAL initialized.') && ipcRenderer.send('close-launching-dialog'))

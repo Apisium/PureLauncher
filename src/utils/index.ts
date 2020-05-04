@@ -13,7 +13,7 @@ import { ZipFile } from 'yazl'
 import { version } from '../../package.json'
 import { join, resolve, extname, basename } from 'path'
 import { createHash, BinaryLike } from 'crypto'
-import { exec, spawn } from 'child_process'
+import { exec, spawn, execFile } from 'child_process'
 import { Profile } from '../plugin/Authenticator'
 import { Readable } from 'stream'
 import { extractTaskFunction } from '@xmcl/unzip/task/index'
@@ -26,9 +26,10 @@ import { genUUIDOrigin } from './analytics'
 
 export { genUUIDOrigin }
 
-export const getJavaVersion = (path: string) => new Promise<[string, boolean] | undefined>(resolve =>
-  exec(`${path} -version`, (_, sout, serr) => {
-    const output = sout + serr
+export const getJavaVersion = (path: string, file = false) => new Promise<[string, boolean] | undefined>(resolve => {
+  const cb = (_, sout, serr) => {
+    const output = '' + sout + serr
+    console.log()
     if (output) {
       const version = /\d+\.\d+\.\d+/.exec(output)
       if (version) {
@@ -37,7 +38,10 @@ export const getJavaVersion = (path: string) => new Promise<[string, boolean] | 
       }
     }
     resolve()
-  }))
+  }
+  if (file) execFile(path, ['-version'], cb)
+  else exec(`${path} -version`, cb)
+})
 
 export const cacheSkin = (p: Profile) => fetch(p.skinUrl)
   .then(it => it.arrayBuffer())
@@ -238,18 +242,18 @@ export const getSuitableMemory = (isX64: boolean) => {
 }
 
 export const vertifyJava = async (version: [string, boolean], dialog = false) => {
-  if (!version[0].startsWith('1.8') && (!dialog || !await openConfirmDialog({
+  if (parseInt(version[0].split('.')[1] || '7') < 8 && (!dialog || !await openConfirmDialog({
     ignore: true,
     cancelButton: true,
     text: $('The version of Java you selected is {0}, which may cause the game to fail to be launched. Java 8 (1.8.0) is recommended.', version[0])
   }))) return false
   const x64 = isX64()
-  if ((version[1] && !x64) || (!dialog || !openConfirmDialog({
+  if ((version[1] && !x64) && (!dialog || !await openConfirmDialog({
     ignore: true,
     cancelButton: true,
-    text: $('The Java you selected is 64-bit, but the system supports 32-bit, which will cause the game to fail to be launched.')
+    text: $('The Java you selected is 64-bit, but the system only supports 32-bit, which will cause the game to fail to be launched.')
   }))) return false
-  if ((!version[1] && x64) || (!dialog || !openConfirmDialog({
+  if ((!version[1] && x64) && (!dialog || !await openConfirmDialog({
     ignore: true,
     cancelButton: true,
     text: $('The Java you selected is 32-bit, but the system supports 64-bit, which will not be able to take full advantage of computer performance.')

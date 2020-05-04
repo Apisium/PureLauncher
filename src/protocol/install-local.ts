@@ -7,6 +7,7 @@ import * as T from './types'
 import fs from 'fs-extra'
 import install from './install'
 import versionSelector from '../components/VersionSelector'
+import history from '../utils/history'
 
 const installResource = async (zip: CachedZipFile, dir: string, json: any, entry: Entry, name: string) => {
   if (!entry || !json.hash || !name || name.includes('/') || name.includes('\\')) {
@@ -180,6 +181,13 @@ pluginMaster.on('fileDragIn', async (file: File) => {
   try {
     await fs.copy(path, GAME_ROOT, { overwrite: false })
     notice({ content: $('Success!') })
+    if ((await fs.readdir(join(path, 'versions')).catch(() => null))?.length && await openConfirmDialog({
+      cancelButton: true,
+      text: $('After importing, you still need to add the game version manually. Click OK to add.')
+    })) {
+      history.push('/manager/versions')
+      setTimeout(() => (window as any).__setVersionAddDialogOpen?.(), 300)
+    }
   } catch (e) {
     console.error(e)
     notice({ content: e ? e.message : $('Failed!'), error: true })
