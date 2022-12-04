@@ -15,7 +15,7 @@ An awesome Minecraft Launcher.
 
 ## Snapshots
 
-![Home](./screenshots/home.jpg)
+![Home](./screenshots/home.png)
 
 ![Accounts](./screenshots/accounts.png)
 
@@ -74,11 +74,6 @@ npm run run
 
 - Shirasawa
 - CI010
-
-## Thanks
-
-- Baleine2000
-- Fleey
 
 ## License
 
